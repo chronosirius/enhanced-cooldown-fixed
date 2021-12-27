@@ -27,7 +27,7 @@ The new component callbacks are modified so you can enable checking if the `cust
 ## How to use:
 In your bot, you must use this line:
 ```py
-from better_components import setup
+from interactions.ext.better_components import setup
 ...
 bot = interactions.Client(...)
 setup(bot)
