@@ -35,7 +35,7 @@ setup(bot)
 
 Then, you can use the decorator!
 
-If you want to use `interactions-wait-for` with this extension, you must add `use_wait_for=True` to the function.
+If you want to use `interactions-wait-for` with this extension, you must add its respective keyword arguments into the setup function as well.
 
 Below is an example of a component callback.
 ```py
