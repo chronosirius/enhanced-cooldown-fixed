@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="better-components",
+    name="interactions-better-components",
     version="1.0.0",
     description="Better components for discord-py-interactions",
     long_description=long_description,
