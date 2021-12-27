@@ -1,7 +1,8 @@
+from typing import Union, Callable, Optional, Any, Coroutine
+import types
+
 import interactions
 from interactions.ext import wait_for
-import types
-from typing import Any, Callable, Coroutine, Optional, Union
 
 
 class ExtendedWebSocket(interactions.api.gateway.WebSocket):
@@ -14,6 +15,7 @@ class ExtendedWebSocket(interactions.api.gateway.WebSocket):
 
             context: interactions.ComponentContext = self.contextualize(data)
 
+            # startswith component callbacks
             if context.data.custom_id:
                 for event in self.dispatch.events:
                     try:
@@ -24,7 +26,6 @@ class ExtendedWebSocket(interactions.api.gateway.WebSocket):
                         event.replace("component_startswith_", "")
                     ):
                         self.dispatch.dispatch(event, context)
-                        return
 
 
 interactions.api.gateway.WebSocket = ExtendedWebSocket
@@ -77,10 +78,26 @@ def component(
     return decorator
 
 
+def _replace_values(old, new):
+    """Change all values on new to the values on old. Useful if neither object has __dict__"""
+    for item in dir(old):  # can't use __dict__, this should take everything
+        value = getattr(old, item)
+
+        if hasattr(value, "__call__") or isinstance(value, property):
+            # Don't need to get callables or properties, that would un-overwrite things
+            continue
+
+        try:
+            new.__setattr__(item, value)
+        except AttributeError:
+            pass
+
+
 def setup(
     bot: interactions.Client,
     modify_component_callbacks: bool = True,
-    use_wait_for: bool = False,
+    add_method: bool = False,
+    add_interaction_events: bool = False,
 ) -> None:
     """
     Apply hooks to a bot to add additional features
@@ -89,7 +106,8 @@ def setup(
 
     :param Client bot: The bot instance or class to apply hooks to
     :param bool modify_component_callbacks: Whether to modify the component callbacks
-    :param bool use_wait_for: Whether to use `interactions-wait-for`
+    :param bool add_method: If ``wait_for`` should be attached to the bot
+    :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
     """
 
     if not isinstance(bot, interactions.Client):
@@ -97,5 +115,17 @@ def setup(
 
     if modify_component_callbacks:
         bot.component = types.MethodType(component, bot)
-    if use_wait_for:
-        wait_for.setup(bot, add_method=True)
+
+        old_websocket = bot.websocket
+        new_websocket = ExtendedWebSocket(
+            old_websocket.intents, old_websocket.session_id, old_websocket.sequence
+        )
+
+        _replace_values(old_websocket, new_websocket)
+
+        bot.websocket = new_websocket
+
+    if add_method or add_interaction_events:
+        wait_for.setup(
+            bot, add_method=add_method, add_interaction_events=add_interaction_events
+        )
