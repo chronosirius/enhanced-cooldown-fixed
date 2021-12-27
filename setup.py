@@ -13,7 +13,7 @@ setup(
     author="Toricane",
     author_email="prjwl028@gmail.com",
     license="MIT",
-    packages=["better_components"],
+    packages=["interactions.ext.better_components"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
