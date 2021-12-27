@@ -9,7 +9,7 @@ setup(
     description="Better components for discord-py-interactions",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Toricane/better-components",
+    url="https://github.com/Toricane/interactions-better-components",
     author="Toricane",
     author_email="prjwl028@gmail.com",
     license="MIT",
