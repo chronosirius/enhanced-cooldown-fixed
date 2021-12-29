@@ -4,6 +4,8 @@ import types
 import interactions
 from interactions.ext import wait_for
 
+from .context_menu import message_menu, user_menu
+
 
 class ExtendedWebSocket(interactions.api.gateway.WebSocket):
     def handle_dispatch(self, event: str, data: dict) -> None:
@@ -96,6 +98,7 @@ def _replace_values(old, new):
 def setup(
     bot: interactions.Client,
     modify_component_callbacks: bool = True,
+    add_context_menu: bool = True,
     add_method: bool = False,
     add_interaction_events: bool = False,
 ) -> None:
@@ -124,6 +127,10 @@ def setup(
         _replace_values(old_websocket, new_websocket)
 
         bot.websocket = new_websocket
+
+    if add_context_menu:
+        bot.message_menu = types.MethodType(message_menu, bot)
+        bot.user_menu = types.MethodType(user_menu, bot)
 
     if add_method or add_interaction_events:
         wait_for.setup(
