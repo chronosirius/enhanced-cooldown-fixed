@@ -5,6 +5,7 @@ import interactions
 from interactions.ext import wait_for
 
 from .context_menu import message_menu, user_menu
+from .subcomand import subcommand
 
 
 class ExtendedWebSocket(interactions.api.gateway.WebSocket):
@@ -99,6 +100,7 @@ def setup(
     bot: interactions.Client,
     modify_component_callbacks: bool = True,
     add_context_menu: bool = True,
+    add_subcommand: bool = True,
     add_method: bool = False,
     add_interaction_events: bool = False,
 ) -> None:
@@ -131,6 +133,9 @@ def setup(
     if add_context_menu:
         bot.message_menu = types.MethodType(message_menu, bot)
         bot.user_menu = types.MethodType(user_menu, bot)
+
+    if add_subcommand:
+        bot.subcommand = types.MethodType(subcommand, bot)
 
     if add_method or add_interaction_events:
         wait_for.setup(
