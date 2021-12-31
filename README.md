@@ -17,7 +17,9 @@ This is `better-interactions`, a library for `discord-py-interactions` which mod
 Listed below are all the features this library currently has:
 - Component callbacks are modified so you can enable checking if the `custom_id` of the component starts with the one provided in the decorator
 - `ActionRow` function which enables usage of `ActionRow(...)`
+- Component functions for `Button` and `SelectMenu` that has checks so you never have to incorrectly use `Button(...)` or `SelectMenu(...)`
 - `spread_to_rows` function which allows components to be spread to multiple `ActionRow`s
+- `subcommand` decorator which allows you to create subcommands
 
 ---------------------
 
@@ -82,6 +84,31 @@ async def test(ctx):
 
 ## Why should I use this?
 This is only for aesthetics, making the code look cleaner. Using `ActionRow(...)` is the same as using `ActionRow(components=[...])`, however, it is more readable.
+
+---------------------
+
+# Button and SelectMenu
+The `Button` and `SelectMenu` functions are made so you never have to incorrectly use `Button(...)` or `SelectMenu(...)`.
+
+## How to use:
+Below is an example of `Button` usage:
+```py
+from interactions.ext.better_interactions import Button
+
+@bot.command(
+    name="test", description="Test command",
+)
+async def test(ctx):
+    await ctx.send("test", components=[
+        Button(
+            style=1,
+            custom_id="test1",
+            label="Test 1",
+        ),
+    ]
+)
+```
+You can import `Button` and `SelectMenu` from `better_interactions` and use them like you would use `Button(...)` and `SelectMenu(...)` from `discord-py-interactions`.
 
 ---------------------
 
