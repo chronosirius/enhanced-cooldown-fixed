@@ -10,6 +10,7 @@ from .subcomand import subcommand
 class ExtendedWebSocket(interactions.api.gateway.WebSocket):
     def handle_dispatch(self, event: str, data: dict) -> None:
         super().handle_dispatch(event, data)
+        print(f"{event=}")
 
         if event == "INTERACTION_CREATE":
             if "type" not in data:
