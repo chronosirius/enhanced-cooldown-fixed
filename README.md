@@ -153,7 +153,7 @@ setup(bot)
     name="subcommand",
     description="subcommand description",
 )
-async def subcommand_with_group(ctx, subcommand_group, subcommand): # last 2 arguments are required to avoid any errors, must have same name as the ones in the decorator
+async def subcommand_with_group(ctx):
     await ctx.send("subcommand with group")
 
 # subcommand with 2 terms: `/base subcommand`
@@ -162,7 +162,7 @@ async def subcommand_with_group(ctx, subcommand_group, subcommand): # last 2 arg
     name="subcommand",
     description="subcommand description",
 )
-async def just_subcommand(ctx, subcommand): # last argument is required to avoid any errors, must have same name as the one in the decorator
+async def just_subcommand(ctx):
     await ctx.send("just subcommand")
 
 # subcommand with options:
@@ -178,6 +178,6 @@ async def just_subcommand(ctx, subcommand): # last argument is required to avoid
         ),
     ]
 )
-async def subcommand_with_options(ctx, option, *, subcommand_group, subcommand): # last 2 arguments are required to avoid any errors, must have same name as the ones in the decorator, '*' also required
+async def subcommand_with_options(ctx, option):
     await ctx.send("subcommand with options")
 ```
