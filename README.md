@@ -1,17 +1,17 @@
-# interactions-better-components
-[![Discord](https://img.shields.io/discord/924871439776108544?color=blue&label=discord&style=for-the-badge)](https://discord.gg/Y78bpT5aNv) [![PyPI - Downloads](https://img.shields.io/pypi/dm/interactions-better-components?color=blue&style=for-the-badge)](https://pypi.org/project/interactions-better-components/)
+# better-interactions
+[![Discord](https://img.shields.io/discord/924871439776108544?color=blue&label=discord&style=for-the-badge)](https://discord.gg/Y78bpT5aNv) [![PyPI - Downloads](https://img.shields.io/pypi/dm/interactions-better-components?color=blue&style=for-the-badge)](https://pypi.org/project/better-interactions/)
 
-Better components for discord-py-interactions
+Better interactions for discord-py-interactions
 
 ## Installation:
 ```
-pip install -U interactions-better-components
+pip install -U better-interactions
 ```
 
 ---------------------
 
 ## What is this library?
-This is `interactions-better-components`, a library for `discord-py-interactions` which modifies component callbacks, and adds useful helper functions.
+This is `better-interactions`, a library for `discord-py-interactions` which modifies component callbacks, and adds useful helper functions.
 
 ## What does this have?
 Listed below are all the features this library currently has:
@@ -27,7 +27,7 @@ The new component callbacks are modified so you can enable checking if the `cust
 ## How to use:
 In your bot, you must use this line:
 ```py
-from interactions.ext.better_components import setup
+from interactions.ext.better_interactions import setup
 ...
 bot = interactions.Client(...)
 setup(bot)
@@ -105,4 +105,52 @@ async def test(ctx):
         button1, button2, button3, button4, button5, button6, button7, button8, button9, button10,
     )
 )
+```
+
+---------------------
+
+# subcommand
+The `subcommand` function is a decorator that allows you to create a subcommand easily.
+
+## How to use:
+Here's 3 examples of subcommand usage:
+```py
+from interactions.ext.better_interactions import setup
+...
+setup(bot)
+...
+# subcommand with 3 terms: `/base subcommand_group subcommand`
+@bot.subcommand(
+    base="base",
+    subcommand_group="subcommand_group",
+    name="subcommand",
+    description="subcommand description",
+)
+async def subcommand_with_group(ctx, subcommand_group, subcommand): # last 2 arguments are required to avoid any errors, must have same name as the ones in the decorator
+    await ctx.send("subcommand with group")
+
+# subcommand with 2 terms: `/base subcommand`
+@bot.subcommand(
+    base="base",
+    name="subcommand",
+    description="subcommand description",
+)
+async def just_subcommand(ctx, subcommand): # last argument is required to avoid any errors, must have same name as the one in the decorator
+    await ctx.send("just subcommand")
+
+# subcommand with options:
+@bot.subcommand(
+    base="base",
+    subcommand_group="subcommand_group",
+    name="subcommand",
+    description="subcommand description",
+    options=[
+        Option(
+            name="option",
+            description="option description",
+        ),
+    ]
+)
+async def subcommand_with_options(ctx, option, *, subcommand_group, subcommand): # last 2 arguments are required to avoid any errors, must have same name as the ones in the decorator, '*' also required
+    await ctx.send("subcommand with options")
 ```
