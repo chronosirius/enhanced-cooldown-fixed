@@ -114,6 +114,9 @@ def subcommand(
                 for command in commands
             ]
 
-        return self.event(coro, name=f"command_{base}")
+        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
+            return await coro(ctx, *args, **kwargs)
+
+        return self.event(inner, name=f"command_{base}")
 
     return decorator
