@@ -62,11 +62,22 @@ def subcommand(
                 11, message="Your command must have a base and name."
             )
 
-        if len(coro.__code__.co_varnames) < (3 if subcommand_group else 2):
+        if not description:
+            raise InteractionException(
+                11, message="Chat-input commands must have a description."
+            )
+
+        if not len(coro.__code__.co_varnames):
             raise InteractionException(
                 11,
-                message="Your command needs at least two arguments to return context *and* subcommand. if using subcommand_group, then a total of three are required.",
+                message="Your command needs at least one argument to return context.",
             )
+        if options:
+            if (len(coro.__code__.co_varnames) + 1) < len(options):
+                raise InteractionException(
+                    11,
+                    message="You must have the same amount of arguments as the options of the command.",
+                )
 
         if subcommand_group:
             commands: List[ApplicationCommand] = command(
