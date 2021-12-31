@@ -4,16 +4,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="interactions-better-components",
+    name="better-interactions",
     version="1.3.0",
     description="Better components for discord-py-interactions",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Toricane/interactions-better-components",
+    url="https://github.com/Toricane/better-interactions",
     author="Toricane",
     author_email="prjwl028@gmail.com",
     license="MIT",
-    packages=["interactions.ext.better_components"],
+    packages=["interactions.ext.better_interactions"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
