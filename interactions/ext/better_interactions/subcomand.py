@@ -114,6 +114,6 @@ def subcommand(
                 for command in commands
             ]
 
-        return self.event(coro, name=f"command_{name}")
+        return self.event(coro, name=f"command_{base}")
 
     return decorator
