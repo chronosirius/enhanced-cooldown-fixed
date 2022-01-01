@@ -126,12 +126,10 @@ def subcommand(
             ]
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
-            print(f"{sub_command_group=} {sub_command=}")
+            print(f"got {sub_command=}, expecting {name=}")
             if sub_command_group == sub_command_group and sub_command == name:
                 return await coro(ctx, *args, **kwargs)
-            else:
-                print(f"got {sub_command=} expecting {name=}")
 
-        return self.event(inner, name=f"command_{coro.__name__}")
+        return self.event(inner, name=f"command_{base}")
 
     return decorator
