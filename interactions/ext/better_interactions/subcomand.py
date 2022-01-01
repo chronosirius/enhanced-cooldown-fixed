@@ -130,7 +130,7 @@ def subcommand(
             if sub_command_group == sub_command_group and sub_command == name:
                 return await coro(ctx, *args, **kwargs)
             else:
-                print(f"expecting {name=}")
+                print(f"got {sub_command=} expecting {name=}")
 
         return self.event(inner, name=f"command_{base}")
 
