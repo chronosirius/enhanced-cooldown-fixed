@@ -118,15 +118,15 @@ def subcommand(
                 ],
                 default_permission=default_permission,
             )
-
-        if self.automate_sync:
+        if self.websocket.dispatch.events.get(f"command_{base}"):
+            print(self.websocket.dispatch.events.get(f"command_{base}"))
+        elif self.automate_sync:
             [
                 self.loop.run_until_complete(self.synchronize(command))
                 for command in commands
             ]
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
-            print(f"got {sub_command=}, expecting {name=}")
             if sub_command_group == sub_command_group and sub_command == name:
                 return await coro(ctx, *args, **kwargs)
 
