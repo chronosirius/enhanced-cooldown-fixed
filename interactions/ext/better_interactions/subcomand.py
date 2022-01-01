@@ -8,6 +8,8 @@ from interactions import (
     OptionType,
 )
 from interactions.decor import command
+from interactions.api.error import JSONException
+from interactions.api.cache import Item as Build
 
 
 def subcommand(
@@ -120,10 +122,23 @@ def subcommand(
             )
 
         if self.automate_sync:
-            [
-                self.loop.run_until_complete(self.synchronize(command))
-                for command in commands
-            ]
+
+            async def create(data: ApplicationCommand) -> None:
+                """
+                Creates a new application command in the API if one does not exist for it.
+                :param data: The data of the command to create.
+                :type data: ApplicationCommand
+                """
+                request = await self.http.create_application_command(
+                    application_id=self.me.id, data=data._json, guild_id=data.guild_id
+                )
+
+                if request.get("code"):
+                    raise JSONException(request["code"])
+                else:
+                    self.http.cache.interactions.add(Build(id=data.name, value=data))
+
+            [self.loop.run_until_complete(create(command)) for command in commands]
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
             print(f"got {sub_command=}, expecting {name=}")
