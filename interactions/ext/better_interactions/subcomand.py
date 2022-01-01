@@ -126,7 +126,8 @@ def subcommand(
             ]
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
-            return await coro(ctx, *args, **kwargs)
+            if sub_command_group == sub_command_group and sub_command == name:
+                return await coro(ctx, *args, **kwargs)
 
         return self.event(inner, name=f"command_{base}")
 
