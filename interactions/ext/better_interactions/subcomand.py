@@ -132,6 +132,6 @@ def subcommand(
             else:
                 print(f"got {sub_command=} expecting {name=}")
 
-        return self.event(inner, name=f"command_{base}")
+        return self.event(inner, name=f"command_{coro.__name__}")
 
     return decorator
