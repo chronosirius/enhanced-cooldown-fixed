@@ -248,5 +248,5 @@ class SubCommand:
         return self.event(inner, name=f"command_{base}")
 
 
-def base(base: str):
+def base(self, base: str):
     return SubCommand(base)
