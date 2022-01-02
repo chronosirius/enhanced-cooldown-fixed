@@ -144,10 +144,11 @@ class SubCommand:
     def __init__(self, base: str):
         self.base = base
         self.group_names: Dict[str, dict] = {}
+        self.description: str = None
 
         self.scope = None
         self.default_permission = None
-        self.coro = None
+        self.coros = {}
 
     def subcommand(
         self,
@@ -195,10 +196,12 @@ class SubCommand:
             try_except("names", name)
             try_except("descriptions", description)
             try_except("options", options)
+            coro.__origin__ = f"{self.base}_{group}_{name}"
 
+            self.description = description
             self.scope = scope
             self.default_permission = default_permission
-            self.coro = coro
+            self.coros[f"{self.base}_{group}_{name}"] = coro
 
             return coro
 
@@ -272,8 +275,11 @@ class SubCommand:
             ]
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
-            if sub_command_group == sub_command_group and sub_command == self.name:
-                return await self.coro(ctx, *args, **kwargs)
+            try:
+                origin = f"{self.base}_{sub_command_group}_{sub_command}"
+                return await self.coros[origin](ctx, *args, **kwargs)
+            except Exception:
+                raise
 
         return client.event(inner, name=f"command_{self.base}")
 
