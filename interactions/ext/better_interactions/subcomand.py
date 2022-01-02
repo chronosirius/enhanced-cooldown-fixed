@@ -142,14 +142,13 @@ def subcommand(
 class SubCommand:
     def __init__(self, base: str):
         self.base = base
-        self.group = None
-        self.name = None
+        self.groups = []
+        self.names = []
+        self.descriptions = []
+        self.options = []
 
-        self.description = None
         self.scope = None
         self.default_permission = None
-        self.options = None
-
         self.coro = None
 
     def subcommand(
@@ -184,12 +183,13 @@ class SubCommand:
                         11,
                         message="You must have the same amount of arguments as the options of the command.",
                     )
-            self.group = group
-            self.name = name
-            self.description = description
+            self.groups.append(group)
+            self.names.append(name)
+            self.descriptions.append(description)
+            self.options.append(options)
+
             self.scope = scope
             self.default_permission = default_permission
-            self.options = options
             self.coro = coro
 
             return coro
@@ -197,45 +197,43 @@ class SubCommand:
         return decorator
 
     def finish(self, client: Client):
-        if self.group:
-            commands: List[ApplicationCommand] = command(
-                type=ApplicationCommandType.CHAT_INPUT,
-                name=self.base,
-                description=self.description,
-                scope=self.scope,
-                options=[
+        options: List[Option] = []
+        for group, name, description, option in zip(
+            self.groups, self.names, self.descriptions, self.options
+        ):
+            if group:
+                options.append(
                     Option(
                         type=OptionType.SUB_COMMAND_GROUP,
-                        name=self.group,
-                        description=self.description,
+                        name=group,
+                        description=description,
                         options=[
                             Option(
                                 type=OptionType.SUB_COMMAND,
-                                name=self.name,
-                                description=self.description,
-                                options=self.options,
+                                name=name,
+                                description=description,
+                                options=option,
                             )
                         ],
                     )
-                ],
-                default_permission=self.default_permission,
-            )
-        else:
-            commands: List[ApplicationCommand] = command(
-                type=ApplicationCommandType.CHAT_INPUT,
-                name=self.base,
-                description=self.description,
-                scope=self.scope,
-                options=[
+                )
+            else:
+                options.append(
                     Option(
                         type=OptionType.SUB_COMMAND,
-                        name=self.name,
-                        description=self.description,
-                        options=self.options,
+                        name=name,
+                        description=description,
+                        options=option,
                     )
-                ],
-                default_permission=self.default_permission,
-            )
+                )
+        commands: List[ApplicationCommand] = command(
+            type=ApplicationCommandType.CHAT_INPUT,
+            name=self.base,
+            description=self.descriptions[0],
+            scope=self.scope,
+            options=options,
+            default_permission=self.default_permission,
+        )
         if client.automate_sync:
             [
                 client.loop.run_until_complete(client.synchronize(command))
