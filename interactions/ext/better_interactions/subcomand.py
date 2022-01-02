@@ -143,10 +143,7 @@ def subcommand(
 class SubCommand:
     def __init__(self, base: str):
         self.base = base
-        self.groups = []
-        self.names = []
-        self.descriptions = []
-        self.options = []
+        self.group_names: Dict[str, dict] = {}
 
         self.scope = None
         self.default_permission = None
@@ -184,10 +181,20 @@ class SubCommand:
                         11,
                         message="You must have the same amount of arguments as the options of the command.",
                     )
-            self.groups.append(group)
-            self.names.append(name)
-            self.descriptions.append(description)
-            self.options.append(options)
+            try:
+                self.group_names[group] = {}
+            except:
+                pass
+
+            def try_except(key, value):
+                try:
+                    self.group_names[group][key].append(value)
+                except KeyError:
+                    self.group_names[group][key] = [value]
+
+            try_except("names", name)
+            try_except("descriptions", description)
+            try_except("options", options)
 
             self.scope = scope
             self.default_permission = default_permission
@@ -199,41 +206,62 @@ class SubCommand:
 
     @logger.catch
     def finish(self, client: Client):
-        options: List[Option] = []
-        for group, name, description, option in zip(
-            self.groups, self.names, self.descriptions, self.options
-        ):
-            if group:
-                options.append(
+        all_options: List[Option] = []
+        for group in self.group_names:
+            group_options = []
+            _names = self.group_names[group]["names"]
+            _descriptions = self.group_names[group]["descriptions"]
+            _options = self.group_names[group]["options"]
+            for n, d, o in zip(_names, _descriptions, _options):
+                group_options.append(
                     Option(
-                        type=OptionType.SUB_COMMAND_GROUP,
-                        name=group,
-                        description=description,
-                        options=[
-                            Option(
-                                type=OptionType.SUB_COMMAND,
-                                name=name,
-                                description=description,
-                                options=option,
-                            )
-                        ],
+                        type=OptionType.SUB_COMMAND, name=n, description=d, options=o
                     )
                 )
-            else:
-                options.append(
-                    Option(
-                        type=OptionType.SUB_COMMAND,
-                        name=name,
-                        description=description,
-                        options=option,
-                    )
+            all_options.append(
+                Option(
+                    type=OptionType.SUB_COMMAND_GROUP,
+                    name=group,
+                    description=self.group_names[group]["descriptions"][0],
+                    options=group_options,
                 )
+            )
+
+        # for group, name, description, option in zip(
+        #     self.groups, self.names, self.descriptions, self.options
+        # ):
+        #     if group:
+        #         options.append(
+        #             Option(
+        #                 type=OptionType.SUB_COMMAND_GROUP,
+        #                 name=group,
+        #                 description=description,
+        #                 options=[
+        #                     Option(
+        #                         type=OptionType.SUB_COMMAND,
+        #                         name=n,
+        #                         description=description,
+        #                         options=o,
+        #                     )
+        #                     for n, o in zip(name, option)
+        #                 ],
+        #             )
+        #         )
+        #     else:
+        #         options.append(
+        #             Option(
+        #                 type=OptionType.SUB_COMMAND,
+        #                 name=name,
+        #                 description=description,
+        #                 options=option,
+        #             )
+        #         )
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
-            description=self.descriptions[0],
+            description=self.group_names[group]["descriptions"][0],
             scope=self.scope,
-            options=options,
+            options=all_options,
             default_permission=self.default_permission,
         )
         print(commands[0]._json)
