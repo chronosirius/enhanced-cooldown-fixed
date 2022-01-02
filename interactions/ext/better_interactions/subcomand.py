@@ -1,6 +1,7 @@
 from typing import Union, Coroutine, Optional, List, Dict, Any, Callable
 from interactions import (
     ApplicationCommandType,
+    Client,
     Guild,
     Option,
     InteractionException,
@@ -195,7 +196,7 @@ class SubCommand:
 
         return decorator
 
-    def finish(self):
+    def finish(self, client: Client):
         if self.group:
             commands: List[ApplicationCommand] = command(
                 type=ApplicationCommandType.CHAT_INPUT,
@@ -235,9 +236,9 @@ class SubCommand:
                 ],
                 default_permission=self.default_permission,
             )
-        if self.automate_sync:
+        if client.automate_sync:
             [
-                self.loop.run_until_complete(self.synchronize(command))
+                client.loop.run_until_complete(client.synchronize(command))
                 for command in commands
             ]
 
@@ -245,7 +246,7 @@ class SubCommand:
             if sub_command_group == sub_command_group and sub_command == self.name:
                 return await self.coro(ctx, *args, **kwargs)
 
-        return self.event(inner, name=f"command_{base}")
+        return client.event(inner, name=f"command_{base}")
 
 
 def base(self, base: str):
