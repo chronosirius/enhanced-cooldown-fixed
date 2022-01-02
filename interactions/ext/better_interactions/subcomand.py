@@ -236,7 +236,7 @@ class SubCommand:
             options=options,
             default_permission=self.default_permission,
         )
-        print(commands)
+        print(commands[0]._json)
         if client.automate_sync:
             [
                 client.loop.run_until_complete(client.synchronize(command))
