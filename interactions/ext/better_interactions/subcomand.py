@@ -246,7 +246,7 @@ class SubCommand:
             if sub_command_group == sub_command_group and sub_command == self.name:
                 return await self.coro(ctx, *args, **kwargs)
 
-        return client.event(inner, name=f"command_{base}")
+        return client.event(inner, name=f"command_{self.base}")
 
 
 def base(self, base: str):
