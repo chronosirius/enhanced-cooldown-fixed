@@ -9,6 +9,7 @@ from interactions import (
     OptionType,
 )
 from interactions.decor import command
+from loguru import logger
 
 
 def subcommand(
@@ -196,6 +197,7 @@ class SubCommand:
 
         return decorator
 
+    @logger.catch
     def finish(self, client: Client):
         options: List[Option] = []
         for group, name, description, option in zip(
