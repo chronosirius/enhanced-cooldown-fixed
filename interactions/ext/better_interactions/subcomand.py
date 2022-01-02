@@ -133,3 +133,120 @@ def subcommand(
         return self.event(inner, name=f"command_{base}")
 
     return decorator
+
+
+# START OF NEW CODE
+
+
+class SubCommand:
+    def __init__(self, base: str):
+        self.base = base
+        self.group = None
+        self.name = None
+
+        self.description = None
+        self.scope = None
+        self.default_permission = None
+        self.options = None
+
+        self.coro = None
+
+    def subcommand(
+        self,
+        *,
+        group: Optional[str] = None,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
+        default_permission: Optional[bool] = None,
+        options: Optional[List[Option]] = None,
+    ):
+        def decorator(coro: Coroutine):
+            if not name:
+                raise InteractionException(
+                    11, message="Your command must have a base and name."
+                )
+
+            if not description:
+                raise InteractionException(
+                    11, message="Chat-input commands must have a description."
+                )
+
+            if not len(coro.__code__.co_varnames):
+                raise InteractionException(
+                    11,
+                    message="Your command needs at least one argument to return context.",
+                )
+            if options:
+                if (len(coro.__code__.co_varnames) + 1) < len(options):
+                    raise InteractionException(
+                        11,
+                        message="You must have the same amount of arguments as the options of the command.",
+                    )
+            self.group = group
+            self.name = name
+            self.description = description
+            self.scope = scope
+            self.default_permission = default_permission
+            self.options = options
+            self.coro = coro
+
+            return coro
+
+        return decorator
+
+    def finish(self):
+        if self.group:
+            commands: List[ApplicationCommand] = command(
+                type=ApplicationCommandType.CHAT_INPUT,
+                name=self.base,
+                description=self.description,
+                scope=self.scope,
+                options=[
+                    Option(
+                        type=OptionType.SUB_COMMAND_GROUP,
+                        name=self.group,
+                        description=self.description,
+                        options=[
+                            Option(
+                                type=OptionType.SUB_COMMAND,
+                                name=self.name,
+                                description=self.description,
+                                options=self.options,
+                            )
+                        ],
+                    )
+                ],
+                default_permission=self.default_permission,
+            )
+        else:
+            commands: List[ApplicationCommand] = command(
+                type=ApplicationCommandType.CHAT_INPUT,
+                name=self.base,
+                description=self.description,
+                scope=self.scope,
+                options=[
+                    Option(
+                        type=OptionType.SUB_COMMAND,
+                        name=self.name,
+                        description=self.description,
+                        options=self.options,
+                    )
+                ],
+                default_permission=self.default_permission,
+            )
+        if self.automate_sync:
+            [
+                self.loop.run_until_complete(self.synchronize(command))
+                for command in commands
+            ]
+
+        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
+            if sub_command_group == sub_command_group and sub_command == self.name:
+                return await self.coro(ctx, *args, **kwargs)
+
+        return self.event(inner, name=f"command_{base}")
+
+
+def base(base: str):
+    return SubCommand(base)
