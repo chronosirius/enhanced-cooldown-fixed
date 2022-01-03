@@ -279,10 +279,11 @@ class SubcommandSetup:
                 for command in commands
             ]
 
+        @logger.catch
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
             if sub_command_group:
                 group = self.groups[sub_command_group]
-                subcommand = group.subcommands[sub_command]
+                subcommand = group.subcommands[group.index(sub_command)]
                 original_coro = subcommand.coro
                 return await original_coro(ctx, *args, **kwargs)
             else:
