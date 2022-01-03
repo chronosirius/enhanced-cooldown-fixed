@@ -153,7 +153,7 @@ class SubcommandSetup:
 def base(
     self: Client,
     base: str,
-    description: str,
+    description: Optional[str] = "No description",
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
     default_permission: Optional[bool] = None,
 ):
