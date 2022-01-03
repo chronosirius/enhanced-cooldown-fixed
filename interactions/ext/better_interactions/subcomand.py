@@ -12,7 +12,7 @@ from interactions.decor import command
 from loguru import logger
 
 
-def subcommand(
+def _subcommand(
     self,
     *,
     base: Optional[str] = None,
@@ -120,9 +120,7 @@ def subcommand(
                 ],
                 default_permission=default_permission,
             )
-        if self.websocket.dispatch.events.get(f"command_{base}"):
-            print(self.websocket.dispatch.events.get(f"command_{base}"))
-        elif self.automate_sync:
+        if self.automate_sync:
             [
                 self.loop.run_until_complete(self.synchronize(command))
                 for command in commands
@@ -140,15 +138,56 @@ def subcommand(
 # START OF NEW CODE
 
 
-class SubCommand:
-    def __init__(self, base: str):
-        self.base = base
-        self.group_names: Dict[str, dict] = {}
-        self.description: str = None
+class Group:
+    def __init__(
+        self,
+        group: str,
+        description: str,
+    ):
+        self.group: str = group
+        self.description: str = description
+        self.subcommands: List[Subcommand] = []
+        self._options: Option = Option(
+            type=OptionType.SUB_COMMAND_GROUP,
+            name=group,
+            description=description,
+            options=[subcommand._options for subcommand in self.subcommands]
+            if self.subcommands
+            else None,
+        )
 
-        self.scope = None
-        self.default_permission = None
-        self.coros = {}
+
+class Subcommand:
+    def __init__(
+        self,
+        name: str,
+        description: str,
+        coro: Coroutine,
+        options: List[Option] = None,
+    ):
+        self.name: str = name
+        self.description: str = description
+        self.coro: Coroutine = coro
+        self.options: List[Option] = options
+        self._options: Option = Option(
+            type=OptionType.SUB_COMMAND,
+            name=name,
+            description=description,
+            options=options,
+        )
+
+
+class SubcommandSetup:
+    def __init__(self, client: Client, base: str):
+        self.client: Client = client
+        self.base: str = base
+        self.groups: Dict[str, Group] = {}
+        self.subcommands: Dict[str, Subcommand] = {}
+
+        self.scope: Union[int, Guild, List[int], List[Guild]] = None
+        self.default_permission: bool = None
+        self.coros: Dict[str, Coroutine] = {}
+        self.description: str = None
 
     def subcommand(
         self,
@@ -182,108 +221,62 @@ class SubCommand:
                         11,
                         message="You must have the same amount of arguments as the options of the command.",
                     )
-            try:
-                self.group_names[group] = {}
-            except:
-                pass
+            if not self.scope:
+                self.scope = scope
+            if not self.default_permission:
+                self.default_permission = default_permission
+            if not self.description:
+                self.description = description
 
-            def try_except(key, value):
-                try:
-                    self.group_names[group][key].append(value)
-                except KeyError:
-                    self.group_names[group][key] = [value]
-
-            try_except("names", name)
-            try_except("descriptions", description)
-            try_except("options", options)
-            coro.__origin__ = f"{self.base}_{group}_{name}"
-
-            self.description = description
-            self.scope = scope
-            self.default_permission = default_permission
-            self.coros[f"{self.base}_{group}_{name}"] = coro
+            if group:
+                if group not in self.groups:
+                    self.groups[group] = Group(group, description)
+                self.groups[group].subcommands.append(
+                    Subcommand(name, description, coro, options)
+                )
+            else:
+                self.subcommands[name] = Subcommand(name, description, coro, options)
 
             return coro
 
         return decorator
 
     @logger.catch
-    def finish(self, client: Client):
-        all_options: List[Option] = []
-        for group in self.group_names:
-            group_options = []
-            _names = self.group_names[group]["names"]
-            _descriptions = self.group_names[group]["descriptions"]
-            _options = self.group_names[group]["options"]
-            for n, d, o in zip(_names, _descriptions, _options):
-                group_options.append(
-                    Option(
-                        type=OptionType.SUB_COMMAND, name=n, description=d, options=o
-                    )
-                )
-            all_options.append(
-                Option(
-                    type=OptionType.SUB_COMMAND_GROUP,
-                    name=group,
-                    description=self.group_names[group]["descriptions"][0],
-                    options=group_options,
-                )
+    def finish(self):
+        def decorator(coro: Coroutine) -> Callable[..., Any]:
+            commands: List[ApplicationCommand] = command(
+                type=ApplicationCommandType.CHAT_INPUT,
+                name=self.base,
+                description=self.description,
+                scope=self.scope,
+                options=[group._options for group in self.groups.values()].extend(
+                    subcommand._options for subcommand in self.subcommands.values()
+                ),
             )
 
-        # for group, name, description, option in zip(
-        #     self.groups, self.names, self.descriptions, self.options
-        # ):
-        #     if group:
-        #         options.append(
-        #             Option(
-        #                 type=OptionType.SUB_COMMAND_GROUP,
-        #                 name=group,
-        #                 description=description,
-        #                 options=[
-        #                     Option(
-        #                         type=OptionType.SUB_COMMAND,
-        #                         name=n,
-        #                         description=description,
-        #                         options=o,
-        #                     )
-        #                     for n, o in zip(name, option)
-        #                 ],
-        #             )
-        #         )
-        #     else:
-        #         options.append(
-        #             Option(
-        #                 type=OptionType.SUB_COMMAND,
-        #                 name=name,
-        #                 description=description,
-        #                 options=option,
-        #             )
-        #         )
-        commands: List[ApplicationCommand] = command(
-            type=ApplicationCommandType.CHAT_INPUT,
-            name=self.base,
-            description=self.group_names[group]["descriptions"][0],
-            scope=self.scope,
-            options=all_options,
-            default_permission=self.default_permission,
-        )
-        # print(commands[0]._json)
-        print(all_options)
-        if client.automate_sync:
-            [
-                client.loop.run_until_complete(client.synchronize(command))
-                for command in commands
-            ]
+            if self.automate_sync:
+                [
+                    self.loop.run_until_complete(self.synchronize(command))
+                    for command in commands
+                ]
 
-        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
-            try:
-                origin = f"{self.base}_{sub_command_group}_{sub_command}"
-                return await self.coros[origin](ctx, *args, **kwargs)
-            except Exception:
-                raise
+            async def inner(
+                ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+            ):
+                if sub_command_group:
+                    group = self.groups[sub_command_group]
+                    subcommand = group.subcommands[sub_command]
+                    original_coro = subcommand.coro
+                    return await original_coro(ctx, *args, **kwargs)
+                else:
+                    subcommand = self.subcommands[sub_command]
+                    original_coro = subcommand.coro
+                    return await original_coro(ctx, *args, **kwargs)
 
-        return client.event(inner, name=f"command_{self.base}")
+            return self.event(inner, name=f"command_{base}")
+
+        return decorator
 
 
-def base(self, base: str):
-    return SubCommand(base)
+def base(self: Client, base: str):
+    return SubcommandSetup(self, base)
