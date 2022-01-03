@@ -52,15 +52,22 @@ class Group:
 
 
 class SubcommandSetup:
-    def __init__(self, client: Client, base: str):
+    def __init__(
+        self,
+        client: Client,
+        base: str,
+        description: Optional[str] = "No description",
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
+        default_permission: Optional[bool] = None,
+    ):
         self.client: Client = client
         self.base: str = base
+        self.description: str = description
+        self.scope: Union[int, Guild, List[int], List[Guild]] = scope
+        self.default_permission: bool = default_permission
+
         self.groups: Dict[str, Group] = {}
         self.subcommands: Dict[str, Subcommand] = {}
-
-        self.scope: Union[int, Guild, List[int], List[Guild]] = None
-        self.default_permission: bool = None
-        self.description: str = None
 
     def subcommand(
         self,
@@ -68,8 +75,6 @@ class SubcommandSetup:
         group: Optional[str] = None,
         name: Optional[str] = None,
         description: Optional[str] = None,
-        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
-        default_permission: Optional[bool] = None,
         options: Optional[List[Option]] = None,
     ):
         def decorator(coro: Coroutine):
@@ -93,12 +98,6 @@ class SubcommandSetup:
                     11,
                     message="You must have the same amount of arguments as the options of the command.",
                 )
-            if not self.scope:
-                self.scope = scope
-            if not self.default_permission:
-                self.default_permission = default_permission
-            if not self.description:
-                self.description = description
 
             if group:
                 if group not in self.groups:
@@ -151,5 +150,11 @@ class SubcommandSetup:
         return self.client.event(inner, name=f"command_{self.base}")
 
 
-def base(self: Client, base: str):
-    return SubcommandSetup(self, base)
+def base(
+    self: Client,
+    base: str,
+    description: str,
+    scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
+    default_permission: Optional[bool] = None,
+):
+    return SubcommandSetup(self, base, description, scope, default_permission)
