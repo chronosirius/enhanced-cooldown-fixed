@@ -168,10 +168,13 @@ class Group:
             self.subcommands: List[Subcommand] = []
         else:
             self.subcommands: List[Subcommand] = [subcommand]
-        self._options: Option = Option(
+
+    @property
+    async def _options(self) -> Option:
+        return Option(
             type=OptionType.SUB_COMMAND_GROUP,
-            name=group,
-            description=description,
+            name=self.group,
+            description=self.description,
             options=[subcommand._options for subcommand in self.subcommands]
             if self.subcommands
             else None,
@@ -238,11 +241,8 @@ class SubcommandSetup:
                         subcommand=Subcommand(name, description, coro, options),
                     )
                 else:
-                    existing_group = self.groups[group]
-                    subcommands = existing_group.subcommands
+                    subcommands = self.groups[group].subcommands
                     subcommands.append(Subcommand(name, description, coro, options))
-                    existing_group.subcommands = subcommands
-                    self.groups[group] = existing_group
             else:
                 self.subcommands[name] = Subcommand(name, description, coro, options)
 
