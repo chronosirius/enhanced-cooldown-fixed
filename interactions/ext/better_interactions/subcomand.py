@@ -254,14 +254,10 @@ class SubcommandSetup:
     def finish(self):
         print("finish called")
         print(f"{self.groups.values()=}")
-        options = []
-        if self.groups:
-            options.extend([group._options for group in self.groups.values()])
-        if self.subcommands:
-            options.extend(
-                [subcommand._options for subcommand in self.subcommands.values()]
-            )
-        options = None if not options else options
+        options = (
+            [group._options for group in self.groups.values()]
+            + [subcommand._options for subcommand in self.subcommands.values()]
+        ) or None
         print(f"{options=}")
         for option in options:
             print(f"{option._json=}")
