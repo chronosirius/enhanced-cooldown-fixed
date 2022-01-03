@@ -245,7 +245,7 @@ class SubcommandSetup:
     @logger.catch
     def finish(self):
         print("finish called")
-        print(f"{self.groups=}")
+        print(f"{self.groups.values()=}")
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
