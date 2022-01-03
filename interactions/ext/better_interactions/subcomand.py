@@ -258,7 +258,7 @@ class SubcommandSetup:
 
         if self.client.automate_sync:
             [
-                self.client.loop.run_until_complete(self.synchronize(command))
+                self.client.loop.run_until_complete(self.client.synchronize(command))
                 for command in commands
             ]
 
