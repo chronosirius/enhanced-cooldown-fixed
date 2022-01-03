@@ -25,7 +25,7 @@ Listed below are all the features this library currently has:
 
 ---------------------
 
-# subcommand
+# Subcommands
 Subcommands are technically options for commands, meaning to make subcommands, you may need long chains of options and if/elif/else conditionals.
 
 This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
@@ -223,52 +223,6 @@ async def test(ctx):
 ```
 
 ---------------------
-
-# subcommand
-The `subcommand` function is a decorator that allows you to create a subcommand easily.
-
-## How to use:
-Here's 3 examples of subcommand usage:
-```py
-from interactions.ext.better_interactions import setup
-...
-setup(bot)
-...
-# subcommand with 3 terms: `/base subcommand_group subcommand`
-@bot.subcommand(
-    base="base",
-    subcommand_group="subcommand_group",
-    name="subcommand",
-    description="subcommand description",
-)
-async def subcommand_with_group(ctx):
-    await ctx.send("subcommand with group")
-
-# subcommand with 2 terms: `/base subcommand`
-@bot.subcommand(
-    base="base",
-    name="subcommand",
-    description="subcommand description",
-)
-async def just_subcommand(ctx):
-    await ctx.send("just subcommand")
-
-# subcommand with options:
-@bot.subcommand(
-    base="base",
-    subcommand_group="subcommand_group",
-    name="subcommand",
-    description="subcommand description",
-    options=[
-        Option(
-            name="option",
-            description="option description",
-        ),
-    ]
-)
-async def subcommand_with_options(ctx, option):
-    await ctx.send("subcommand with options")
-```
 
 # Credits
 - Catalyst4 for helping me solve countless issues
