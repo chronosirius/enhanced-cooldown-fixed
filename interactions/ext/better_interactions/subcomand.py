@@ -232,9 +232,11 @@ class SubcommandSetup:
             if group:
                 if group not in self.groups:
                     self.groups[group] = Group(group, description)
-                self.groups[group].subcommands.append(
+                new_group = self.groups[group]
+                new_group.subcommands.append(
                     Subcommand(name, description, coro, options)
                 )
+                self.groups[group] = new_group
             else:
                 self.subcommands[name] = Subcommand(name, description, coro, options)
 
