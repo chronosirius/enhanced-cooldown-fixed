@@ -245,41 +245,35 @@ class SubcommandSetup:
     # @logger.catch
     def finish(self):
         print("finish called")
+        commands: List[ApplicationCommand] = command(
+            type=ApplicationCommandType.CHAT_INPUT,
+            name=self.base,
+            description=self.description,
+            scope=self.scope,
+            options=[group._options for group in self.groups.values()].extend(
+                subcommand._options for subcommand in self.subcommands.values()
+            ),
+        )
+        print(commands[0]._json)
 
-        def decorator(coro: Coroutine) -> Callable[..., Any]:
-            commands: List[ApplicationCommand] = command(
-                type=ApplicationCommandType.CHAT_INPUT,
-                name=self.base,
-                description=self.description,
-                scope=self.scope,
-                options=[group._options for group in self.groups.values()].extend(
-                    subcommand._options for subcommand in self.subcommands.values()
-                ),
-            )
-            print(commands[0]._json)
+        if self.automate_sync:
+            [
+                self.loop.run_until_complete(self.synchronize(command))
+                for command in commands
+            ]
 
-            if self.automate_sync:
-                [
-                    self.loop.run_until_complete(self.synchronize(command))
-                    for command in commands
-                ]
+        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
+            if sub_command_group:
+                group = self.groups[sub_command_group]
+                subcommand = group.subcommands[sub_command]
+                original_coro = subcommand.coro
+                return await original_coro(ctx, *args, **kwargs)
+            else:
+                subcommand = self.subcommands[sub_command]
+                original_coro = subcommand.coro
+                return await original_coro(ctx, *args, **kwargs)
 
-            async def inner(
-                ctx, *args, sub_command_group=None, sub_command=None, **kwargs
-            ):
-                if sub_command_group:
-                    group = self.groups[sub_command_group]
-                    subcommand = group.subcommands[sub_command]
-                    original_coro = subcommand.coro
-                    return await original_coro(ctx, *args, **kwargs)
-                else:
-                    subcommand = self.subcommands[sub_command]
-                    original_coro = subcommand.coro
-                    return await original_coro(ctx, *args, **kwargs)
-
-            return self.event(inner, name=f"command_{base}")
-
-        return decorator
+        return self.event(inner, name=f"command_{self.base}")
 
 
 def base(self: Client, base: str):
