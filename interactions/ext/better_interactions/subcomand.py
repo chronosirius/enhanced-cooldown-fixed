@@ -138,25 +138,6 @@ def _subcommand(
 # START OF NEW CODE
 
 
-class Group:
-    def __init__(
-        self,
-        group: str,
-        description: str,
-    ):
-        self.group: str = group
-        self.description: str = description
-        self.subcommands: List[Subcommand] = []
-        self._options: Option = Option(
-            type=OptionType.SUB_COMMAND_GROUP,
-            name=group,
-            description=description,
-            options=[subcommand._options for subcommand in self.subcommands]
-            if self.subcommands
-            else None,
-        )
-
-
 class Subcommand:
     def __init__(
         self,
@@ -174,6 +155,26 @@ class Subcommand:
             name=name,
             description=description,
             options=options,
+        )
+
+
+class Group:
+    def __init__(
+        self, group: str, description: str, subcommand: Optional[Subcommand] = None
+    ):
+        self.group: str = group
+        self.description: str = description
+        if not subcommand:
+            self.subcommands: List[Subcommand] = []
+        else:
+            self.subcommands: List[Subcommand] = [subcommand]
+        self._options: Option = Option(
+            type=OptionType.SUB_COMMAND_GROUP,
+            name=group,
+            description=description,
+            options=[subcommand._options for subcommand in self.subcommands]
+            if self.subcommands
+            else None,
         )
 
 
@@ -231,12 +232,17 @@ class SubcommandSetup:
 
             if group:
                 if group not in self.groups:
-                    self.groups[group] = Group(group, description)
-                new_group = self.groups[group]
-                list_of_subcommands = new_group.subcommands
-                list_of_subcommands.append(Subcommand(name, description, coro, options))
-                new_group.subcommands = list_of_subcommands
-                self.groups[group] = new_group
+                    self.groups[group] = Group(
+                        group,
+                        description,
+                        subcommand=Subcommand(name, description, coro, options),
+                    )
+                else:
+                    existing_group = self.groups[group]
+                    existing_group.subcommands.append(
+                        Subcommand(name, description, coro, options)
+                    )
+                    self.groups[group] = existing_group
             else:
                 self.subcommands[name] = Subcommand(name, description, coro, options)
 
