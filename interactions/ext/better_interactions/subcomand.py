@@ -246,15 +246,25 @@ class SubcommandSetup:
     def finish(self):
         print("finish called")
         print(f"{self.groups.values()=}")
-        commands: List[ApplicationCommand] = command(
-            type=ApplicationCommandType.CHAT_INPUT,
-            name=self.base,
-            description=self.description,
-            scope=self.scope,
-            options=[group._options for group in self.groups.values()].extend(
-                subcommand._options for subcommand in self.subcommands.values()
+        options = None
+        if self.groups:
+            options = [group._options for group in self.groups.values()]
+            if self.subcommands:
+                options.extend(
+                    [subcommand._options for subcommand in self.subcommands.values()]
+                )
+        elif self.subcommands:
+            options = [subcommand._options for subcommand in self.subcommands.values()]
+        commands: List[ApplicationCommand] = (
+            command(
+                type=ApplicationCommandType.CHAT_INPUT,
+                name=self.base,
+                description=self.description,
+                scope=self.scope,
+                options=[group._options for group in self.groups.values()],
             ),
         )
+
         print(commands[0]._json)
 
         if self.client.automate_sync:
