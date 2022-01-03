@@ -170,7 +170,7 @@ class Group:
             self.subcommands: List[Subcommand] = [subcommand]
 
     @property
-    async def _options(self) -> Option:
+    def _options(self) -> Option:
         return Option(
             type=OptionType.SUB_COMMAND_GROUP,
             name=self.group,
