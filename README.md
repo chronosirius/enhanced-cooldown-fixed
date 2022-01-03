@@ -59,7 +59,7 @@ async def the_group(
     description="A simple subcommand",
 )
 async def the_group2(
-    ctx: interactions.CommandContext,n dyt
+    ctx: interactions.CommandContext,
 ):
     await ctx.send("2")
 
