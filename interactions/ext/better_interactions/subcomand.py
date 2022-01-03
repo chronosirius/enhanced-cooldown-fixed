@@ -258,6 +258,7 @@ class SubcommandSetup:
             [group._options for group in self.groups.values()]
             + [subcommand._options for subcommand in self.subcommands.values()]
         ) or None
+        print(f"{options=}")
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
