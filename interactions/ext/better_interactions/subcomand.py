@@ -186,7 +186,6 @@ class SubcommandSetup:
 
         self.scope: Union[int, Guild, List[int], List[Guild]] = None
         self.default_permission: bool = None
-        self.coros: Dict[str, Coroutine] = {}
         self.description: str = None
 
     def subcommand(
@@ -199,6 +198,8 @@ class SubcommandSetup:
         default_permission: Optional[bool] = None,
         options: Optional[List[Option]] = None,
     ):
+        print("subcommand called")
+
         def decorator(coro: Coroutine):
             if not name:
                 raise InteractionException(
@@ -243,6 +244,8 @@ class SubcommandSetup:
 
     # @logger.catch
     def finish(self):
+        print("finish called")
+
         def decorator(coro: Coroutine) -> Callable[..., Any]:
             commands: List[ApplicationCommand] = command(
                 type=ApplicationCommandType.CHAT_INPUT,
