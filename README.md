@@ -3,6 +3,8 @@
 
 Better interactions for discord-py-interactions
 
+Join the [Discord server](https://discord.gg/Y78bpT5aNv) to ask questions, get help, or to discuss the project!
+
 ## Installation:
 ```
 pip install -U better-interactions
@@ -57,7 +59,7 @@ async def the_group(
     description="A simple subcommand",
 )
 async def the_group2(
-    ctx: interactions.CommandContext,
+    ctx: interactions.CommandContext,n dyt
 ):
     await ctx.send("2")
 
@@ -267,3 +269,7 @@ async def just_subcommand(ctx):
 async def subcommand_with_options(ctx, option):
     await ctx.send("subcommand with options")
 ```
+
+# Credits
+- Catalyst4 for helping me solve countless issues
+- The devs of `discord-py-interactions`
