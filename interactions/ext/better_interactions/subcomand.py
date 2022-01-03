@@ -256,9 +256,9 @@ class SubcommandSetup:
         )
         print(commands[0]._json)
 
-        if self.automate_sync:
+        if self.client.automate_sync:
             [
-                self.loop.run_until_complete(self.synchronize(command))
+                self.client.loop.run_until_complete(self.synchronize(command))
                 for command in commands
             ]
 
@@ -273,7 +273,7 @@ class SubcommandSetup:
                 original_coro = subcommand.coro
                 return await original_coro(ctx, *args, **kwargs)
 
-        return self.event(inner, name=f"command_{self.base}")
+        return self.client.event(inner, name=f"command_{self.base}")
 
 
 def base(self: Client, base: str):
