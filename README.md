@@ -15,11 +15,97 @@ This is `better-interactions`, a library for `discord-py-interactions` which mod
 
 ## What does this have?
 Listed below are all the features this library currently has:
+- Subcommands that you can create easily
 - Component callbacks are modified so you can enable checking if the `custom_id` of the component starts with the one provided in the decorator
 - `ActionRow` function which enables usage of `ActionRow(...)`
 - Component functions for `Button` and `SelectMenu` that has checks so you never have to incorrectly use `Button(...)` or `SelectMenu(...)`
 - `spread_to_rows` function which allows components to be spread to multiple `ActionRow`s
-- `subcommand` decorator which allows you to create subcommands
+
+---------------------
+
+# subcommand
+Subcommands are technically options for commands, meaning to make subcommands, you may need long chains of options and if/elif/else conditionals.
+
+This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
+
+## How to use:
+Here's some examples of subcommand usage:
+```py
+from interactions.ext.better_interactions import setup
+...
+# sets up bot.base
+setup(bot)
+...
+# create a base command:
+the_base = bot.base("the_base", scope=874781880489222154)
+
+# create a subcommand with an optional group and required name:
+@the_base.subcommand(
+    group="the_group",
+    name="the_name",
+    description="A simple subcommand",
+)
+async def the_group(
+    ctx: interactions.CommandContext,
+):
+    await ctx.send("1")
+
+# another subcommand in the same group:
+@the_base.subcommand(
+    group="the_group",
+    name="the_name2",
+    description="A simple subcommand",
+)
+async def the_group2(
+    ctx: interactions.CommandContext,
+):
+    await ctx.send("2")
+
+# anotehr subcommand in the same group with some options:
+@the_base.subcommand(
+    group="the_group",
+    name="the_name3",
+    description="A simple subcommand",
+    options=[
+        interactions.Option(
+            type=interactions.OptionType.STRING,
+            name="the_string",
+            description="A string",
+            required=True,
+        ),
+    ],
+)
+async def the_group3(
+    ctx: interactions.CommandContext,
+    the_string,
+):
+    await ctx.send(f"3 {the_string}")
+
+# a subcommand in a different group:
+@the_base.subcommand(
+    group="the_group2",
+    name="the_name4",
+    description="A simple subcommand4",
+)
+async def the_group24(
+    ctx: interactions.CommandContext,
+):
+    await ctx.send("4")
+
+# a subcommand with no group:
+@the_base.subcommand(
+    name="the_name5",
+    description="A simple subcommand5",
+)
+async def the_name5(
+    ctx: interactions.CommandContext,
+):
+    await ctx.send("5")
+
+# finishes the command:
+the_base.finish()
+```
+This approach that I took is similar to the one in `discord-py-interactions<=3.0.2`, and the least complicated way to do it.
 
 ---------------------
 
