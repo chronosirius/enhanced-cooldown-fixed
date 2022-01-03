@@ -241,7 +241,7 @@ class SubcommandSetup:
 
         return decorator
 
-    @logger.catch
+    # @logger.catch
     def finish(self):
         def decorator(coro: Coroutine) -> Callable[..., Any]:
             commands: List[ApplicationCommand] = command(
