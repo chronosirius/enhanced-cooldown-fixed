@@ -1,9 +1,6 @@
 from typing import Union, Callable, Optional, Any, Coroutine
 import interactions
 
-from .context_menu import message_menu, user_menu
-from .subcomand import subcommand
-
 
 def component(
     bot: interactions.Client,
