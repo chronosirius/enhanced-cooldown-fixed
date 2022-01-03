@@ -253,6 +253,7 @@ class SubcommandSetup:
                     subcommand._options for subcommand in self.subcommands.values()
                 ),
             )
+            print(commands[0]._json)
 
             if self.automate_sync:
                 [
