@@ -284,6 +284,7 @@ class SubcommandSetup:
 
         @logger.catch
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
+            print(f"{sub_command_group=} {sub_command=}")
             if sub_command_group:
                 group = self.groups[sub_command_group]
                 subcommand = group.subcommands[group.subcommands.index(sub_command)]
