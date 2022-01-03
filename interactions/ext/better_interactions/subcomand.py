@@ -271,7 +271,7 @@ class SubcommandSetup:
             name=self.base,
             description=self.description,
             scope=self.scope,
-            options=[group._options for group in self.groups.values()],
+            options=options,
         )
 
         print(commands[0]._json)
