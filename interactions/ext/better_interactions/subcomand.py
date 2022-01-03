@@ -239,9 +239,9 @@ class SubcommandSetup:
                     )
                 else:
                     existing_group = self.groups[group]
-                    existing_group.subcommands.append(
-                        Subcommand(name, description, coro, options)
-                    )
+                    subcommands = existing_group.subcommands
+                    subcommands.append(Subcommand(name, description, coro, options))
+                    existing_group.subcommands = subcommands
                     self.groups[group] = existing_group
             else:
                 self.subcommands[name] = Subcommand(name, description, coro, options)
