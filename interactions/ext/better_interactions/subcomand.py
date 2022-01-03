@@ -287,7 +287,9 @@ class SubcommandSetup:
             print(f"{sub_command_group=} {sub_command=}")
             if sub_command_group:
                 group = self.groups[sub_command_group]
-                subcommand = group.subcommands[group.subcommands.index(sub_command)]
+                for subcommand in group.subcommands:
+                    if subcommand.name == sub_command:
+                        break
                 original_coro = subcommand.coro
                 return await original_coro(ctx, *args, **kwargs)
             else:
