@@ -263,6 +263,9 @@ class SubcommandSetup:
                 )
         elif self.subcommands:
             options = [subcommand._options for subcommand in self.subcommands.values()]
+        print(f"{options=}")
+        for option in options:
+            print(f"{option._json=}")
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
@@ -283,7 +286,7 @@ class SubcommandSetup:
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
             if sub_command_group:
                 group = self.groups[sub_command_group]
-                subcommand = group.subcommands[group.index(sub_command)]
+                subcommand = group.subcommands[group.subcommands.index(sub_command)]
                 original_coro = subcommand.coro
                 return await original_coro(ctx, *args, **kwargs)
             else:
