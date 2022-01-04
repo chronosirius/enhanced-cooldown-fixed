@@ -1,2 +1,2 @@
-discord-py-interactions
+discord-py-interactions>=4.0.1
 interactions-wait-for
