@@ -32,12 +32,10 @@ class Subcommand:
 
 
 class Group:
-    def __init__(
-        self, group: str, description: str, subcommand: Optional[Subcommand] = None
-    ):
+    def __init__(self, group: str, description: str, subcommand: Subcommand):
         self.group: str = group
         self.description: str = description
-        self.subcommands: List[Subcommand] = [] if not subcommand else [subcommand]
+        self.subcommands: List[Subcommand] = [subcommand]
 
     @property
     def _options(self) -> Option:
@@ -45,9 +43,7 @@ class Group:
             type=OptionType.SUB_COMMAND_GROUP,
             name=self.group,
             description=self.description,
-            options=[subcommand._options for subcommand in self.subcommands]
-            if self.subcommands
-            else None,
+            options=[subcommand._options for subcommand in self.subcommands],
         )
 
 
@@ -80,7 +76,7 @@ class SubcommandSetup:
         def decorator(coro: Coroutine):
             if not name:
                 raise InteractionException(
-                    11, message="Your command must have a base and name."
+                    11, message="Your subcommand must have a name."
                 )
 
             if not description:
@@ -96,7 +92,7 @@ class SubcommandSetup:
             if options and (len(coro.__code__.co_varnames) + 1) < len(options):
                 raise InteractionException(
                     11,
-                    message="You must have the same amount of arguments as the options of the command.",
+                    message="You must have the same amount of arguments as the options of the command plus 1 for the context.",
                 )
 
             if group:
@@ -117,10 +113,15 @@ class SubcommandSetup:
         return decorator
 
     def finish(self):
-        options = (
-            [group._options for group in self.groups.values()]
-            + [subcommand._options for subcommand in self.subcommands.values()]
-        ) or None
+        group_options = []
+        subcommand_options = []
+        if self.groups:
+            group_options = [group._options for group in self.groups.values()]
+        if self.subcommands:
+            subcommand_options = [
+                subcommand._options for subcommand in self.subcommands.values()
+            ]
+        options = (group_options + subcommand_options) or None
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
