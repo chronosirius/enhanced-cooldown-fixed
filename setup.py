@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="better-interactions",
-    version="2.0.3",
+    version="2.0.4",
     description="Better interactions for discord-py-interactions",
     long_description=long_description,
     long_description_content_type="text/markdown",
