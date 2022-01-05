@@ -1,14 +1,14 @@
-from typing import Union, Coroutine, Optional, List, Dict, Any, Callable
 from interactions import (
+    ApplicationCommand,
     ApplicationCommandType,
     Client,
     Guild,
-    Option,
     InteractionException,
-    ApplicationCommand,
+    Option,
     OptionType,
 )
 from interactions.decor import command
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
 
 class Subcommand:
@@ -19,6 +19,16 @@ class Subcommand:
         coro: Coroutine,
         options: List[Option] = None,
     ):
+        """
+        A class that represents a subcommand.
+
+        DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+        :param str name: The name of the subcommand.
+        :param str description: The description of the subcommand.
+        :param Coroutine coro: The coroutine that will be executed when the subcommand is called.
+        :param List[Option] options: The options of the subcommand.
+        """
         self.name: str = name
         self.description: str = description
         self.coro: Coroutine = coro
@@ -33,12 +43,26 @@ class Subcommand:
 
 class Group:
     def __init__(self, group: str, description: str, subcommand: Subcommand):
+        """
+        A class that represents a subcommand group.
+
+        DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+        :param str group: The name of the subcommand group.
+        :param str description: The description of the subcommand group.
+        :param Subcommand subcommand: The initial subcommand.
+        """
         self.group: str = group
         self.description: str = description
         self.subcommands: List[Subcommand] = [subcommand]
 
     @property
     def _options(self) -> Option:
+        """
+        Returns the subcommand group as an option.
+
+        The subcommands of the group are in the ``options=`` field of the option.
+        """
         return Option(
             type=OptionType.SUB_COMMAND_GROUP,
             name=self.group,
@@ -48,6 +72,18 @@ class Group:
 
 
 class SubcommandSetup:
+    """
+    A class you get when using ``base_name = client.base("base_name", ...)``
+
+    Use this class to create subcommands by using the ``@base_name.subcommand(...)`` decorator.
+
+    :param Client client: The client that the subcommand belongs to.
+    :param str base: The base name of the subcommand.
+    :param str description: The description of the subcommand.
+    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the subcommand.
+    :param bool default_permission: The default permission of the subcommand.
+    """
+
     def __init__(
         self,
         client: Client,
@@ -72,8 +108,26 @@ class SubcommandSetup:
         name: Optional[str] = None,
         description: Optional[str] = None,
         options: Optional[List[Option]] = None,
-    ):
-        def decorator(coro: Coroutine):
+    ) -> Callable[..., Any]:
+        """
+        Decorator that creates a subcommand for the corresponding base.
+
+        ``group`` and ``options`` are optional.
+        ```py
+        @base_name.subcommand(
+            group="group_name",
+            name="subcommand_name",
+            description="subcommand_description",
+            options=[...]
+        )
+        ```
+        :param str group: The group of the subcommand.
+        :param str name: The name of the subcommand.
+        :param str description: The description of the subcommand.
+        :param List[Option] options: The options of the subcommand.
+        """
+
+        def decorator(coro: Coroutine) -> Coroutine:
             if not name:
                 raise InteractionException(
                     11, message="Your subcommand must have a name."
@@ -89,7 +143,7 @@ class SubcommandSetup:
                     11,
                     message="Your command needs at least one argument to return context.",
                 )
-            if options and (len(coro.__code__.co_varnames) + 1) < len(options):
+            if options and (len(coro.__code__.co_varnames) + 1) != len(options):
                 raise InteractionException(
                     11,
                     message="You must have the same amount of arguments as the options of the command plus 1 for the context.",
@@ -112,15 +166,23 @@ class SubcommandSetup:
 
         return decorator
 
-    def finish(self):
-        group_options = []
-        subcommand_options = []
-        if self.groups:
-            group_options = [group._options for group in self.groups.values()]
-        if self.subcommands:
-            subcommand_options = [
-                subcommand._options for subcommand in self.subcommands.values()
-            ]
+    def finish(self) -> Callable[..., Any]:
+        """
+        Function that finishes the setup of the base command.
+
+        Use this when you are done creating subcommands for a specified base.
+        ```py
+        base_name.finish()
+        ```
+        """
+        group_options = (
+            [group._options for group in self.groups.values()] if self.groups else []
+        )
+        subcommand_options = (
+            [subcommand._options for subcommand in self.subcommands.values()]
+            if self.subcommands
+            else []
+        )
         options = (group_options + subcommand_options) or None
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
@@ -136,17 +198,16 @@ class SubcommandSetup:
                 for command in commands
             ]
 
-        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs):
+        async def inner(
+            ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+        ) -> None:
             if sub_command_group:
                 group = self.groups[sub_command_group]
-                for subcommand in group.subcommands:
-                    if subcommand.name == sub_command:
-                        break
+                subcommand = group.subcommands[sub_command]
             else:
                 subcommand = self.subcommands[sub_command]
 
-            original_coro = subcommand.coro
-            return await original_coro(ctx, *args, **kwargs)
+            return await subcommand.coro(ctx, *args, **kwargs)
 
         return self.client.event(inner, name=f"command_{self.base}")
 
@@ -154,8 +215,28 @@ class SubcommandSetup:
 def base(
     self: Client,
     base: str,
+    *,
     description: Optional[str] = "No description",
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
     default_permission: Optional[bool] = None,
-):
+) -> SubcommandSetup:
+    """
+    Use this function to initialize a base for future subcommands.
+    Kwargs are optional.
+
+    To use this function without ``setup(client)``, pass in the client as the first argument.
+    ```py
+    base_name = client.base(
+        "base_name",
+        description="Description of the base",
+        scope=123456789,
+        default_permission=True
+    )
+    ```
+    :param Client self: The client. This is only used if you do not ``setup(client)``.
+    :param str base: The base name.
+    :param str description: The description of the base.
+    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
+    :param bool default_permission: The default permission of the base.
+    """
     return SubcommandSetup(self, base, description, scope, default_permission)

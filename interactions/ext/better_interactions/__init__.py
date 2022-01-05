@@ -1,6 +1,11 @@
+from interactions.base import __version__ as __lib_version__
+
+__version__ = "2.0.5"
+__ext_version__ = f"{__lib_version__}:{__version__}"
+
 from . import *
 
-from .callback import component
-from .subcomand import base
-from .components import ActionRow, Button, SelectMenu, spread_to_rows
-from .setup import setup
+from .callback import *
+from .subcomand import *
+from .components import *
+from .setup import *

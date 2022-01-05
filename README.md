@@ -63,7 +63,7 @@ async def the_group2(
 ):
     await ctx.send("2")
 
-# anotehr subcommand in the same group with some options:
+# another subcommand in the same group with some options:
 @the_base.subcommand(
     group="the_group",
     name="the_name3",

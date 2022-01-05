@@ -1,11 +1,12 @@
 from setuptools import setup
+from .interactions.ext.better_interactions.__init__ import __version__ as version
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="better-interactions",
-    version="2.0.4",
+    version=version,
     description="Better interactions for discord-py-interactions",
     long_description=long_description,
     long_description_content_type="text/markdown",
