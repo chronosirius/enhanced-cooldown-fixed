@@ -1,5 +1,5 @@
 from setuptools import setup
-from .interactions.ext.better_interactions.__init__ import __version__ as version
+from interactions.ext.better_interactions.__init__ import __version__ as version
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
