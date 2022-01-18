@@ -3,7 +3,6 @@ import interactions
 from interactions.ext import wait_for
 
 from .callback import component
-from .context_menu import message_menu, user_menu
 from .subcomand import base
 
 
@@ -51,7 +50,6 @@ def _replace_values(old, new):
 def setup(
     bot: interactions.Client,
     modify_component_callbacks: bool = True,
-    add_context_menu: bool = True,
     add_subcommand: bool = True,
     add_method: bool = False,
     add_interaction_events: bool = False,
@@ -63,6 +61,7 @@ def setup(
 
     :param Client bot: The bot instance or class to apply hooks to
     :param bool modify_component_callbacks: Whether to modify the component callbacks
+    :param bool add_subcommand: Whether to add the subcommand
     :param bool add_method: If ``wait_for`` should be attached to the bot
     :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
     """
@@ -81,10 +80,6 @@ def setup(
         _replace_values(old_websocket, new_websocket)
 
         bot.websocket = new_websocket
-
-    if add_context_menu:
-        bot.message_menu = types.MethodType(message_menu, bot)
-        bot.user_menu = types.MethodType(user_menu, bot)
 
     if add_subcommand:
         bot.base = types.MethodType(base, bot)
