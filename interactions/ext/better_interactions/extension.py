@@ -38,11 +38,13 @@ interactions.api.gateway.WebSocket = ExtendedWebSocket
 
 class Extension(interactions.client.Extension):
     def __new__(cls, client: Client, *args, **kwargs):
+        print("new")
         self = super().__new__(cls, client, *args, **kwargs)
         self.__client__ = client
         return self
 
     def __post_init__(self):
+        print("post init")
         client = self.__client__
         print("E", getmembers(self, predicate=iscoroutinefunction))
         # get the methods
