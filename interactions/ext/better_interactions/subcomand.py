@@ -367,7 +367,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         else:
             subcommand = self.subcommands[sub_command]
 
-        return subcommand.coro(ctx, *args, **kwargs)
+        return subcommand.coro(self, ctx, *args, **kwargs)
 
 
 def base(
