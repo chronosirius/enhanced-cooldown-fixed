@@ -37,7 +37,7 @@ interactions.api.gateway.WebSocket = ExtendedWebSocket
 
 
 def sync_subcommands(self):
-    print("original init")
+    print("syncing...")
     client = self.client
     print("E", getmembers(self, predicate=iscoroutinefunction))
     # get the methods
