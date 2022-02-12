@@ -2,8 +2,9 @@ import types
 import interactions
 from interactions import Client
 from interactions.ext import wait_for
-from asyncio import iscoroutinefunction
-from inspect import getmembers
+
+# from asyncio import iscoroutinefunction
+from inspect import getmembers, iscoroutinefunction
 
 from .callback import component
 from .subcomand import base
