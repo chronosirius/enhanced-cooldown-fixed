@@ -37,10 +37,7 @@ interactions.api.gateway.WebSocket = ExtendedWebSocket
 
 
 def sync_subcommands(self):
-    print(f"syncing... {self.__class__.__name__}")
     client = self.client
-    print("E", getmembers(self, predicate=iscoroutinefunction))
-    # get the methods
     if any(
         hasattr(func, "__subcommand__")
         for _, func in getmembers(self, predicate=iscoroutinefunction)
@@ -50,7 +47,6 @@ def sync_subcommands(self):
             for _, func in getmembers(self, predicate=iscoroutinefunction)
             if hasattr(func, "__subcommand__")
         }
-        print(bases)
         commands = []
 
         for subcommand in bases.values():
@@ -83,12 +79,9 @@ def sync_subcommands(self):
 
 class BetterExtension(interactions.client.Extension):
     def __new__(cls, client, *args, **kwargs):
-        print("new start")
+        print("yes yes yes")
         self = super().__new__(cls, client, *args, **kwargs)
-        print("new end")
-        print("sync start")
         sync_subcommands(self)
-        print("sync end")
         return self
 
 
@@ -130,7 +123,6 @@ class BetterInteractions(interactions.client.Extension):
         :param bool add_method: If ``wait_for`` should be attached to the bot
         :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
         """
-        print("loading extension")
         if not isinstance(bot, interactions.Client):
             raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
 
