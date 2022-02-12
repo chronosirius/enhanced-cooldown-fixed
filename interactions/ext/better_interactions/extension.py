@@ -83,7 +83,7 @@ def sync_subcommands(self):
 
 class BetterExtension(interactions.Extension):
     def __new__(cls, client, *args, **kwargs):
-        self = super().__new__(client, *args, **kwargs)
+        self = super().__new__(cls, client, *args, **kwargs)
         sync_subcommands(self)
         return self
 
