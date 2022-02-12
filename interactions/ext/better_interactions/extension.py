@@ -43,7 +43,7 @@ class Extension(interactions.client.Extension):
         self.__client__ = client
         return self
 
-    def __init__(self):
+    def sync_subcommands(self):
         print("original init")
         client = self.__client__
         print("E", getmembers(self, predicate=iscoroutinefunction))
