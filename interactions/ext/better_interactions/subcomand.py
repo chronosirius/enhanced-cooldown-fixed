@@ -224,7 +224,9 @@ class SubcommandSetup:
         ) -> None:
             if sub_command_group:
                 group = self.groups[sub_command_group]
-                subcommand = group.subcommands[sub_command]
+                subcommand = next(
+                    (sub for sub in group.subcommands if sub.name == sub_command), None
+                )
             else:
                 subcommand = self.subcommands[sub_command]
 
@@ -380,7 +382,10 @@ class ExternalSubcommandSetup(SubcommandSetup):
     ) -> None:
         if sub_command_group:
             group = self.groups[sub_command_group]
-            subcommand = group.subcommands[sub_command]
+            subcommand = next(
+                (sub for sub in group.subcommands if sub.name == sub_command), None
+            )
+
         else:
             subcommand = self.subcommands[sub_command]
 
