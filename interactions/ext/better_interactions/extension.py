@@ -2,7 +2,6 @@ import types
 import interactions
 from interactions import Client
 from interactions.ext import wait_for
-from dataclasses import dataclass
 
 # from asyncio import iscoroutinefunction
 from inspect import getmembers, iscoroutinefunction
@@ -37,7 +36,6 @@ class ExtendedWebSocket(interactions.api.gateway.WebSocket):
 interactions.api.gateway.WebSocket = ExtendedWebSocket
 
 
-@dataclass
 class Extension(interactions.client.Extension):
     def __new__(cls, client: Client, *args, **kwargs):
         print("new")
@@ -45,8 +43,8 @@ class Extension(interactions.client.Extension):
         self.__client__ = client
         return self
 
-    def __post_init__(self):
-        print("post init")
+    def __init__(self):
+        print("original init")
         client = self.__client__
         print("E", getmembers(self, predicate=iscoroutinefunction))
         # get the methods
