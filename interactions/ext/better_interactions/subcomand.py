@@ -75,7 +75,7 @@ class Group:
 
 class SubcommandSetup:
     """
-    A class you get when using ``base_name = client.base("base_name", ...)``
+    A class you get when using ``base_var = client.base("base_name", ...)``
 
     Use this class to create subcommands by using the ``@base_name.subcommand(...)`` decorator.
 
@@ -116,7 +116,7 @@ class SubcommandSetup:
 
         ``group`` and ``options`` are optional.
         ```py
-        @base_name.subcommand(
+        @base_var.subcommand(
             group="group_name",
             name="subcommand_name",
             description="subcommand_description",
@@ -174,7 +174,7 @@ class SubcommandSetup:
 
         Use this when you are done creating subcommands for a specified base.
         ```py
-        base_name.finish()
+        base_var.finish()
         ```
         """
         group_options = (
@@ -234,6 +234,15 @@ class SubcommandSetup:
 
 
 class NonSynchronizedCommand:
+    """
+    A class that represents a non-synchronized command inside extensions.
+
+    DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+    :param str commands: The raw commands data.
+    :param str description: The base of the command.
+    """
+
     def __init__(self, commands: List[ApplicationCommand], base: str = None):
         self.__need_sync__ = True
         self.commands = commands
@@ -241,6 +250,17 @@ class NonSynchronizedCommand:
 
 
 class ExternalSubcommandSetup(SubcommandSetup):
+    """
+    A class you get when using ``base_var = extension_base("base_name", ...)``
+
+    Use this class to create subcommands by using the ``@base_name.subcommand(...)`` decorator.
+
+    :param str base: The base name of the subcommand.
+    :param str description: The description of the subcommand.
+    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the subcommand.
+    :param bool default_permission: The default permission of the subcommand.
+    """
+
     def __init__(
         self,
         base: str,
@@ -271,7 +291,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
 
         ``group`` and ``options`` are optional.
         ```py
-        @base_name.subcommand(
+        @base_var.subcommand(
             group="group_name",
             name="subcommand_name",
             description="subcommand_description",
@@ -328,6 +348,14 @@ class ExternalSubcommandSetup(SubcommandSetup):
         return decorator
 
     def finish(self) -> Callable[..., Any]:
+        """
+        Function that finishes the setup of the base command inside extensions.
+
+        Use this when you are done creating subcommands for a specified base.
+        ```py
+        base_var.finish()
+        ```
+        """
         group_options = (
             [group._options for group in self.groups.values()] if self.groups else []
         )
@@ -371,7 +399,7 @@ def base(
     Use this function to initialize a base for future subcommands.
     Kwargs are optional.
 
-    To use this function without ``setup(client)``, pass in the client as the first argument.
+    To use this function without loading the extension, pass in the client as the first argument.
     ```py
     base_name = client.base(
         "base_name",
@@ -380,7 +408,7 @@ def base(
         default_permission=True
     )
     ```
-    :param Client self: The client. This is only used if you do not ``setup(client)``.
+    :param Client self: The client. This is only used if you do not load the extension.
     :param str base: The base name.
     :param str description: The description of the base.
     :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
@@ -396,4 +424,21 @@ def extension_base(
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
     default_permission: Optional[bool] = None,
 ) -> ExternalSubcommandSetup:
+    """
+    Use this function to initialize a base for future subcommands inside of extensions.
+    Kwargs are optional.
+
+    ```py
+    base_name = extension_base(
+        "base_name",
+        description="Description of the base",
+        scope=123456789,
+        default_permission=True
+    )
+    ```
+    :param str base: The base name.
+    :param str description: The description of the base.
+    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
+    :param bool default_permission: The default permission of the base.
+    """
     return ExternalSubcommandSetup(base, description, scope, default_permission)
