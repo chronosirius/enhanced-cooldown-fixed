@@ -358,6 +358,17 @@ class ExternalSubcommandSetup(SubcommandSetup):
         self.raw_commands = commands
         self.full_command = NonSynchronizedCommand(commands, self.base)
 
+    def inner(
+        self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+    ) -> None:
+        if sub_command_group:
+            group = self.groups[sub_command_group]
+            subcommand = group.subcommands[sub_command]
+        else:
+            subcommand = self.subcommands[sub_command]
+
+        return subcommand.coro(ctx, *args, **kwargs)
+
 
 def base(
     self: Client,
