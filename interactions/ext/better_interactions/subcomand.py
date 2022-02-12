@@ -239,16 +239,16 @@ class NonSynchronizedCommand:
         self.commands = commands
         self.base = base
 
-    def inner(
-        self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
-    ) -> None:
-        if sub_command_group:
-            group = self.groups[sub_command_group]
-            subcommand = group.subcommands[sub_command]
-        else:
-            subcommand = self.subcommands[sub_command]
+    # def inner(
+    #     self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+    # ) -> None:
+    #     if sub_command_group:
+    #         group = self.groups[sub_command_group]
+    #         subcommand = group.subcommands[sub_command]
+    #     else:
+    #         subcommand = self.subcommands[sub_command]
 
-        return subcommand.coro(ctx, *args, **kwargs)
+    #     return subcommand.coro(ctx, *args, **kwargs)
 
 
 class ExternalSubcommandSetup(SubcommandSetup):
