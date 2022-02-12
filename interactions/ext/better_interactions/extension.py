@@ -39,7 +39,11 @@ interactions.api.gateway.WebSocket = ExtendedWebSocket
 class Extension(interactions.client.Extension):
     def __new__(cls, client: Client, *args, **kwargs):
         self = super().__new__(cls, client, *args, **kwargs)
+        self.__client__ = client
+        return self
 
+    def __post_init__(self):
+        client = self.__client__
         print("E", getmembers(self, predicate=iscoroutinefunction))
         # get the methods
         if any(
@@ -81,8 +85,6 @@ class Extension(interactions.client.Extension):
                     client._scopes.add(
                         self.scope if isinstance(self.scope, int) else self.scope.id
                     )
-
-        return self
 
 
 interactions.client.Extension = Extension
