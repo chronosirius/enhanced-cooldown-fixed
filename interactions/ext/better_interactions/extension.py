@@ -81,10 +81,17 @@ def sync_subcommands(self):
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
 
+class BetterExtension(interactions.Extension):
+    def __new__(cls, client, *args, **kwargs):
+        self = super().__new__(client, *args, **kwargs)
+        sync_subcommands(self)
+        return self
+
+
 class Extension(interactions.client.Extension):
     def __init__(self, client: Client, *args, **kwargs):
         self.sync_subcommands()
-    
+
     def sync_subcommands(self):
         print("original init")
         client = self.client
@@ -127,9 +134,9 @@ class Extension(interactions.client.Extension):
                             for _ in scope
                         ]
                     else:
-                        client._scopes.add(scope if isinstance(scope, int) else scope.id)
-
-
+                        client._scopes.add(
+                            scope if isinstance(scope, int) else scope.id
+                        )
 
 
 interactions.client.Extension = Extension
