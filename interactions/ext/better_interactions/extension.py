@@ -79,13 +79,10 @@ def sync_subcommands(self):
 
 class BetterExtension(interactions.client.Extension):
     def __new__(cls, client, *args, **kwargs):
-        print("yes yes yes")
         self = super().__new__(cls, client, *args, **kwargs)
         sync_subcommands(self)
         return self
 
-
-interactions.client.Extension = BetterExtension
 
 
 def _replace_values(old, new):
