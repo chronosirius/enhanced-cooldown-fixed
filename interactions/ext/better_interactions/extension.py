@@ -38,7 +38,7 @@ interactions.api.gateway.WebSocket = ExtendedWebSocket
 
 def sync_subcommands(self):
     print("original init")
-    client = self.__client__
+    client = self.client
     print("E", getmembers(self, predicate=iscoroutinefunction))
     # get the methods
     if any(
@@ -82,11 +82,54 @@ def sync_subcommands(self):
 
 
 class Extension(interactions.client.Extension):
-    def __new__(cls, client: Client, *args, **kwargs):
-        print("new")
-        self = super().__new__(cls, client, *args, **kwargs)
-        self.__client__ = client
-        return self
+    def __init__(self, client: Client, *args, **kwargs):
+        self.sync_subcommands()
+    
+    def sync_subcommands(self):
+        print("original init")
+        client = self.client
+        print("E", getmembers(self, predicate=iscoroutinefunction))
+        # get the methods
+        if any(
+            hasattr(func, "__subcommand__")
+            for _, func in getmembers(self, predicate=iscoroutinefunction)
+        ):
+            bases = {
+                func.__base__: func.__data__
+                for _, func in getmembers(self, predicate=iscoroutinefunction)
+                if hasattr(func, "__subcommand__")
+            }
+            print(bases)
+            commands = []
+
+            for subcommand in bases.values():
+                client.event(subcommand.inner, name=f"command_{subcommand.base}")
+                commands.extend(subcommand.raw_commands)
+
+            if client._automate_sync:
+
+                if client._loop.is_running():
+                    [
+                        client._loop.create_task(client._synchronize(command))
+                        for command in commands
+                    ]
+                else:
+                    [
+                        client._loop.run_until_complete(client._synchronize(command))
+                        for command in commands
+                    ]
+            for subcommand in bases.values():
+                scope = subcommand.scope
+                if scope is not None:
+                    if isinstance(scope, list):
+                        [
+                            client._scopes.add(_ if isinstance(_, int) else _.id)
+                            for _ in scope
+                        ]
+                    else:
+                        client._scopes.add(scope if isinstance(scope, int) else scope.id)
+
+
 
 
 interactions.client.Extension = Extension
