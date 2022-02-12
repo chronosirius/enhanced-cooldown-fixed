@@ -76,17 +76,18 @@ class Extension(interactions.client.Extension):
                         client._loop.run_until_complete(client._synchronize(command))
                         for command in commands
                     ]
-
-            if self.scope is not None:
-                if isinstance(self.scope, list):
-                    [
-                        client._scopes.add(_ if isinstance(_, int) else _.id)
-                        for _ in self.scope
-                    ]
-                else:
-                    client._scopes.add(
-                        self.scope if isinstance(self.scope, int) else self.scope.id
-                    )
+            for subcommand in bases.values():
+                scope = subcommand.scope
+                if scope is not None:
+                    if isinstance(scope, list):
+                        [
+                            client._scopes.add(_ if isinstance(_, int) else _.id)
+                            for _ in scope
+                        ]
+                    else:
+                        client._scopes.add(
+                            scope if isinstance(scope, int) else scope.id
+                        )
 
 
 interactions.client.Extension = Extension
