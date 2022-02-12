@@ -83,8 +83,12 @@ def sync_subcommands(self):
 
 class BetterExtension(interactions.client.Extension):
     def __new__(cls, client, *args, **kwargs):
+        print("new start")
         self = super().__new__(cls, client, *args, **kwargs)
+        print("new end")
+        print("sync start")
         sync_subcommands(self)
+        print("sync end")
         return self
 
 
@@ -126,6 +130,7 @@ class BetterInteractions(interactions.client.Extension):
         :param bool add_method: If ``wait_for`` should be attached to the bot
         :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
         """
+        print("loading extension")
         if not isinstance(bot, interactions.Client):
             raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
 
