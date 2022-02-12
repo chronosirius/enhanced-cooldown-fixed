@@ -194,7 +194,7 @@ class SubcommandSetup:
             options=options,
         )
 
-        if self._automate_sync:
+        if self.client._automate_sync:
             if self.client._loop.is_running():
                 [
                     self.client._loop.create_task(self.client._synchronize(command))
