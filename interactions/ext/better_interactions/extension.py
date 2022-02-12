@@ -35,7 +35,7 @@ class ExtendedWebSocket(interactions.api.gateway.WebSocket):
 interactions.api.gateway.WebSocket = ExtendedWebSocket
 
 
-class Extension(interactions.Extension):
+class Extension(interactions.client.Extension):
     def __new__(cls, client: Client, *args, **kwargs):
         self = super().__new__(cls, client, *args, **kwargs)
 
@@ -102,7 +102,7 @@ def _replace_values(old, new):
             pass
 
 
-class BetterInteractions(interactions.Extension):
+class BetterInteractions(interactions.client.Extension):
     def __init__(
         self,
         bot: Client,
