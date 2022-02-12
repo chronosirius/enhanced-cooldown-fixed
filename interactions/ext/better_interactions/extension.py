@@ -40,7 +40,7 @@ class Extension(interactions.client.Extension):
     def __new__(cls, client: Client, *args, **kwargs):
         self = super().__new__(cls, client, *args, **kwargs)
 
-        print("E", getmembers(self))
+        print("E", getmembers(self, predicate=iscoroutinefunction))
         # get the methods
         if any(
             hasattr(func, "__subcommand__")
