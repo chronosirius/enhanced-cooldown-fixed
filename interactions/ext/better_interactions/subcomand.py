@@ -1,7 +1,9 @@
+import interactions
 from interactions import (
     ApplicationCommand,
     ApplicationCommandType,
     Client,
+    Extension,
     Guild,
     InteractionException,
     Option,
@@ -192,11 +194,30 @@ class SubcommandSetup:
             options=options,
         )
 
-        if self.client.automate_sync:
-            [
-                self.client.loop.run_until_complete(self.client.synchronize(command))
-                for command in commands
-            ]
+        if self._automate_sync:
+            if self.client._loop.is_running():
+                [
+                    self.client._loop.create_task(self.client._synchronize(command))
+                    for command in commands
+                ]
+            else:
+                [
+                    self.client._loop.run_until_complete(
+                        self.client._synchronize(command)
+                    )
+                    for command in commands
+                ]
+
+        if self.scope is not None:
+            if isinstance(self.scope, list):
+                [
+                    self.client._scopes.add(_ if isinstance(_, int) else _.id)
+                    for _ in self.scope
+                ]
+            else:
+                self.client._scopes.add(
+                    self.scope if isinstance(self.scope, int) else self.scope.id
+                )
 
         async def inner(
             ctx, *args, sub_command_group=None, sub_command=None, **kwargs
@@ -210,6 +231,132 @@ class SubcommandSetup:
             return await subcommand.coro(ctx, *args, **kwargs)
 
         return self.client.event(inner, name=f"command_{self.base}")
+
+
+class NonSynchronizedCommand:
+    def __init__(self, commands: List[ApplicationCommand], base: str = None):
+        self.__need_sync__ = True
+        self.commands = commands
+        self.base = base
+
+    def inner(
+        self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+    ) -> None:
+        if sub_command_group:
+            group = self.groups[sub_command_group]
+            subcommand = group.subcommands[sub_command]
+        else:
+            subcommand = self.subcommands[sub_command]
+
+        return subcommand.coro(ctx, *args, **kwargs)
+
+
+class ExternalSubcommandSetup(SubcommandSetup):
+    def __init__(
+        self,
+        base: str,
+        description: Optional[str] = "No description",
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
+        default_permission: Optional[bool] = None,
+    ):
+        super().__init__(
+            client=None,
+            base=base,
+            description=description,
+            scope=scope,
+            default_permission=default_permission,
+        )
+        self.raw_commands = None
+        self.full_command = None
+
+    def subcommand(
+        self,
+        *,
+        group: Optional[str] = None,
+        name: Optional[str] = None,
+        description: Optional[str] = None,
+        options: Optional[List[Option]] = None,
+    ) -> Callable[..., Any]:
+        """
+        Decorator that creates a subcommand for the corresponding base.
+
+        ``group`` and ``options`` are optional.
+        ```py
+        @base_name.subcommand(
+            group="group_name",
+            name="subcommand_name",
+            description="subcommand_description",
+            options=[...]
+        )
+        ```
+        :param str group: The group of the subcommand.
+        :param str name: The name of the subcommand.
+        :param str description: The description of the subcommand.
+        :param List[Option] options: The options of the subcommand.
+        """
+
+        def decorator(coro: Coroutine) -> Coroutine:
+            coro.__subcommand__ = True
+            coro.__base__ = self.base
+            coro.__data__ = self
+
+            if not name:
+                raise InteractionException(
+                    11, message="Your subcommand must have a name."
+                )
+
+            if not description:
+                raise InteractionException(
+                    11, message="Chat-input commands must have a description."
+                )
+
+            if not len(coro.__code__.co_varnames):
+                raise InteractionException(
+                    11,
+                    message="Your command needs at least one argument to return context.",
+                )
+            if options and (len(coro.__code__.co_varnames) + 1) != len(options):
+                raise InteractionException(
+                    11,
+                    message="You must have the same amount of arguments as the options of the command plus 1 for the context.",
+                )
+
+            if group:
+                if group not in self.groups:
+                    self.groups[group] = Group(
+                        group,
+                        description,
+                        subcommand=Subcommand(name, description, coro, options),
+                    )
+                else:
+                    subcommands = self.groups[group].subcommands
+                    subcommands.append(Subcommand(name, description, coro, options))
+            else:
+                self.subcommands[name] = Subcommand(name, description, coro, options)
+
+            return coro
+
+        return decorator
+
+    def finish(self) -> Callable[..., Any]:
+        group_options = (
+            [group._options for group in self.groups.values()] if self.groups else []
+        )
+        subcommand_options = (
+            [subcommand._options for subcommand in self.subcommands.values()]
+            if self.subcommands
+            else []
+        )
+        options = (group_options + subcommand_options) or None
+        commands: List[ApplicationCommand] = command(
+            type=ApplicationCommandType.CHAT_INPUT,
+            name=self.base,
+            description=self.description,
+            scope=self.scope,
+            options=options,
+        )
+        self.raw_commands = commands
+        self.full_command = NonSynchronizedCommand(commands, self.base)
 
 
 def base(
@@ -240,3 +387,13 @@ def base(
     :param bool default_permission: The default permission of the base.
     """
     return SubcommandSetup(self, base, description, scope, default_permission)
+
+
+def extension_base(
+    base: str,
+    *,
+    description: Optional[str] = "No description",
+    scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
+    default_permission: Optional[bool] = None,
+) -> ExternalSubcommandSetup:
+    return ExternalSubcommandSetup(base, description, scope, default_permission)

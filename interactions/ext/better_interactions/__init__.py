@@ -8,4 +8,4 @@ from . import *
 from .callback import *
 from .subcomand import *
 from .components import *
-from .setup import *
+from .extension import *
