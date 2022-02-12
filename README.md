@@ -33,13 +33,15 @@ This library provides a way to make subcommands, similar to subcommands in `disc
 ## How to use:
 Here's some examples of subcommand usage:
 ```py
-from interactions.ext.better_interactions import setup
+from interactions.ext.better_interactions import base
 ...
-# sets up bot.base
-setup(bot)
+# sets up bot.base, optional
+bot.load("interactions.ext.better_interactions")
 ...
 # create a base command:
 the_base = bot.base("the_base", scope=874781880489222154)
+# Or without loading:
+the_base = base(bot, "the_base", scope=874781880489222154)
 
 # create a subcommand with an optional group and required name:
 @the_base.subcommand(
@@ -109,6 +111,52 @@ the_base.finish()
 ```
 This approach that I took is similar to the one in `discord-py-interactions<=3.0.2`, and the least complicated way to do it.
 
+## How to use inside of extensions:
+
+``main.py``:
+```py
+import interactions
+
+bot = interactions.Bot(...)]
+bot.load("interactions.ext.better_interactions")  # optional
+
+...
+
+# load cog before bot.start()
+bot.load("cog")
+
+bot.start()
+```
+
+``cog.py``:
+```py
+from interactions.ext.better_interactions import (
+    extension_base,
+    BetterExtension,
+)
+
+
+class Cog(BetterExtension):
+    def __init__(self, bot):
+        self.bot = bot
+
+    the_base = extension_base("the_base", scope=874781880489222154)
+
+    @the_base.subcommand(name="name1", description="subcommand")
+    async def b(self, ctx):
+        await ctx.send("You used /the_base name1")
+
+    @the_base.subcommand(group="group1", name="name2", description="group subcommand")
+    async def c(self, ctx):
+        await ctx.send("You used /the_base group1 name2")
+
+    the_base.finish()
+
+
+def setup(bot):
+    return Cog(bot)
+```
+
 ---------------------
 
 # New component callback
@@ -117,10 +165,8 @@ The new component callbacks are modified so you can enable checking if the `cust
 ## How to use:
 In your bot, you must use this line:
 ```py
-from interactions.ext.better_interactions import setup
-...
 bot = interactions.Client(...)
-setup(bot)
+bot.load("interactions.ext.better_interactions")
 ```
 
 Then, you can use the decorator!
