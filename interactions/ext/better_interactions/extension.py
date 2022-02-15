@@ -8,6 +8,7 @@ from inspect import getmembers, iscoroutinefunction
 
 from .callback import component
 from .subcomand import base
+from .command import command
 
 
 class ExtendedWebSocket(interactions.api.gateway.WebSocket):
@@ -84,7 +85,6 @@ class BetterExtension(interactions.client.Extension):
         return self
 
 
-
 def _replace_values(old, new):
     """Change all values on new to the values on old. Useful if neither object has __dict__"""
     for item in dir(old):  # can't use __dict__, this should take everything
@@ -108,6 +108,7 @@ class BetterInteractions(interactions.client.Extension):
         add_subcommand: bool = True,
         add_method: bool = False,
         add_interaction_events: bool = False,
+        modify_command: bool = True,
     ):
         """
         Apply hooks to a bot to add additional features
@@ -144,6 +145,9 @@ class BetterInteractions(interactions.client.Extension):
                 add_method=add_method,
                 add_interaction_events=add_interaction_events,
             )
+
+        if modify_command:
+            bot.command = types.MethodType(command, bot)
 
 
 def setup(

@@ -7,5 +7,6 @@ from . import *
 
 from .callback import *
 from .subcomand import *
+from .command import *
 from .components import *
 from .extension import *
