@@ -117,7 +117,7 @@ This approach that I took is similar to the one in `discord-py-interactions<=3.0
 ```py
 import interactions
 
-bot = interactions.Bot(...)]
+bot = interactions.Bot(...)
 bot.load("interactions.ext.better_interactions")  # optional
 
 ...
