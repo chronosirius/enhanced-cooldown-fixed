@@ -18,6 +18,7 @@ This is `better-interactions`, a library for `discord-py-interactions` which mod
 ## What does this have?
 Listed below are all the features this library currently has:
 - Subcommands that you can create easily
+- Modified commands that have a default name and description
 - Component callbacks are modified so you can enable checking if the `custom_id` of the component starts with the one provided in the decorator
 - `ActionRow` function which enables usage of `ActionRow(...)`
 - Component functions for `Button` and `SelectMenu` that has checks so you never have to incorrectly use `Button(...)` or `SelectMenu(...)`
@@ -156,6 +157,29 @@ class Cog(BetterExtension):
 def setup(bot):
     return Cog(bot)
 ```
+
+---------------------
+
+# Modified commands
+Modified commands are commands that have a default name and description.
+
+## How to use:
+In your bot, you must use this line:
+```py
+bot = interactions.Client(...)
+bot.load("interactions.ext.better_interactions", modify_command=True)
+```
+
+Then, you can do stuff like this:
+```py
+@bot.command()
+async def ping(ctx):
+    """Says pong!"""
+    await ctx.send("pong")
+```
+The default name in this case is `ping`, and the default description is `Says pong!`.
+
+The function name is the default name, while the docstring is the default description.
 
 ---------------------
 
