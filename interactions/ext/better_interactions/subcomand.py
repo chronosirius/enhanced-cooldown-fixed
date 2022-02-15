@@ -313,13 +313,13 @@ class ExternalSubcommandSetup(SubcommandSetup):
                     self.groups[group] = Group(
                         group,
                         description,
-                        subcommand=Subcommand(_name, description, coro, options),
+                        subcommand=Subcommand(_name, _description, coro, options),
                     )
                 else:
                     subcommands = self.groups[group].subcommands
-                    subcommands.append(Subcommand(_name, description, coro, options))
+                    subcommands.append(Subcommand(_name, _description, coro, options))
             else:
-                self.subcommands[_name] = Subcommand(_name, description, coro, options)
+                self.subcommands[_name] = Subcommand(_name, _description, coro, options)
 
             return coro
 
