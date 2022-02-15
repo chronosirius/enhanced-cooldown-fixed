@@ -1,6 +1,6 @@
 from interactions.base import __version__ as __lib_version__
 
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 __ext_version__ = f"{__lib_version__}:{__version__}"
 
 from . import *
