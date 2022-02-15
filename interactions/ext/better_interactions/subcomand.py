@@ -11,6 +11,7 @@ from interactions import (
 )
 from interactions.decor import command
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
+from inspect import getdoc
 
 
 class Subcommand:
@@ -130,8 +131,8 @@ class SubcommandSetup:
         """
 
         def decorator(coro: Coroutine) -> Coroutine:
-            _name = coro.__name__ if not name else name
-            _description = coro.__doc__ if not description else description
+            _name = name or coro.__name__
+            _description = description or getdoc(coro) or "No description"
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
@@ -299,8 +300,8 @@ class ExternalSubcommandSetup(SubcommandSetup):
             coro.__base__ = self.base
             coro.__data__ = self
 
-            _name = coro.__name__ if not name else name
-            _description = coro.__doc__ if not description else description
+            _name = name or coro.__name__
+            _description = description or getdoc(coro) or "No description"
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
