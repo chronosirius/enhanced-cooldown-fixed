@@ -145,11 +145,6 @@ class SubcommandSetup:
                     11,
                     message="Your command needs at least one argument to return context.",
                 )
-            if options and (len(coro.__code__.co_varnames) + 1) != len(options):
-                raise InteractionException(
-                    11,
-                    message="You must have the same amount of arguments as the options of the command plus 1 for the context.",
-                )
 
             if group:
                 if group not in self.groups:
@@ -325,11 +320,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 raise InteractionException(
                     11,
                     message="Your command needs at least one argument to return context.",
-                )
-            if options and (len(coro.__code__.co_varnames) - 2) != len(options):
-                raise InteractionException(
-                    11,
-                    message="You must have the same amount of arguments as the options of the command plus 2 for self and the context.",
                 )
 
             if group:
