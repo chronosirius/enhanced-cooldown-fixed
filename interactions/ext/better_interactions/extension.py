@@ -156,6 +156,7 @@ def setup(
     add_subcommand: bool = True,
     add_method: bool = False,
     add_interaction_events: bool = False,
+    modify_command: bool = True,
 ) -> None:
     """
     Setup the extension
@@ -174,4 +175,5 @@ def setup(
         add_subcommand,
         add_method,
         add_interaction_events,
+        modify_command,
     )
