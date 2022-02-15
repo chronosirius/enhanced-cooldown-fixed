@@ -114,7 +114,7 @@ class SubcommandSetup:
         """
         Decorator that creates a subcommand for the corresponding base.
 
-        ``group`` and ``options`` are optional.
+        All arguments are optional.
         ```py
         @base_var.subcommand(
             group="group_name",
@@ -130,15 +130,8 @@ class SubcommandSetup:
         """
 
         def decorator(coro: Coroutine) -> Coroutine:
-            if not name:
-                raise InteractionException(
-                    11, message="Your subcommand must have a name."
-                )
-
-            if not description:
-                raise InteractionException(
-                    11, message="Chat-input commands must have a description."
-                )
+            _name = coro.__name__ if not name else name
+            _description = coro.__doc__ if not description else description
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
@@ -151,13 +144,13 @@ class SubcommandSetup:
                     self.groups[group] = Group(
                         group,
                         description,
-                        subcommand=Subcommand(name, description, coro, options),
+                        subcommand=Subcommand(_name, _description, coro, options),
                     )
                 else:
                     subcommands = self.groups[group].subcommands
-                    subcommands.append(Subcommand(name, description, coro, options))
+                    subcommands.append(Subcommand(_name, _description, coro, options))
             else:
-                self.subcommands[name] = Subcommand(name, description, coro, options)
+                self.subcommands[_name] = Subcommand(_name, _description, coro, options)
 
             return coro
 
@@ -286,7 +279,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         """
         Decorator that creates a subcommand for the corresponding base.
 
-        ``group`` and ``options`` are optional.
+        All arguments are optional.
         ```py
         @base_var.subcommand(
             group="group_name",
@@ -306,15 +299,8 @@ class ExternalSubcommandSetup(SubcommandSetup):
             coro.__base__ = self.base
             coro.__data__ = self
 
-            if not name:
-                raise InteractionException(
-                    11, message="Your subcommand must have a name."
-                )
-
-            if not description:
-                raise InteractionException(
-                    11, message="Chat-input commands must have a description."
-                )
+            _name = coro.__name__ if not name else name
+            _description = coro.__doc__ if not description else description
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
@@ -327,13 +313,13 @@ class ExternalSubcommandSetup(SubcommandSetup):
                     self.groups[group] = Group(
                         group,
                         description,
-                        subcommand=Subcommand(name, description, coro, options),
+                        subcommand=Subcommand(_name, description, coro, options),
                     )
                 else:
                     subcommands = self.groups[group].subcommands
-                    subcommands.append(Subcommand(name, description, coro, options))
+                    subcommands.append(Subcommand(_name, description, coro, options))
             else:
-                self.subcommands[name] = Subcommand(name, description, coro, options)
+                self.subcommands[_name] = Subcommand(_name, description, coro, options)
 
             return coro
 
