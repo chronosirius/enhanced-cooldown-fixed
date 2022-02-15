@@ -73,7 +73,12 @@ def command(
         _name = name or coro.__name__
         _description = description or getdoc(coro) or "No description"
         return self.command(
-            type, _name, _description, scope, options, default_permission
+            type=type,
+            name=_name,
+            description=_description,
+            scope=scope,
+            options=options,
+            default_permission=default_permission,
         )(coro)
 
     return decorator
