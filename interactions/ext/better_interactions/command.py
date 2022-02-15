@@ -72,7 +72,7 @@ def command(
     def decorator(coro: Coroutine) -> Callable[..., Any]:
         _name = name or coro.__name__
         _description = description or getdoc(coro) or "No description"
-        return self.command(
+        return self.old_command(
             type=type,
             name=_name,
             description=_description,
