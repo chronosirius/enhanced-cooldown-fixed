@@ -9,6 +9,8 @@ from interactions import (
     User,
     Channel,
     Role,
+    Choice,
+    ChannelType,
 )
 from typing import (
     List,
@@ -22,7 +24,7 @@ from typing import (
 from logging import Logger
 from inspect import getdoc
 from functools import wraps, partial
-from inspect import signature
+from inspect import signature, _empty
 
 
 log: Logger = get_logger("client")
@@ -34,6 +36,13 @@ class BetterOption:
         type: Union[type, int, OptionType],
         description: Optional[str] = MISSING,
         name: Optional[str] = MISSING,
+        choices: Optional[List[Choice]] = MISSING,
+        channel_types: Optional[List[ChannelType]] = MISSING,
+        min_value: Optional[int] = MISSING,
+        max_value: Optional[int] = MISSING,
+        autocomplete: Optional[bool] = MISSING,
+        focused: Optional[bool] = MISSING,
+        value: Optional[str] = MISSING,
     ):
         if isinstance(type, int):
             self.type = type
@@ -59,6 +68,13 @@ class BetterOption:
 
         self.description = description
         self.name = name
+        self.choices = choices
+        self.channel_types = channel_types
+        self.min_value = min_value
+        self.max_value = max_value
+        self.autocomplete = autocomplete
+        self.focused = focused
+        self.value = value
 
 
 def command(
@@ -114,6 +130,7 @@ def command(
             getdoc(coro) or "No description" if description is MISSING else description
         )
         _description = _description[:100]
+        _options = []
 
         print(f"Registering command: {_name}, {_description[:100]}")
 
@@ -125,14 +142,29 @@ def command(
                 callback = partial(coro, None)
             params = signature(callback).parameters
             for __name, param in params.items():
-                print(param.annotation.type)
+                typehint = param.annotation
+                _options.append(
+                    Option(
+                        type=typehint.type,
+                        name=__name if typehint.name is MISSING else typehint.name,
+                        description=typehint.description,
+                        required=param.default is _empty,
+                        choices=typehint.choices,
+                        channel_types=typehint.channel_types,
+                        min_value=typehint.min_value,
+                        max_value=typehint.max_value,
+                        autocomplete=typehint.autocomplete,
+                        focused=typehint.focused,
+                        value=typehint.value,
+                    )
+                )
 
         return self.old_command(
             type=type,
             name=_name,
             description=_description,
             scope=scope,
-            options=options,
+            options=_options or MISSING,
             default_permission=default_permission,
         )(coro)
 
