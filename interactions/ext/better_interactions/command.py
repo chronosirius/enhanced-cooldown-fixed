@@ -124,7 +124,7 @@ def command(
             else:
                 callback = partial(coro, None)
             params = signature(callback).parameters
-            for param in params:
+            for __name, param in params.items():
                 print(param.annotation)
 
         return self.old_command(
