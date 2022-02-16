@@ -72,6 +72,10 @@ def command(
     def decorator(coro: Coroutine) -> Callable[..., Any]:
         _name = name or coro.__name__
         _description = description or getdoc(coro) or "No description"
+
+        if not options and len(coro.__code__.co_varnames) > 1:
+            print("STARTING")
+
         return self.old_command(
             type=type,
             name=_name,
