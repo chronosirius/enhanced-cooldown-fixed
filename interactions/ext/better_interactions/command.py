@@ -149,7 +149,7 @@ def command(
                         name=__name if typehint.name is MISSING else typehint.name,
                         description=typehint.description,
                         required=param.default is _empty,
-                        choices=typehint.choices,
+                        choices=[] if typehint.choices is MISSING else typehint.choices,
                         channel_types=typehint.channel_types,
                         min_value=typehint.min_value,
                         max_value=typehint.max_value,
