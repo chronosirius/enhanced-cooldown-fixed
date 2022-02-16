@@ -125,6 +125,7 @@ def command(
     """
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
+        # TODO: fix this code once it breaks
         _name = coro.__name__ if name is MISSING else name
         _description = (
             getdoc(coro) or "No description" if description is MISSING else description
