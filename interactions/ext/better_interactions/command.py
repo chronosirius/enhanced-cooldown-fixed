@@ -116,9 +116,8 @@ def command(
         _description = _description[:100]
 
         print(f"Registering command: {_name}, {_description[:100]}")
-        print(len(coro.__code__.co_varnames))
 
-        if not options and len(coro.__code__.co_varnames) > 1:
+        if options is MISSING and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
             if "." in coro.__qualname__:  # is part of a class
                 callback = partial(coro, None, None)
