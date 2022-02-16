@@ -164,7 +164,7 @@ def command(
             name=_name,
             description=_description,
             scope=scope,
-            options=_options or MISSING,
+            options=_options,
             default_permission=default_permission,
         )(coro)
 
