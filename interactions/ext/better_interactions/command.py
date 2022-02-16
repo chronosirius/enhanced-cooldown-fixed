@@ -125,7 +125,7 @@ def command(
                 callback = partial(coro, None)
             params = signature(callback).parameters
             for __name, param in params.items():
-                print(param.annotation)
+                print(param.annotation.type)
 
         return self.old_command(
             type=type,
