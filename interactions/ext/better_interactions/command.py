@@ -18,10 +18,13 @@ from logging import Logger
 from inspect import getdoc
 from functools import wraps
 
+from loguru import logger
+
 
 log: Logger = get_logger("client")
 
 
+@logger.catch
 def command(
     self,
     *,
