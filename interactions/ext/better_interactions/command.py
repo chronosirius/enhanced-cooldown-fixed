@@ -76,9 +76,10 @@ def command(
         _name = coro.__name__ if name is MISSING else name
         _description = (
             getdoc(coro) or "No description" if description is MISSING else description
-        )[:100]
+        )
+        _description = _description[:100]
 
-        print(f"Registering command: {_name}, {_description}")
+        print(f"Registering command: {_name}, {_description[:100]}")
 
         if not options and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
@@ -103,7 +104,8 @@ def extension_command(**kwargs):
         kwargs["name"] = coro.__name__ if name is MISSING else name
         kwargs["description"] = (
             getdoc(coro) or "No description" if description is MISSING else description
-        )[:100]
+        )
+        kwargs["description"] = kwargs["description"][:100]
         coro.__command_data__ = ((), kwargs)
         return coro
 
