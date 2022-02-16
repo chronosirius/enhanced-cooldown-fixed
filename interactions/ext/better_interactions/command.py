@@ -73,8 +73,10 @@ def command(
     """
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
-        _name = name is not MISSING or coro.__name__
-        _description = description is not MISSING or getdoc(coro) or "No description"
+        _name = coro.__name__ if name is MISSING else name
+        _description = (
+            getdoc(coro) or "No description" if description is MISSING else description
+        )
 
         print(f"Registering command: {_name}, {_description}")
 
@@ -96,9 +98,11 @@ def command(
 @wraps(command)
 def extension_command(**kwargs):
     def decorator(coro):
-        kwargs["name"] = kwargs.get("name", coro.__name__)
-        kwargs["description"] = kwargs.get(
-            "description", (getdoc(coro) or "No description")
+        name = kwargs.get("name", MISSING)
+        description = kwargs.get("description", MISSING)
+        kwargs["name"] = coro.__name__ if name is MISSING else name
+        kwargs["description"] = (
+            getdoc(coro) or "No description" if description is MISSING else description
         )
         coro.__command_data__ = ((), kwargs)
         return coro
