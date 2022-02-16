@@ -1,9 +1,14 @@
+from collections import UserList
 from interactions import (
     MISSING,
     ApplicationCommandType,
     Option,
     Guild,
     get_logger,
+    OptionType,
+    User,
+    Channel,
+    Role,
 )
 from typing import (
     List,
@@ -16,15 +21,46 @@ from typing import (
 )
 from logging import Logger
 from inspect import getdoc
-from functools import wraps
-
-from loguru import logger
+from functools import wraps, partial
+from inspect import signature
 
 
 log: Logger = get_logger("client")
 
 
-@logger.catch
+class BetterOption:
+    def __init__(
+        self,
+        type: Union[type, int, OptionType],
+        description: Optional[str] = MISSING,
+        name: Optional[str] = MISSING,
+    ):
+        if isinstance(type, int):
+            self.type = type
+        elif type in (str, int, float):
+            if type is str:
+                self.type = OptionType.STRING
+            elif type is int:
+                self.type = OptionType.INTEGER
+            elif type is float:
+                self.type = OptionType.NUMBER
+            elif type is bool:
+                self.type = OptionType.BOOLEAN
+        elif isinstance(type, OptionType):
+            self.type = type
+        elif type is User:
+            self.type = OptionType.USER
+        elif type is Channel:
+            self.type = OptionType.CHANNEL
+        elif type is Role:
+            self.type = OptionType.ROLE
+        else:
+            raise TypeError(f"Invalid type: {type}")
+
+        self.description = description
+        self.name = name
+
+
 def command(
     self,
     *,
@@ -83,6 +119,13 @@ def command(
 
         if not options and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
+            if "." in coro.__qualname__:  # is part of a class
+                callback = partial(coro, None, None)
+            else:
+                callback = partial(coro, None)
+            params = signature(callback).parameters
+            for param in params:
+                print(param.annotation)
 
         return self.old_command(
             type=type,
