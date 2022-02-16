@@ -147,7 +147,7 @@ class BetterInteractions(interactions.client.Extension):
             )
 
         if modify_command:
-            bot.old_command = types.MethodType(bot.command, bot)
+            bot.old_command = bot.command
             bot.command = types.MethodType(command, bot)
 
 
