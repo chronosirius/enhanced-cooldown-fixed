@@ -76,6 +76,8 @@ def command(
         _name = name or coro.__name__
         _description = description or getdoc(coro) or "No description"
 
+        print(f"Registering command: {_name}, {_description}")
+
         if not options and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
 
