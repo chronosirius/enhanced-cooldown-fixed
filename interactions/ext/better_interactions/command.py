@@ -73,8 +73,8 @@ def command(
     """
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
-        _name = name or coro.__name__
-        _description = description or getdoc(coro) or "No description"
+        _name = name is not MISSING or coro.__name__
+        _description = description is not MISSING or getdoc(coro) or "No description"
 
         print(f"Registering command: {_name}, {_description}")
 
