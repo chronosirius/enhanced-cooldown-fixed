@@ -31,6 +31,25 @@ log: Logger = get_logger("client")
 
 
 class BetterOption:
+    """
+    An alternative way of providing options.
+    ```py
+    async def command(ctx, name: BetterOption(int, "description") = 5):
+        ...
+    ```
+
+    :param Union[type, int, OptionType] type: The type of the option.
+    :param Optional[str] description?: The description of the option.
+    :param Optional[str] name?: The name of the option.
+    :param Optional[List[Choice]] choices?: The choices of the option.
+    :param Optional[List[ChannelType]] channel_types?: The channel types of the option.
+    :param Optional[int] min_value?: The minimum value of the option.
+    :param Optional[int] max_value?: The maximum value of the option.
+    :param Optional[bool] autocomplete?: Whether the option should autocomplete.
+    :param Optional[bool] focused?: Whether the option should be focused.
+    :param Optional[str] value?: The value of the option.
+    """
+
     def __init__(
         self,
         type: Union[type, int, OptionType],
