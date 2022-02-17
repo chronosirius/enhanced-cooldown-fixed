@@ -133,17 +133,19 @@ def command(
         _description = _description[:100]
         _options = []
 
-        print(f"Registering command: {_name}, {_description[:100]}")
         params = signature(coro).parameters
 
         if options is MISSING and len(params) > 1:
-            print(f"STARTING {_name} {len(coro.__code__.co_varnames)}")
             context = True
             for __name, param in params.items():
                 if context:
                     context = False
                     continue
-                typehint = param.annotation
+                typehint: BetterOption = param.annotation
+                if typehint is _empty or not isinstance(typehint, BetterOption):
+                    raise TypeError(
+                        "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
+                    )
                 _options.append(
                     Option(
                         type=typehint.type,
