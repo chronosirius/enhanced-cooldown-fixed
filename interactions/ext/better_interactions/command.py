@@ -66,7 +66,7 @@ class BetterOption:
         else:
             raise TypeError(f"Invalid type: {type}")
 
-        self.description = description
+        self.description = description or "No description"
         self.name = name
         self.choices = choices
         self.channel_types = channel_types
