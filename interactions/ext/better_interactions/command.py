@@ -138,7 +138,11 @@ def command(
 
         if options is MISSING and len(params) > 1:
             print(f"STARTING {_name} {len(coro.__code__.co_varnames)}")
+            context = True
             for __name, param in params.items():
+                if context:
+                    context = False
+                    continue
                 typehint = param.annotation
                 _options.append(
                     Option(
