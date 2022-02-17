@@ -136,7 +136,7 @@ def command(
         print(f"Registering command: {_name}, {_description[:100]}")
 
         if options is MISSING and len(coro.__code__.co_varnames) > 1:
-            print(f"STARTING {_name}")
+            print(f"STARTING {_name} {len(coro.__code__.co_varnames)}")
             params = signature(coro).parameters
             for __name, param in params.items():
                 typehint = param.annotation
