@@ -34,8 +34,8 @@ class BetterOption:
     def __init__(
         self,
         type: Union[type, int, OptionType],
-        description: Optional[str] = MISSING,
-        name: Optional[str] = MISSING,
+        description: Optional[str] = None,
+        name: Optional[str] = None,
         choices: Optional[List[Choice]] = None,
         channel_types: Optional[List[ChannelType]] = None,
         min_value: Optional[int] = None,
@@ -126,16 +126,16 @@ def command(
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
         # TODO: fix this code once it breaks
-        _name = coro.__name__ if name is MISSING else name
+        _name = coro.__name__ if not name else name
         _description = (
-            getdoc(coro) or "No description" if description is MISSING else description
+            getdoc(coro) or "No description" if not description else description
         )
         _description = _description[:100]
         _options = []
 
         print(f"Registering command: {_name}, {_description[:100]}")
 
-        if options is MISSING and len(coro.__code__.co_varnames) > 1:
+        if not options and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
             if "." in coro.__qualname__:  # is part of a class
                 callback = partial(coro, None, None)
@@ -147,7 +147,7 @@ def command(
                 _options.append(
                     Option(
                         type=typehint.type,
-                        name=__name if typehint.name is MISSING else typehint.name,
+                        name=__name if not typehint.name else typehint.name,
                         description=typehint.description,
                         required=param.default is _empty,
                         choices=typehint.choices,
@@ -172,7 +172,6 @@ def command(
     return decorator
 
 
-@wraps(command)
 def extension_command(**kwargs):
     def decorator(coro):
         name = kwargs.get("name", MISSING)
