@@ -137,11 +137,7 @@ def command(
 
         if not options and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
-            if "." in coro.__qualname__:  # is part of a class
-                callback = partial(coro, None, None)
-            else:
-                callback = partial(coro, None)
-            params = signature(callback).parameters
+            params = signature(coro).parameters
             for __name, param in params.items():
                 typehint = param.annotation
                 _options.append(
