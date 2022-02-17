@@ -126,16 +126,16 @@ def command(
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
         # TODO: fix this code once it breaks
-        _name = coro.__name__ if not name else name
+        _name = coro.__name__ if name is MISSING else name
         _description = (
-            getdoc(coro) or "No description" if not description else description
+            getdoc(coro) or "No description" if description is MISSING else description
         )
         _description = _description[:100]
         _options = []
 
         print(f"Registering command: {_name}, {_description[:100]}")
 
-        if not options and len(coro.__code__.co_varnames) > 1:
+        if options is MISSING and len(coro.__code__.co_varnames) > 1:
             print("STARTING")
             params = signature(coro).parameters
             for __name, param in params.items():
