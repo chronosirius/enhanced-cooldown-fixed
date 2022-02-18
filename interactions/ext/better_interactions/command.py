@@ -1,4 +1,3 @@
-from collections import UserList
 from interactions import (
     MISSING,
     ApplicationCommandType,
@@ -17,9 +16,9 @@ from typing import (
 )
 from logging import Logger
 from inspect import getdoc
-from inspect import signature, _empty
+from inspect import signature
 
-from .command_models import BetterOption
+from .command_models import parameters_to_options
 
 log: Logger = get_logger("client")
 
@@ -83,31 +82,7 @@ def command(
         params = signature(coro).parameters
 
         if options is MISSING and len(params) > 1:
-            context = True
-            for __name, param in params.items():
-                if context:
-                    context = False
-                    continue
-                typehint: BetterOption = param.annotation
-                if typehint is _empty or not isinstance(typehint, BetterOption):
-                    raise TypeError(
-                        "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
-                    )
-                _options.append(
-                    Option(
-                        type=typehint.type,
-                        name=__name if not typehint.name else typehint.name,
-                        description=typehint.description,
-                        required=param.default is _empty,
-                        choices=typehint.choices,
-                        channel_types=typehint.channel_types,
-                        min_value=typehint.min_value,
-                        max_value=typehint.max_value,
-                        autocomplete=typehint.autocomplete,
-                        focused=typehint.focused,
-                        value=typehint.value,
-                    )
-                )
+            _options = parameters_to_options(params)
 
         return self.old_command(
             type=type,

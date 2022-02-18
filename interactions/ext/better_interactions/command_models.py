@@ -5,12 +5,14 @@ from interactions import (
     Role,
     Choice,
     ChannelType,
+    Option,
+    MISSING,
 )
-from typing import (
-    List,
-    Optional,
-    Union,
-)
+from typing import List, Optional, Union, TYPE_CHECKING
+from inspect import _empty
+
+if TYPE_CHECKING:
+    from collections import OrderedDict
 
 
 class BetterOption:
@@ -77,3 +79,36 @@ class BetterOption:
         self.autocomplete = autocomplete
         self.focused = focused
         self.value = value
+
+
+def parameters_to_options(params: OrderedDict) -> List[Option]:
+    context = params.popitem(last=False)
+    _options = [
+        (
+            Option(
+                type=param.annotation.type,
+                name=__name if not param.annotation.name else param.annotation.name,
+                description=param.annotation.description,
+                required=param.default is _empty,
+                choices=param.annotation.choices,
+                channel_types=param.annotation.channel_types,
+                min_value=param.annotation.min_value,
+                max_value=param.annotation.max_value,
+                autocomplete=param.annotation.autocomplete,
+                focused=param.annotation.focused,
+                value=param.annotation.value,
+            )
+            if isinstance(param.annotation, BetterOption)
+            else MISSING
+        )
+        for __name, param in params.items()
+    ]
+    params.update(context)
+    params.move_to_end(context[0], last=False)
+
+    if any(opt is MISSING for opt in _options):
+        raise TypeError(
+            "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
+        )
+
+    return _options

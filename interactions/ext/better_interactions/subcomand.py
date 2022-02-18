@@ -9,11 +9,13 @@ from interactions import (
     MISSING,
 )
 from interactions.decor import command
-from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
-from inspect import getdoc, signature, _empty
-from collections import OrderedDict
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union, TYPE_CHECKING
+from inspect import getdoc, signature
 
-from .command_models import BetterOption
+from .command_models import parameters_to_options
+
+if TYPE_CHECKING:
+    from collections import OrderedDict
 
 
 class Subcommand:
@@ -149,7 +151,6 @@ class SubcommandSetup:
             _options = []
 
             params: OrderedDict = signature(coro).parameters
-            print(f"{params}=")
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
@@ -158,25 +159,7 @@ class SubcommandSetup:
                 )
 
             if options is MISSING and len(params) > 1:
-                params.popitem(last=False)
-                _options = [
-                    Option(
-                        type=param.annotation.type,
-                        name=__name
-                        if not param.annotation.name
-                        else param.annotation.name,
-                        description=param.annotation.description,
-                        required=param.default is _empty,
-                        choices=param.annotation.choices,
-                        channel_types=param.annotation.channel_types,
-                        min_value=param.annotation.min_value,
-                        max_value=param.annotation.max_value,
-                        autocomplete=param.annotation.autocomplete,
-                        focused=param.annotation.focused,
-                        value=param.annotation.value,
-                    )
-                    for __name, param in params.items()
-                ]
+                _options = parameters_to_options(params)
 
             _options = _options if options is MISSING and len(params) > 1 else options
 
