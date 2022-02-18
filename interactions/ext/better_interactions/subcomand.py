@@ -1,4 +1,3 @@
-import interactions
 from interactions import (
     ApplicationCommand,
     ApplicationCommandType,
@@ -8,6 +7,7 @@ from interactions import (
     InteractionException,
     Option,
     OptionType,
+    MISSING,
 )
 from interactions.decor import command
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
@@ -109,10 +109,10 @@ class SubcommandSetup:
     def subcommand(
         self,
         *,
-        group: Optional[str] = None,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        options: Optional[List[Option]] = None,
+        group: Optional[str] = MISSING,
+        name: Optional[str] = MISSING,
+        description: Optional[str] = MISSING,
+        options: Optional[List[Option]] = MISSING,
     ) -> Callable[..., Any]:
         """
         Decorator that creates a subcommand for the corresponding base.
@@ -133,8 +133,12 @@ class SubcommandSetup:
         """
 
         def decorator(coro: Coroutine) -> Coroutine:
-            _name = name or coro.__name__
-            _description = description or getdoc(coro) or "No description"
+            _name = coro.__name__ if name is MISSING else name
+            _description = (
+                (getdoc(coro) or "No description")
+                if description is MISSING
+                else description
+            )
             _options = []
 
             params = signature(coro).parameters
@@ -145,7 +149,7 @@ class SubcommandSetup:
                     message="Your command needs at least one argument to return context.",
                 )
 
-            if not options and len(params) > 1:
+            if options is MISSING and len(params) > 1:
                 context = True
                 for __name, param in params.items():
                     if context:
@@ -172,7 +176,7 @@ class SubcommandSetup:
                         )
                     )
 
-            _options = options or _options
+            _options = _options if options is MISSING and len(params) > 1 else options
 
             if group:
                 if group not in self.groups:
@@ -308,10 +312,10 @@ class ExternalSubcommandSetup(SubcommandSetup):
     def subcommand(
         self,
         *,
-        group: Optional[str] = None,
-        name: Optional[str] = None,
-        description: Optional[str] = None,
-        options: Optional[List[Option]] = None,
+        group: Optional[str] = MISSING,
+        name: Optional[str] = MISSING,
+        description: Optional[str] = MISSING,
+        options: Optional[List[Option]] = MISSING,
     ) -> Callable[..., Any]:
         """
         Decorator that creates a subcommand for the corresponding base.
