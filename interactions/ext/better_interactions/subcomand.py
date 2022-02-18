@@ -229,6 +229,7 @@ class SubcommandSetup:
             scope=self.scope,
             options=options,
         )
+        print(commands)
 
         if self.client._automate_sync:
             if self.client._loop.is_running():
