@@ -303,8 +303,8 @@ class ExternalSubcommandSetup(SubcommandSetup):
         self,
         base: str,
         description: Optional[str] = "No description",
-        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
-        default_permission: Optional[bool] = None,
+        scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
+        default_permission: Optional[bool] = MISSING,
     ):
         super().__init__(
             client=None,
