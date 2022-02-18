@@ -2,7 +2,6 @@ from interactions import (
     ApplicationCommand,
     ApplicationCommandType,
     Client,
-    Extension,
     Guild,
     InteractionException,
     Option,

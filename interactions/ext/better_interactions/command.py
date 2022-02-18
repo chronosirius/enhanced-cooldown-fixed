@@ -5,12 +5,6 @@ from interactions import (
     Option,
     Guild,
     get_logger,
-    OptionType,
-    User,
-    Channel,
-    Role,
-    Choice,
-    ChannelType,
 )
 from typing import (
     List,
