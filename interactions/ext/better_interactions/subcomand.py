@@ -38,12 +38,19 @@ class Subcommand:
         self.description: str = description
         self.coro: Coroutine = coro
         self.options: List[Option] = options
-        self._options: Option = Option(
-            type=OptionType.SUB_COMMAND,
-            name=name,
-            description=description,
-            options=options,
-        )
+        if options:
+            self._options: Option = Option(
+                type=OptionType.SUB_COMMAND,
+                name=name,
+                description=description,
+                options=options,
+            )
+        else:
+            self._options: Option = Option(
+                type=OptionType.SUB_COMMAND,
+                name=name,
+                description=description,
+            )
 
 
 class Group:
