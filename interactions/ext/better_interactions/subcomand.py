@@ -11,6 +11,7 @@ from interactions import (
 from interactions.decor import command
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 from inspect import getdoc, signature, _empty
+from collections import OrderedDict
 
 from .command_models import BetterOption
 
@@ -147,7 +148,8 @@ class SubcommandSetup:
             )
             _options = []
 
-            params = signature(coro).parameters
+            params: OrderedDict = signature(coro).parameters
+            print(f"{params}=")
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
@@ -157,32 +159,53 @@ class SubcommandSetup:
 
             if options is MISSING and len(params) > 1:
                 print("options is MISSING")
-                context = True
+                # context = True
                 print(type(params.items()))
-                for __name, param in params.items():
-                    if context:
-                        context = False
-                        continue
-                    typehint: BetterOption = param.annotation
-                    if typehint is _empty or not isinstance(typehint, BetterOption):
-                        raise TypeError(
-                            "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
-                        )
-                    _options.append(
-                        Option(
-                            type=typehint.type,
-                            name=__name if not typehint.name else typehint.name,
-                            description=typehint.description,
-                            required=param.default is _empty,
-                            choices=typehint.choices,
-                            channel_types=typehint.channel_types,
-                            min_value=typehint.min_value,
-                            max_value=typehint.max_value,
-                            autocomplete=typehint.autocomplete,
-                            focused=typehint.focused,
-                            value=typehint.value,
-                        )
+
+                params.popitem(last=False)
+                _options = [
+                    Option(
+                        type=param.annotation.type,
+                        name=__name
+                        if not param.annotation.name
+                        else param.annotation.name,
+                        description=param.annotation.description,
+                        required=param.default is _empty,
+                        choices=param.annotation.choices,
+                        channel_types=param.annotation.channel_types,
+                        min_value=param.annotation.min_value,
+                        max_value=param.annotation.max_value,
+                        autocomplete=param.annotation.autocomplete,
+                        focused=param.annotation.focused,
+                        value=param.annotation.value,
                     )
+                    for __name, param in params.items()
+                ]
+
+                # for __name, param in params.items():
+                #     if context:
+                #         context = False
+                #         continue
+                #     typehint: BetterOption = param.annotation
+                #     if typehint is _empty or not isinstance(typehint, BetterOption):
+                #         raise TypeError(
+                #             "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
+                #         )
+                #     _options.append(
+                #         Option(
+                #             type=typehint.type,
+                #             name=__name if not typehint.name else typehint.name,
+                #             description=typehint.description,
+                #             required=param.default is _empty,
+                #             choices=typehint.choices,
+                #             channel_types=typehint.channel_types,
+                #             min_value=typehint.min_value,
+                #             max_value=typehint.max_value,
+                #             autocomplete=typehint.autocomplete,
+                #             focused=typehint.focused,
+                #             value=typehint.value,
+                #         )
+                #     )
 
             _options = _options if options is MISSING and len(params) > 1 else options
 
