@@ -185,21 +185,19 @@ class SubcommandSetup:
 
             _options = _options if options is MISSING and len(params) > 1 else options
 
-            if group is not MISSING:
-                if group not in self.groups:
-                    self.groups[group] = Group(
-                        group,
-                        description,
-                        subcommand=Subcommand(_name, _description, coro, _options),
-                    )
-                else:
-                    subcommands = self.groups[group].subcommands
-                    subcommands.append(Subcommand(_name, _description, coro, _options))
-            else:
+            if group is MISSING:
                 self.subcommands[_name] = Subcommand(
                     _name, _description, coro, _options
                 )
-
+            elif group not in self.groups:
+                self.groups[group] = Group(
+                    group,
+                    description,
+                    subcommand=Subcommand(_name, _description, coro, _options),
+                )
+            else:
+                subcommands = self.groups[group].subcommands
+                subcommands.append(Subcommand(_name, _description, coro, _options))
             return coro
 
         return decorator
