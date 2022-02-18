@@ -11,7 +11,9 @@ from interactions import (
 )
 from interactions.decor import command
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
-from inspect import getdoc
+from inspect import getdoc, signature, _empty
+
+from .command_models import BetterOption
 
 
 class Subcommand:
@@ -133,6 +135,9 @@ class SubcommandSetup:
         def decorator(coro: Coroutine) -> Coroutine:
             _name = name or coro.__name__
             _description = description or getdoc(coro) or "No description"
+            _options = []
+
+            params = signature(coro).parameters
 
             if not len(coro.__code__.co_varnames):
                 raise InteractionException(
@@ -140,18 +145,49 @@ class SubcommandSetup:
                     message="Your command needs at least one argument to return context.",
                 )
 
+            if not options and len(params) > 1:
+                context = True
+                for __name, param in params.items():
+                    if context:
+                        context = False
+                        continue
+                    typehint: BetterOption = param.annotation
+                    if typehint is _empty or not isinstance(typehint, BetterOption):
+                        raise TypeError(
+                            "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
+                        )
+                    _options.append(
+                        Option(
+                            type=typehint.type,
+                            name=__name if not typehint.name else typehint.name,
+                            description=typehint.description,
+                            required=param.default is _empty,
+                            choices=typehint.choices,
+                            channel_types=typehint.channel_types,
+                            min_value=typehint.min_value,
+                            max_value=typehint.max_value,
+                            autocomplete=typehint.autocomplete,
+                            focused=typehint.focused,
+                            value=typehint.value,
+                        )
+                    )
+
+            _options = options or _options
+
             if group:
                 if group not in self.groups:
                     self.groups[group] = Group(
                         group,
                         description,
-                        subcommand=Subcommand(_name, _description, coro, options),
+                        subcommand=Subcommand(_name, _description, coro, _options),
                     )
                 else:
                     subcommands = self.groups[group].subcommands
-                    subcommands.append(Subcommand(_name, _description, coro, options))
+                    subcommands.append(Subcommand(_name, _description, coro, _options))
             else:
-                self.subcommands[_name] = Subcommand(_name, _description, coro, options)
+                self.subcommands[_name] = Subcommand(
+                    _name, _description, coro, _options
+                )
 
             return coro
 
@@ -300,27 +336,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
             coro.__base__ = self.base
             coro.__data__ = self
 
-            _name = name or coro.__name__
-            _description = description or getdoc(coro) or "No description"
-
-            if not len(coro.__code__.co_varnames):
-                raise InteractionException(
-                    11,
-                    message="Your command needs at least one argument to return context.",
-                )
-
-            if group:
-                if group not in self.groups:
-                    self.groups[group] = Group(
-                        group,
-                        description,
-                        subcommand=Subcommand(_name, _description, coro, options),
-                    )
-                else:
-                    subcommands = self.groups[group].subcommands
-                    subcommands.append(Subcommand(_name, _description, coro, options))
-            else:
-                self.subcommands[_name] = Subcommand(_name, _description, coro, options)
+            super().subcommand(
+                self, group=group, name=name, description=description, options=options
+            )
 
             return coro
 
