@@ -141,6 +141,7 @@ class SubcommandSetup:
 
         def decorator(coro: Coroutine) -> Coroutine:
             _name = coro.__name__ if name is MISSING else name
+            print("name =", _name)
             _description = (
                 (getdoc(coro) or "No description")
                 if description is MISSING
