@@ -336,7 +336,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
             coro.__base__ = self.base
             coro.__data__ = self
 
-            super().subcommand(
+            super(ExternalSubcommandSetup, self).subcommand(
                 group=group, name=name, description=description, options=options
             )
 
