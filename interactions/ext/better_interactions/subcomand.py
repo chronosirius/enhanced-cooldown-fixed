@@ -22,7 +22,7 @@ class Subcommand:
         name: str,
         description: str,
         coro: Coroutine,
-        options: List[Option] = MISSING,
+        options: List[Option] = None,
     ):
         """
         A class that represents a subcommand.
