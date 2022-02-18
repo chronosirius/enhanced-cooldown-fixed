@@ -177,6 +177,7 @@ class SubcommandSetup:
                     )
 
             _options = _options if options is MISSING and len(params) > 1 else options
+            print("options", _options)
 
             if group:
                 if group not in self.groups:
