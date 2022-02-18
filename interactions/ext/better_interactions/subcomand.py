@@ -156,6 +156,7 @@ class SubcommandSetup:
                 )
 
             if options is MISSING and len(params) > 1:
+                print("options is MISSING")
                 context = True
                 print(type(params.items()))
                 for __name, param in params.items():
