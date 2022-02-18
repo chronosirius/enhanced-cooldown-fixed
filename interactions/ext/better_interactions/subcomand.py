@@ -372,7 +372,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
             if self.subcommands
             else []
         )
-        options = (group_options + subcommand_options) or None
+        options = (group_options + subcommand_options) or MISSING
         commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
