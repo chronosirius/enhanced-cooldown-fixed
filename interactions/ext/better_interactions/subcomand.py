@@ -22,7 +22,7 @@ class Subcommand:
         name: str,
         description: str,
         coro: Coroutine,
-        options: List[Option] = None,
+        options: List[Option] = MISSING,
     ):
         """
         A class that represents a subcommand.
@@ -38,18 +38,18 @@ class Subcommand:
         self.description: str = description
         self.coro: Coroutine = coro
         self.options: List[Option] = options
-        if options:
+        if options is MISSING:
             self._options: Option = Option(
                 type=OptionType.SUB_COMMAND,
                 name=name,
                 description=description,
-                options=options,
             )
         else:
             self._options: Option = Option(
                 type=OptionType.SUB_COMMAND,
                 name=name,
                 description=description,
+                options=options,
             )
 
 
@@ -184,7 +184,6 @@ class SubcommandSetup:
                     )
 
             _options = _options if options is MISSING and len(params) > 1 else options
-            _options = None if _options is MISSING else _options
 
             if group:
                 if group not in self.groups:
