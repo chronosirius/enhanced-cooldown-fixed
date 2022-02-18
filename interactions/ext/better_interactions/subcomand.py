@@ -244,7 +244,7 @@ class SubcommandSetup:
                     for command in commands
                 ]
 
-        if self.scope is not None:
+        if self.scope is not MISSING:
             if isinstance(self.scope, list):
                 [
                     self.client._scopes.add(_ if isinstance(_, int) else _.id)
