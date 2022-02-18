@@ -158,10 +158,6 @@ class SubcommandSetup:
                 )
 
             if options is MISSING and len(params) > 1:
-                print("options is MISSING")
-                # context = True
-                print(type(params.items()))
-
                 params.popitem(last=False)
                 _options = [
                     Option(
@@ -181,31 +177,6 @@ class SubcommandSetup:
                     )
                     for __name, param in params.items()
                 ]
-
-                # for __name, param in params.items():
-                #     if context:
-                #         context = False
-                #         continue
-                #     typehint: BetterOption = param.annotation
-                #     if typehint is _empty or not isinstance(typehint, BetterOption):
-                #         raise TypeError(
-                #             "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
-                #         )
-                #     _options.append(
-                #         Option(
-                #             type=typehint.type,
-                #             name=__name if not typehint.name else typehint.name,
-                #             description=typehint.description,
-                #             required=param.default is _empty,
-                #             choices=typehint.choices,
-                #             channel_types=typehint.channel_types,
-                #             min_value=typehint.min_value,
-                #             max_value=typehint.max_value,
-                #             autocomplete=typehint.autocomplete,
-                #             focused=typehint.focused,
-                #             value=typehint.value,
-                #         )
-                #     )
 
             _options = _options if options is MISSING and len(params) > 1 else options
 
