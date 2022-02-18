@@ -77,12 +77,13 @@ def command(
             getdoc(coro) or "No description" if description is MISSING else description
         )
         _description = _description[:100]
-        _options = []
 
         params = signature(coro).parameters
-
-        if options is MISSING and len(params) > 1:
-            _options = parameters_to_options(params)
+        _options = (
+            parameters_to_options(params)
+            if options is MISSING and len(params) > 1
+            else options
+        )
 
         return self.old_command(
             type=type,

@@ -148,20 +148,19 @@ class SubcommandSetup:
                 if description is MISSING
                 else description
             )
-            _options = []
 
-            params: OrderedDict = signature(coro).parameters
+            params = signature(coro).parameters
+            _options = (
+                parameters_to_options(params)
+                if options is MISSING and len(params) > 1
+                else options
+            )
 
-            if not len(coro.__code__.co_varnames):
+            if not len(params):
                 raise InteractionException(
                     11,
                     message="Your command needs at least one argument to return context.",
                 )
-
-            if options is MISSING and len(params) > 1:
-                _options = parameters_to_options(params)
-
-            _options = _options if options is MISSING and len(params) > 1 else options
 
             if group is MISSING:
                 self.subcommands[_name] = Subcommand(
