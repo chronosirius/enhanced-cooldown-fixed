@@ -7,7 +7,7 @@ from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 
 from .callback import component
-from .subcomand import base
+from .subcomand import ExternalSubcommandSetup, base
 from .command import command
 from ._logging import get_logger
 
@@ -54,11 +54,11 @@ def sync_subcommands(self):
         commands = []
 
         for subcommand in bases.values():
+            subcommand: ExternalSubcommandSetup
             client.event(subcommand.inner, name=f"command_{subcommand.base}")
             commands.extend(subcommand.raw_commands)
 
         if client._automate_sync:
-
             if client._loop.is_running():
                 [
                     client._loop.create_task(client._synchronize(command))
