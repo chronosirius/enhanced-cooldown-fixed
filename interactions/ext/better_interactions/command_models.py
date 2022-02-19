@@ -90,9 +90,6 @@ class BetterOption:
 @logger.catch
 def parameters_to_options(params: "OrderedDict") -> List[Option]:
     log.debug("parameters_to_options:")
-    print("DICT: ", params)
-    context = next(iter(params.items()))
-    del params[context[0]]
     _options = [
         (
             Option(
@@ -112,9 +109,7 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
             else MISSING
         )
         for __name, param in params.items()
-    ]
-    params.update(context)
-    params.move_to_end(context[0], last=False)
+    ][1:]
 
     if any(opt is MISSING for opt in _options):
         raise TypeError(
