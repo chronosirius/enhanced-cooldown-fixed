@@ -10,6 +10,7 @@ from interactions import (
 )
 from typing import List, Optional, Union, TYPE_CHECKING
 from inspect import _empty
+from loguru import logger
 
 from ._logging import get_logger
 
@@ -86,6 +87,7 @@ class BetterOption:
         self.value = value
 
 
+@logger.catch
 def parameters_to_options(params: "OrderedDict") -> List[Option]:
     log.debug("parameters_to_options:")
     context = params.popitem(last=False)
