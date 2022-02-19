@@ -13,9 +13,9 @@ from typing import Any, Callable, Coroutine, Dict, List, Optional, Union, TYPE_C
 from inspect import getdoc, signature
 
 from .command_models import parameters_to_options
+from ._logging import get_logger
 
-if TYPE_CHECKING:
-    from collections import OrderedDict
+log = get_logger("subcommand")
 
 
 class Subcommand:
@@ -36,6 +36,7 @@ class Subcommand:
         :param Coroutine coro: The coroutine that will be executed when the subcommand is called.
         :param List[Option] options: The options of the subcommand.
         """
+        log.debug(f"Subcommand.__init__: {name=}")
         self.name: str = name
         self.description: str = description
         self.coro: Coroutine = coro
@@ -66,6 +67,7 @@ class Group:
         :param str description: The description of the subcommand group.
         :param Subcommand subcommand: The initial subcommand.
         """
+        log.debug(f"Group.__init__: {group=}, {subcommand=}")
         self.group: str = group
         self.description: str = description
         self.subcommands: List[Subcommand] = [subcommand]
@@ -106,6 +108,7 @@ class SubcommandSetup:
         scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
         default_permission: Optional[bool] = None,
     ):
+        log.debug(f"SubcommandSetup.__init__: {base=}")
         self.client: Client = client
         self.base: str = base
         self.description: str = description
@@ -140,6 +143,7 @@ class SubcommandSetup:
         :param str description: The description of the subcommand.
         :param List[Option] options: The options of the subcommand.
         """
+        log.debug(f"SubcommandSetup.subcommand: {self.base=}, {group=}, {name=}")
 
         def decorator(coro: Coroutine) -> Coroutine:
             _name = coro.__name__ if name is MISSING else name
@@ -188,6 +192,7 @@ class SubcommandSetup:
         base_var.finish()
         ```
         """
+        log.debug(f"SubcommandSetup.finish: {self.base=}")
         group_options = (
             [group._options for group in self.groups.values()] if self.groups else []
         )
@@ -257,6 +262,7 @@ class NonSynchronizedCommand:
     """
 
     def __init__(self, commands: List[ApplicationCommand], base: str = None):
+        log.debug(f"NonSynchronizedCommand.__init__: {base=}")
         self.__need_sync__ = True
         self.commands = commands
         self.base = base
@@ -281,6 +287,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
         default_permission: Optional[bool] = MISSING,
     ):
+        log.debug(f"ExternalSubcommandSetup.__init__: {base=}")
         super().__init__(
             client=None,
             base=base,
@@ -316,6 +323,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
         :param str description: The description of the subcommand.
         :param List[Option] options: The options of the subcommand.
         """
+        log.debug(
+            f"ExternalSubcommandSetup.subcommand: {self.base=}, {group=}, {name=}"
+        )
 
         def decorator(coro: Coroutine) -> Coroutine:
             coro.__subcommand__ = True
@@ -339,6 +349,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         base_var.finish()
         ```
         """
+        log.debug(f"ExternalSubcommandSetup.finish: {self.base=}")
         group_options = (
             [group._options for group in self.groups.values()] if self.groups else []
         )
@@ -400,6 +411,7 @@ def base(
     :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
     :param bool default_permission: The default permission of the base.
     """
+    log.debug(f"base: {base=}")
     return SubcommandSetup(self, base, description, scope, default_permission)
 
 
@@ -427,4 +439,5 @@ def extension_base(
     :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
     :param bool default_permission: The default permission of the base.
     """
+    log.debug(f"extension_base: {base=}")
     return ExternalSubcommandSetup(base, description, scope, default_permission)

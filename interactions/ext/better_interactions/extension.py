@@ -4,10 +4,14 @@ from interactions import Client
 from interactions.ext import wait_for
 
 from inspect import getmembers, iscoroutinefunction
+from logging import Logger
 
 from .callback import component
 from .subcomand import base
 from .command import command
+from ._logging import get_logger
+
+log: Logger = get_logger("extension")
 
 
 class ExtendedWebSocket(interactions.api.gateway.WebSocket):
@@ -80,7 +84,9 @@ def sync_subcommands(self):
 class BetterExtension(interactions.client.Extension):
     def __new__(cls, client, *args, **kwargs):
         self = super().__new__(cls, client, *args, **kwargs)
+        log.debug("Syncing subcommands...")
         sync_subcommands(self)
+        log.debug("Synced subcommands")
         return self
 
 
@@ -121,9 +127,13 @@ class BetterInteractions(interactions.client.Extension):
         :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
         """
         if not isinstance(bot, interactions.Client):
+            log.critical("The bot must be an instance of Client")
             raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
+        else:
+            log.debug("The bot is an instance of Client")
 
         if modify_component_callbacks:
+            log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
 
             old_websocket = bot._websocket
@@ -136,9 +146,11 @@ class BetterInteractions(interactions.client.Extension):
             bot._websocket = new_websocket
 
         if add_subcommand:
+            log.debug("Adding bot.base (add_subcommand)")
             bot.base = types.MethodType(base, bot)
 
         if add_method or add_interaction_events:
+            log.debug("Adding bot.wait_for (add_method or add_interaction_events)")
             wait_for.setup(
                 bot,
                 add_method=add_method,
@@ -146,8 +158,11 @@ class BetterInteractions(interactions.client.Extension):
             )
 
         if modify_command:
+            log.debug("Modifying bot.command (modify_command)")
             bot.old_command = bot.command
             bot.command = types.MethodType(command, bot)
+
+        log.info("Hooks applied")
 
 
 def setup(
@@ -169,6 +184,7 @@ def setup(
     :param bool add_method: If ``wait_for`` should be attached to the bot
     :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
     """
+    log.info("Setting up BetterInteractions")
     return BetterInteractions(
         bot,
         modify_component_callbacks,

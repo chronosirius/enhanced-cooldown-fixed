@@ -11,8 +11,12 @@ from interactions import (
 from typing import List, Optional, Union, TYPE_CHECKING
 from inspect import _empty
 
+from ._logging import get_logger
+
 if TYPE_CHECKING:
     from collections import OrderedDict
+
+log = get_logger("command_models")
 
 
 class BetterOption:
@@ -48,6 +52,7 @@ class BetterOption:
         focused: Optional[bool] = None,
         value: Optional[str] = None,
     ):
+        log.debug("BetterOption.__init__")
         if isinstance(type, int):
             self.type = type
         elif type in (str, int, float):
@@ -82,6 +87,7 @@ class BetterOption:
 
 
 def parameters_to_options(params: OrderedDict) -> List[Option]:
+    log.debug("parameters_to_options:")
     context = params.popitem(last=False)
     _options = [
         (
@@ -110,5 +116,6 @@ def parameters_to_options(params: OrderedDict) -> List[Option]:
         raise TypeError(
             "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
         )
-
+    log.debug(f"  _options: {_options}\n")
+    
     return _options

@@ -4,6 +4,10 @@ from interactions import ActionRow as AR
 from interactions import ButtonStyle, Emoji, SelectOption
 from typing import Union, List, Optional
 
+from ._logging import get_logger
+
+log = get_logger("components")
+
 
 def ActionRow(*args: Union[B, SM]) -> AR:
     """
@@ -14,6 +18,7 @@ def ActionRow(*args: Union[B, SM]) -> AR:
     :return: The ActionRow
     :rtype: ActionRow
     """
+    log.debug(f"Creating ActionRow with {list(args)}")
     return AR(components=list(args))
 
 
@@ -44,6 +49,9 @@ def Button(
     :return: The Button
     :rtype: Button
     """
+    log.debug(
+        f"Creating Button with {style=}, {label=}, {custom_id=}, {url=}, {emoji=}, {disabled=}"
+    )
     if custom_id and url:
         raise ValueError("`custom_id` and `url` cannot be used together!")
 
@@ -103,6 +111,9 @@ def SelectMenu(
     :return: The SelectMenu
     :rtype: SelectMenu
     """
+    log.debug(
+        f"Creating SelectMenu with {options=}, {custom_id=}, {placeholder=}, {min_values=}, {max_values=}, {disabled=}"
+    )
     return SM(
         options=options,
         custom_id=custom_id,
@@ -125,6 +136,7 @@ def spread_to_rows(*components: Union[AR, B, SM], max_in_row: int = 5) -> List[A
     :rtype: List[ActionRow]
     :raises: ValueError: Too many or few components or rows
     """
+    log.debug(f"spread_to_rows with {components=}, {max_in_row=}")
     # todo: incorrect format errors
     if not components or len(components) > 25:
         raise ValueError("Number of components should be between 1 and 25.")

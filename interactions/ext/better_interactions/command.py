@@ -20,7 +20,7 @@ from inspect import signature
 
 from .command_models import parameters_to_options
 
-log: Logger = get_logger("client")
+log: Logger = get_logger("command")
 
 
 def command(
@@ -84,6 +84,7 @@ def command(
             if options is MISSING and len(params) > 1
             else options
         )
+        log.debug(f"command: {_name=} {_description=} {_options=}")
 
         return self.old_command(
             type=type,
@@ -107,6 +108,7 @@ def extension_command(**kwargs):
         )
         kwargs["description"] = kwargs["description"][:100]
         coro.__command_data__ = ((), kwargs)
+        log.debug(f"extension_command: {coro.__command_data__=}")
         return coro
 
     return decorator

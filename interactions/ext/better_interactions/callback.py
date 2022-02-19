@@ -1,6 +1,10 @@
 from typing import Union, Callable, Optional, Any, Coroutine
 import interactions
 
+from ._logging import get_logger
+
+log = get_logger("callback")
+
 
 def component(
     bot: interactions.Client,
@@ -44,6 +48,7 @@ def component(
             coro.startswith = False
             return bot.event(coro, name=f"component_{payload}")
         coro.startswith = True
+        log.debug(f"Component callback, {coro.startswith=}")
         return bot.event(coro, name=f"component_startswith_{payload}")
 
     return decorator
