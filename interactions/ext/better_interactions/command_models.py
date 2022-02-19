@@ -91,7 +91,8 @@ class BetterOption:
 def parameters_to_options(params: "OrderedDict") -> List[Option]:
     log.debug("parameters_to_options:")
     print("DICT: ", params)
-    context = params.pop(next(iter(params.items()))[0])
+    context = next(iter(params.items()))
+    del params[context[0]]
     _options = [
         (
             Option(
