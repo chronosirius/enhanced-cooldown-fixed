@@ -86,7 +86,7 @@ class BetterOption:
         self.value = value
 
 
-def parameters_to_options(params: OrderedDict) -> List[Option]:
+def parameters_to_options(params: "OrderedDict") -> List[Option]:
     log.debug("parameters_to_options:")
     context = params.popitem(last=False)
     _options = [
@@ -117,5 +117,5 @@ def parameters_to_options(params: OrderedDict) -> List[Option]:
             "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
         )
     log.debug(f"  _options: {_options}\n")
-    
+
     return _options
