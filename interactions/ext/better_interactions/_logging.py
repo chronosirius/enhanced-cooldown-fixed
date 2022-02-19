@@ -48,7 +48,7 @@ def get_logger(
     if len(_logger.handlers) > 1:
         _logger.removeHandler(_logger.handlers[0])
     _handler = handler
-    _handler.setFormatter(CustomFormatter)
+    _handler.setFormatter(CustomFormatter())
     _handler.setLevel(Data.LOG_LEVEL)
     _logger.addHandler(_handler)
     _logger.propagate = True
