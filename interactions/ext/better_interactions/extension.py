@@ -1,15 +1,15 @@
 import types
+from inspect import getmembers, iscoroutinefunction
+from logging import Logger
+
 import interactions
 from interactions import Client
 from interactions.ext import wait_for
 
-from inspect import getmembers, iscoroutinefunction
-from logging import Logger
-
-from .callback import component
-from .subcomand import ExternalSubcommandSetup, base
-from .command import command
 from ._logging import get_logger
+from .callback import component
+from .command import command
+from .subcomand import ExternalSubcommandSetup, base
 
 log: Logger = get_logger("extension")
 
@@ -60,10 +60,7 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [
-                    client._loop.create_task(client._synchronize(command))
-                    for command in commands
-                ]
+                [client._loop.create_task(client._synchronize(command)) for command in commands]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -73,10 +70,7 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [
-                        client._scopes.add(_ if isinstance(_, int) else _.id)
-                        for _ in scope
-                    ]
+                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 

@@ -1,4 +1,5 @@
-from typing import Union, Callable, Optional, Any, Coroutine
+from typing import Any, Callable, Coroutine, Optional, Union
+
 import interactions
 
 from ._logging import get_logger

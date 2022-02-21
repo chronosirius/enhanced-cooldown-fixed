@@ -1,10 +1,9 @@
+from re import MULTILINE, search
+
 from setuptools import setup
-from re import search, MULTILINE
 
 with open("interactions/ext/better_interactions/__init__.py") as f:
-    version = search(
-        r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), MULTILINE
-    ).group(1)
+    version = search(r'^__version__\s*=\s*[\'"]([^\'"]*)[\'"]', f.read(), MULTILINE).group(1)
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()

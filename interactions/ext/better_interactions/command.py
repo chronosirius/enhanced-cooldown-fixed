@@ -1,25 +1,11 @@
-from interactions import (
-    MISSING,
-    ApplicationCommandType,
-    Option,
-    Guild,
-    get_logger,
-    CommandContext,
-    ComponentContext,
-)
-from typing import (
-    List,
-    Dict,
-    Any,
-    Optional,
-    Union,
-    Callable,
-    Coroutine,
-)
-from logging import Logger
-from inspect import getdoc, signature
-from asyncio import get_running_loop, Task, sleep
+from asyncio import Task, get_running_loop, sleep
 from functools import wraps
+from inspect import getdoc, signature
+from logging import Logger
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
+
+from interactions import (MISSING, ApplicationCommandType, CommandContext,
+                          ComponentContext, Guild, Option, get_logger)
 
 from .command_models import parameters_to_options
 
@@ -29,15 +15,11 @@ log: Logger = get_logger("command")
 def command(
     self,
     *,
-    type: Optional[
-        Union[int, ApplicationCommandType]
-    ] = ApplicationCommandType.CHAT_INPUT,
+    type: Optional[Union[int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
     name: Optional[str] = MISSING,
     description: Optional[str] = MISSING,
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-    options: Optional[
-        Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]
-    ] = MISSING,
+    options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]] = MISSING,
     default_permission: Optional[bool] = MISSING,
 ) -> Callable[..., Any]:
     """
@@ -76,16 +58,12 @@ def command(
     def decorator(coro: Coroutine) -> Callable[..., Any]:
         # TODO: fix this code once it breaks
         _name = coro.__name__ if name is MISSING else name
-        _description = (
-            getdoc(coro) or "No description" if description is MISSING else description
-        )
+        _description = getdoc(coro) or "No description" if description is MISSING else description
         _description = _description[:100]
 
         params = signature(coro).parameters
         _options = (
-            parameters_to_options(params)
-            if options is MISSING and len(params) > 1
-            else options
+            parameters_to_options(params) if options is MISSING and len(params) > 1 else options
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
@@ -144,9 +122,7 @@ def autodefer(
 
     def inner(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        async def deferring_func(
-            ctx: Union[CommandContext, ComponentContext], *args, **kwargs
-        ):
+        async def deferring_func(ctx: Union[CommandContext, ComponentContext], *args, **kwargs):
             loop = get_running_loop()
             task: Task = loop.create_task(func(ctx, *args, **kwargs))
 
