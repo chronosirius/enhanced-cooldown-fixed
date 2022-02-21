@@ -24,7 +24,7 @@
 # }
 
 # build(Base(**data))
-from ._setup import base
+from _setup import base
 from setuptools import setup
 
 setup(
