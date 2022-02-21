@@ -4,6 +4,8 @@ from interactions import (
     Option,
     Guild,
     get_logger,
+    CommandContext,
+    ComponentContext,
 )
 from typing import (
     List,
@@ -15,8 +17,9 @@ from typing import (
     Coroutine,
 )
 from logging import Logger
-from inspect import getdoc
-from inspect import signature
+from inspect import getdoc, signature
+from asyncio import get_running_loop, Task, sleep
+from functools import wraps
 
 from .command_models import parameters_to_options
 
@@ -112,3 +115,54 @@ def extension_command(**kwargs):
         return coro
 
     return decorator
+
+
+def autodefer(
+    delay: Optional[Union[float, int]] = 2,
+    ephemeral: Optional[bool] = False,
+    edit_origin: Optional[bool] = False,
+):
+    """
+    Set up a command to be automatically deferred after some time
+    Note: This will not work if blocking code is used (such as the requests module)
+
+    Usage:
+    ```py
+    @bot.command(...)
+    @autodefer(...)
+    async def foo(ctx, ...):
+        ...
+    ```
+
+    :param delay: How long to wait before deferring
+    :type delay: Optional[Union[float, int]]
+    :param ephemeral: If the command should be deferred hidden
+    :type ephemeral: Optional[bool]
+    :param edit_origin: If the command should be deferred with the origin message
+    :type edit_origin: Optional[bool]
+    """
+
+    def inner(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        async def deferring_func(
+            ctx: Union[CommandContext, ComponentContext], *args, **kwargs
+        ):
+            loop = get_running_loop()
+            task: Task = loop.create_task(func(ctx, *args, **kwargs))
+
+            await sleep(delay)
+
+            if task.done():
+                return task.result()
+
+            if not (ctx.deferred or ctx.responded):
+                if isinstance(ctx, ComponentContext):
+                    await ctx.defer(ephemeral=ephemeral, edit_origin=edit_origin)
+                else:
+                    await ctx.defer(ephemeral=ephemeral)
+
+            return await task
+
+        return deferring_func
+
+    return inner
