@@ -8,13 +8,8 @@ from .cmd.subcommands import base, extension_base
 from .cmpt import callback, components
 from .cmpt.callback import component
 from .cmpt.components import ActionRow, Button, SelectMenu, spread_to_rows
-from .extension import (
-    BetterExtension,
-    BetterInteractions,
-    ExtendedWebSocket,
-    setup,
-    sync_subcommands,
-)
+from .extension import (BetterExtension, BetterInteractions, ExtendedWebSocket,
+                        setup, sync_subcommands)
 
 # fmt: off
 __all__ = [

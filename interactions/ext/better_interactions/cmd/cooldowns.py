@@ -1,9 +1,10 @@
 """
 Credit to @dontbanmeplz for the original code regarding cooldowns, and merging into better-interactions.
 """
-from time import time
 from functools import wraps
-from interactions import CommandContext, User, Guild, Channel
+from time import time
+
+from interactions import Channel, CommandContext, Guild, User
 
 
 class cooldown:
