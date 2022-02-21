@@ -1,6 +1,4 @@
 # flake8: noqa
-from interactions.base import __version__ as __lib_version__
-
 from . import _logging, extension
 from ._logging import CustomFormatter, Data, get_logger
 from .cmd import command_models, commands, subcommands
@@ -10,11 +8,13 @@ from .cmd.subcommands import base, extension_base
 from .cmpt import callback, components
 from .cmpt.callback import component
 from .cmpt.components import ActionRow, Button, SelectMenu, spread_to_rows
-from .extension import (BetterExtension, BetterInteractions, ExtendedWebSocket,
-                        setup, sync_subcommands)
-
-__version__ = "2.1.2"
-__ext_version__ = f"{__lib_version__}:{__version__}"
+from .extension import (
+    BetterExtension,
+    BetterInteractions,
+    ExtendedWebSocket,
+    setup,
+    sync_subcommands,
+)
 
 # fmt: off
 __all__ = [
