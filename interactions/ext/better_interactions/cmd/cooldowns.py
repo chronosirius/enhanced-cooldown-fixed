@@ -41,17 +41,6 @@ class cooldown:
         data = time()
         return (True, data)
 
-        try:
-            data = js[id]
-            if time() - data < self.cool:
-                return (False, data)
-            data = time()
-            return (True, data)
-        except:
-            t = time()
-            js[id] = t
-            return (True, t)
-
     def __call__(self, func):
         @wraps(func)
         async def new_func(ctx: CommandContext, *args, **kwargs):
