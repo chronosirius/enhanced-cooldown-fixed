@@ -7,9 +7,9 @@ from interactions import Client
 from interactions.ext import wait_for
 
 from ._logging import get_logger
-from .callback import component
-from .command import command
-from .subcomand import ExternalSubcommandSetup, base
+from .cmd.commands import command
+from .cmd.subcommands import ExternalSubcommandSetup, base
+from .cmpt.callback import component
 
 log: Logger = get_logger("extension")
 

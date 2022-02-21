@@ -1,14 +1,20 @@
 from inspect import getdoc, signature
-from typing import (TYPE_CHECKING, Any, Callable, Coroutine, Dict, List,
-                    Optional, Union)
+from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
 from interactions.decor import command
 
-from interactions import (MISSING, ApplicationCommand, ApplicationCommandType,
-                          Client, Guild, InteractionException, Option,
-                          OptionType)
+from interactions import (
+    MISSING,
+    ApplicationCommand,
+    ApplicationCommandType,
+    Client,
+    Guild,
+    InteractionException,
+    Option,
+    OptionType,
+)
 
-from ._logging import get_logger
+from .._logging import get_logger
 from .command_models import parameters_to_options
 
 log = get_logger("subcommand")
@@ -144,12 +150,16 @@ class SubcommandSetup:
         def decorator(coro: Coroutine) -> Coroutine:
             _name = coro.__name__ if name is MISSING else name
             _description = (
-                (getdoc(coro) or "No description") if description is MISSING else description
+                (getdoc(coro) or "No description")
+                if description is MISSING
+                else description
             )
 
             params = signature(coro).parameters
             _options = (
-                parameters_to_options(params) if options is MISSING and len(params) > 1 else options
+                parameters_to_options(params)
+                if options is MISSING and len(params) > 1
+                else options
             )
 
             if not len(params):
@@ -159,7 +169,9 @@ class SubcommandSetup:
                 )
 
             if group is MISSING:
-                self.subcommands[_name] = Subcommand(_name, _description, coro, _options)
+                self.subcommands[_name] = Subcommand(
+                    _name, _description, coro, _options
+                )
             elif group not in self.groups:
                 self.groups[group] = Group(
                     group,
@@ -183,7 +195,9 @@ class SubcommandSetup:
         ```
         """
         log.debug(f"SubcommandSetup.finish: {self.base=}")
-        group_options = [group._options for group in self.groups.values()] if self.groups else []
+        group_options = (
+            [group._options for group in self.groups.values()] if self.groups else []
+        )
         subcommand_options = (
             [subcommand._options for subcommand in self.subcommands.values()]
             if self.subcommands
@@ -206,19 +220,26 @@ class SubcommandSetup:
                 ]
             else:
                 [
-                    self.client._loop.run_until_complete(self.client._synchronize(command))
+                    self.client._loop.run_until_complete(
+                        self.client._synchronize(command)
+                    )
                     for command in commands
                 ]
 
         if self.scope is not MISSING:
             if isinstance(self.scope, list):
-                [self.client._scopes.add(_ if isinstance(_, int) else _.id) for _ in self.scope]
+                [
+                    self.client._scopes.add(_ if isinstance(_, int) else _.id)
+                    for _ in self.scope
+                ]
             else:
                 self.client._scopes.add(
                     self.scope if isinstance(self.scope, int) else self.scope.id
                 )
 
-        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
+        async def inner(
+            ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+        ) -> None:
             if sub_command_group:
                 group = self.groups[sub_command_group]
                 subcommand = next(
@@ -304,7 +325,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
         :param str description: The description of the subcommand.
         :param List[Option] options: The options of the subcommand.
         """
-        log.debug(f"ExternalSubcommandSetup.subcommand: {self.base=}, {group=}, {name=}")
+        log.debug(
+            f"ExternalSubcommandSetup.subcommand: {self.base=}, {group=}, {name=}"
+        )
 
         def decorator(coro: Coroutine) -> Coroutine:
             coro.__subcommand__ = True
@@ -329,7 +352,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
         ```
         """
         log.debug(f"ExternalSubcommandSetup.finish: {self.base=}")
-        group_options = [group._options for group in self.groups.values()] if self.groups else []
+        group_options = (
+            [group._options for group in self.groups.values()] if self.groups else []
+        )
         subcommand_options = (
             [subcommand._options for subcommand in self.subcommands.values()]
             if self.subcommands
@@ -346,10 +371,14 @@ class ExternalSubcommandSetup(SubcommandSetup):
         self.raw_commands = commands
         self.full_command = NonSynchronizedCommand(commands, self.base)
 
-    def inner(self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
+    def inner(
+        self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+    ) -> None:
         if sub_command_group:
             group = self.groups[sub_command_group]
-            subcommand = next((sub for sub in group.subcommands if sub.name == sub_command), None)
+            subcommand = next(
+                (sub for sub in group.subcommands if sub.name == sub_command), None
+            )
 
         else:
             subcommand = self.subcommands[sub_command]

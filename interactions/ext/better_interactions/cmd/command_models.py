@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, List, Optional, Union
 from interactions import (MISSING, Channel, ChannelType, Choice, Option,
                           OptionType, Role, User)
 
-from ._logging import get_logger
+from .._logging import get_logger
 
 if TYPE_CHECKING:
     from collections import OrderedDict
