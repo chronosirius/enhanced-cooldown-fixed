@@ -6,9 +6,6 @@ import interactions
 from interactions import Client
 
 from ._logging import get_logger
-from .cmd.commands import command
-from .cmd.subcommands import ExternalSubcommandSetup, base
-from .cmpt.callback import component
 
 log: Logger = get_logger("extension")
 
@@ -64,7 +61,6 @@ def sync_subcommands(self):
         commands = []
 
         for subcommand in bases.values():
-            subcommand: ExternalSubcommandSetup
             client.event(subcommand.inner, name=f"command_{subcommand.base}")
             commands.extend(subcommand.raw_commands)
 
@@ -166,11 +162,15 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("The bot is an instance of Client")
 
         if modify_component_callbacks:
+            from .cmpt.callback import component
+
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
             bot.__modify_component_callbacks__ = True
 
         if add_subcommand:
+            from .cmd.subcommands import base
+
             log.debug("Adding bot.base (add_subcommand)")
             bot.base = types.MethodType(base, bot)
 
@@ -185,6 +185,8 @@ class BetterInteractions(interactions.client.Extension):
             )
 
         if modify_command:
+            from .cmd.commands import command
+
             log.debug("Modifying bot.command (modify_command)")
             bot.old_command = bot.command
             bot.command = types.MethodType(command, bot)
