@@ -1,4 +1,10 @@
-from interactions.ext import Base, Version, VersionAuthor, build
+try:
+    from interactions.ext import Base, Version, VersionAuthor, build
+except ImportError:
+    import pip
+
+    pip.main(["install", "git+https://github.com/Toricane/library@unstable"])
+    from interactions.ext import Base, Version, VersionAuthor, build
 
 # gets the long description from the README file
 with open("README.md", "r", encoding="utf-8") as fh:
