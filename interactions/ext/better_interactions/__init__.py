@@ -1,5 +1,4 @@
 # flake8: noqa
-from . import _logging, extension
 from ._logging import CustomFormatter, Data, get_logger
 from .cmd import command_models, commands, subcommands
 from .cmd.command_models import BetterOption
@@ -15,6 +14,7 @@ from .extension import (
     setup,
     sync_subcommands,
 )
+from . import _logging, extension
 
 # fmt: off
 __all__ = [
