@@ -102,7 +102,7 @@ class BetterExtension(interactions.client.Extension):
             and "ON_COMPONENT" not in client._websocket._dispatch.events
         ):
             client.__modify_component_callbacks__ = False
-            client.event(self.on_component, "on_component")
+            client.event(self.on_component, "ON_COMPONENT")
             log.debug("Registered on_component")
         return self
 
