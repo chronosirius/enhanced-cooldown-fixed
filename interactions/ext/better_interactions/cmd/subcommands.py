@@ -3,9 +3,16 @@ from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
 from interactions.decor import command
 
-from interactions import (MISSING, ApplicationCommand, ApplicationCommandType,
-                          Client, Guild, InteractionException, Option,
-                          OptionType)
+from interactions import (
+    MISSING,
+    ApplicationCommand,
+    ApplicationCommandType,
+    Client,
+    Guild,
+    InteractionException,
+    Option,
+    OptionType,
+)
 
 from .._logging import get_logger
 from .command_models import parameters_to_options

@@ -3,12 +3,19 @@ Credit to @dontbanmeplz for the original code regarding cooldowns, and merging i
 """
 from functools import wraps
 from time import time
+from typing import Callable, Coroutine, Optional, Union
 
 from interactions import Channel, CommandContext, Guild, User
 
 
 class cooldown:
-    def __init__(self, function, cal: function = None, cool: int = 10, typ="user"):
+    def __init__(
+        self,
+        function: Callable,
+        cal: Optional[Coroutine] = None,
+        cool: Optional[Union[float, int]] = 10,
+        typ: Optional[Union[str, User, Channel, Guild]] = "user",
+    ):
         if typ not in {"user", User, "guild", Guild, "channel", Channel}:
             exit()
         self.function = function

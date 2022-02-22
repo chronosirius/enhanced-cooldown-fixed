@@ -1,8 +1,7 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, List, Optional, Union
 
-from interactions import (MISSING, Channel, ChannelType, Choice, Option,
-                          OptionType, Role, User)
+from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
 
 from .._logging import get_logger
 

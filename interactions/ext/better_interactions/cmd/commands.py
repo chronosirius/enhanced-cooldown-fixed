@@ -4,8 +4,15 @@ from inspect import getdoc, signature
 from logging import Logger
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
-from interactions import (MISSING, ApplicationCommandType, CommandContext,
-                          ComponentContext, Guild, Option, get_logger)
+from interactions import (
+    MISSING,
+    ApplicationCommandType,
+    CommandContext,
+    ComponentContext,
+    Guild,
+    Option,
+    get_logger,
+)
 
 from .command_models import parameters_to_options
 
