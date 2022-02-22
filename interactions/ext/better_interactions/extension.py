@@ -4,7 +4,6 @@ from logging import Logger
 
 import interactions
 from interactions import Client
-from interactions.ext import wait_for
 
 from ._logging import get_logger
 from .cmd.commands import command
@@ -14,30 +13,41 @@ from .cmpt.callback import component
 log: Logger = get_logger("extension")
 
 
-class ExtendedWebSocket(interactions.api.gateway.WebSocket):
-    def handle_dispatch(self, event: str, data: dict) -> None:
-        super().handle_dispatch(event, data)
-
-        if event == "INTERACTION_CREATE":
-            if "type" not in data:
-                return
-
-            context: interactions.ComponentContext = self.contextualize(data)
-
-            # startswith component callbacks
-            if context.data.custom_id:
-                for event in self.dispatch.events:
-                    try:
-                        startswith = self.dispatch.events[event][0].startswith
-                    except AttributeError:
-                        continue
-                    if startswith and context.data.custom_id.startswith(
-                        event.replace("component_startswith_", "")
-                    ):
-                        self.dispatch.dispatch(event, context)
+# class ExtendedWebSocket(interactions.api.gateway.WebSocket):
+#     def handle_dispatch(self, event: str, data: dict) -> None:
+#         super().handle_dispatch(event, data)
+#         if event == "INTERACTION_CREATE":
+#             if "type" not in data:
+#                 return
+#             context: interactions.ComponentContext = self.contextualize(data)
+#             # startswith component callbacks
+#             if context.data.custom_id and any(
+#                 hasattr(func, "startswith") for _, func in self.dispatch.events
+#             ):
+#                 for event in self.dispatch.events:
+#                     if hasattr(self.dispatch.events[event], "startswith"):
+#                         startswith = self.dispatch.events[event].startswith
+#                         if startswith and context.data.custom_id.startswith(
+#                             event.replace("component_startswith_", "")
+#                         ):
+#                             return self.dispatch.dispatch(event, context)
 
 
-interactions.api.gateway.WebSocket = ExtendedWebSocket
+# interactions.api.gateway.WebSocket = ExtendedWebSocket
+
+
+# async def on_component(self, context: interactions.ComponentContext):
+#     # startswith component callbacks
+#     if context.data.custom_id:
+#         for event in self.dispatch.events:
+#             try:
+#                 startswith = self.dispatch.events[event][0].startswith
+#             except AttributeError:
+#                 continue
+#             if startswith and context.data.custom_id.startswith(
+#                 event.replace("component_startswith_", "")
+#             ):
+#                 self.dispatch.dispatch(event, context)
 
 
 def sync_subcommands(self):
@@ -60,7 +70,10 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [client._loop.create_task(client._synchronize(command)) for command in commands]
+                [
+                    client._loop.create_task(client._synchronize(command))
+                    for command in commands
+                ]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -70,18 +83,44 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
+                    [
+                        client._scopes.add(_ if isinstance(_, int) else _.id)
+                        for _ in scope
+                    ]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
 
 class BetterExtension(interactions.client.Extension):
-    def __new__(cls, client, *args, **kwargs):
+    def __new__(cls, client: interactions.Client, *args, **kwargs):
         self = super().__new__(cls, client, *args, **kwargs)
         log.debug("Syncing subcommands...")
         sync_subcommands(self)
         log.debug("Synced subcommands")
+        if (
+            hasattr(client, "__modify_component_callbacks__")
+            and "ON_COMPONENT" not in client._websocket._dispatch.events
+        ):
+            client.__modify_component_callbacks__ = False
+            client.event(self.on_component, "on_component")
+            log.debug("Registered on_component")
         return self
+
+    async def on_component(self, ctx: interactions.ComponentContext):
+        bot = self.client
+        websocket = bot._websocket
+        # startswith component callbacks
+        if any(
+            hasattr(func, "startswith")
+            for custom_id, func in websocket._dispatch.events.items()
+        ):
+            for custom_id, func in websocket._dispatch.events.items():
+                if hasattr(func, "startswith"):
+                    startswith = func.startswith
+                    if startswith and ctx.data.custom_id.startswith(
+                        custom_id.replace("component_startswith_", "")
+                    ):
+                        return websocket._dispatch.dispatch(custom_id, ctx)
 
 
 def _replace_values(old, new):
@@ -129,15 +168,7 @@ class BetterInteractions(interactions.client.Extension):
         if modify_component_callbacks:
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
-
-            old_websocket = bot._websocket
-            new_websocket = ExtendedWebSocket(
-                old_websocket.intents, old_websocket.session_id, old_websocket.sequence
-            )
-
-            _replace_values(old_websocket, new_websocket)
-
-            bot._websocket = new_websocket
+            bot.__modify_component_callbacks__ = True
 
         if add_subcommand:
             log.debug("Adding bot.base (add_subcommand)")
@@ -145,6 +176,8 @@ class BetterInteractions(interactions.client.Extension):
 
         if add_method or add_interaction_events:
             log.debug("Adding bot.wait_for (add_method or add_interaction_events)")
+            from interactions.ext import wait_for
+
             wait_for.setup(
                 bot,
                 add_method=add_method,
