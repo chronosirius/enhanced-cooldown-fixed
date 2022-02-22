@@ -103,6 +103,7 @@ class BetterExtension(interactions.client.Extension):
         return self
 
     async def on_component(self, ctx: interactions.ComponentContext):
+        print("somethingg")
         bot = self.client
         websocket = bot._websocket
         # startswith component callbacks
