@@ -193,7 +193,10 @@ class BetterInteractions(interactions.client.Extension):
 
             old_websocket = bot._websocket
             new_websocket = WebSocketExtension(
-                old_websocket.intents, old_websocket.session_id, old_websocket.sequence
+                old_websocket._http.token,
+                old_websocket._intents,
+                old_websocket.session_id,
+                old_websocket.sequence,
             )
 
             _replace_values(old_websocket, new_websocket)
