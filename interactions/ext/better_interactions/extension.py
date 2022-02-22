@@ -47,6 +47,29 @@ log: Logger = get_logger("extension")
 #                 self.dispatch.dispatch(event, context)
 
 
+class WebSocketExtension(interactions.WebSocketClient):
+    def _dispatch_event(self, event: str, data: dict):
+        super()._dispatch_event(event, data)
+
+        if event != "TYPING_START" and event == "INTERACTION_CREATE":
+            _context: object = super().__contextualize(data)
+
+            if (
+                data["type"] == interactions.InteractionType.MESSAGE_COMPONENT
+                and _context.data._json.get("custom_id")
+                and any(
+                    hasattr(func, "startswith") for _, func in self._dispatch.events
+                )
+            ):
+                for event, func in self._dispatch.events.items():
+                    if hasattr(func, "startswith") and func.startswith:
+                        event.replace("components_startswith_", "")
+                        self._dispatch.dispatch(event, _context)
+
+
+interactions.api.gateway.WebSocketClient = WebSocketExtension
+
+
 def sync_subcommands(self):
     client = self.client
     if any(
@@ -93,31 +116,31 @@ class BetterExtension(interactions.client.Extension):
         log.debug("Syncing subcommands...")
         sync_subcommands(self)
         log.debug("Synced subcommands")
-        if (
-            hasattr(client, "__modify_component_callbacks__")
-            and "ON_COMPONENT" not in client._websocket._dispatch.events
-        ):
-            client.__modify_component_callbacks__ = False
-            client.event(self.on_component, "on_component")
-            log.debug("Registered on_component")
+        # if (
+        #     hasattr(client, "__modify_component_callbacks__")
+        #     and "ON_COMPONENT" not in client._websocket._dispatch.events
+        # ):
+        #     client.__modify_component_callbacks__ = False
+        #     client.event(self.on_component, "on_component")
+        #     log.debug("Registered on_component")
         return self
 
-    async def on_component(self, ctx: interactions.ComponentContext):
-        print("somethingg")
-        bot = self.client
-        websocket = bot._websocket
-        # startswith component callbacks
-        if any(
-            hasattr(func, "startswith")
-            for custom_id, func in websocket._dispatch.events.items()
-        ):
-            for custom_id, func in websocket._dispatch.events.items():
-                if hasattr(func, "startswith"):
-                    startswith = func.startswith
-                    if startswith and ctx.data.custom_id.startswith(
-                        custom_id.replace("component_startswith_", "")
-                    ):
-                        return websocket._dispatch.dispatch(custom_id, ctx)
+    # async def on_component(self, ctx: interactions.ComponentContext):
+    #     print("somethingg")
+    #     bot = self.client
+    #     websocket = bot._websocket
+    #     # startswith component callbacks
+    #     if any(
+    #         hasattr(func, "startswith")
+    #         for custom_id, func in websocket._dispatch.events.items()
+    #     ):
+    #         for custom_id, func in websocket._dispatch.events.items():
+    #             if hasattr(func, "startswith"):
+    #                 startswith = func.startswith
+    #                 if startswith and ctx.data.custom_id.startswith(
+    #                     custom_id.replace("component_startswith_", "")
+    #                 ):
+    #                     return websocket._dispatch.dispatch(custom_id, ctx)
 
 
 def _replace_values(old, new):
@@ -167,7 +190,15 @@ class BetterInteractions(interactions.client.Extension):
 
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
-            bot.__modify_component_callbacks__ = True
+
+            old_websocket = bot._websocket
+            new_websocket = WebSocketExtension(
+                old_websocket.intents, old_websocket.session_id, old_websocket.sequence
+            )
+
+            _replace_values(old_websocket, new_websocket)
+
+            bot._websocket = new_websocket
 
         if add_subcommand:
             from .subcommands import base
