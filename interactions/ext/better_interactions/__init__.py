@@ -4,7 +4,7 @@ from _logging import *
 from cmd import *
 from command_models import *
 from commands import *
-from subcommands imort *
+from subcommands import *
 from cmpt import *
 from callback import *
 from components import *
