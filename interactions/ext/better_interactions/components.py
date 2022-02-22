@@ -6,7 +6,7 @@ from interactions import ButtonStyle, Emoji
 from interactions import SelectMenu as SM
 from interactions import SelectOption
 
-from .._logging import get_logger
+from ._logging import get_logger
 
 log = get_logger("components")
 
@@ -63,12 +63,18 @@ def Button(
     if style == ButtonStyle.LINK and not url:
         raise ValueError("`url` must be specified if `style` is `ButtonStyle.LINK`!")
     elif url and style != ButtonStyle.LINK:
-        raise ValueError("`url` can only be specified if `style` is `ButtonStyle.LINK`!")
+        raise ValueError(
+            "`url` can only be specified if `style` is `ButtonStyle.LINK`!"
+        )
 
     if style != ButtonStyle.LINK and not custom_id:
-        raise ValueError("`custom_id` must be specified if `style` is not `ButtonStyle.LINK`!")
+        raise ValueError(
+            "`custom_id` must be specified if `style` is not `ButtonStyle.LINK`!"
+        )
     elif custom_id and style == ButtonStyle.LINK:
-        raise ValueError("`custom_id` can only be specified if `style` is not `ButtonStyle.LINK`!")
+        raise ValueError(
+            "`custom_id` can only be specified if `style` is not `ButtonStyle.LINK`!"
+        )
 
     return B(
         style=style,

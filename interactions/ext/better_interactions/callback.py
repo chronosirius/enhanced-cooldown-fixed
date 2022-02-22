@@ -2,7 +2,7 @@ from typing import Any, Callable, Coroutine, Optional, Union
 
 import interactions
 
-from .._logging import get_logger
+from ._logging import get_logger
 
 log = get_logger("callback")
 
