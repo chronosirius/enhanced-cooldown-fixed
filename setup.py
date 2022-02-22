@@ -1,42 +1,27 @@
-try:
-    from interactions.ext import Base, Version, VersionAuthor, build
-except ImportError:
-    import pip
+from setuptools import setup
 
-    pip.main(["install", "git+https://github.com/Toricane/library@unstable"])
-    from interactions.ext import Base, Version, VersionAuthor, build
-
-# gets the long description from the README file
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-# data for pypi:
-version = Version(
-    major=3,
-    minor=0,
-    patch=0,
-    author=VersionAuthor(name="Toricane", email="prjwl028@gmail.com"),
-)
-
-data = {
-    "name": "better_interactions",
-    "description": "Better interactions for interactions.py",
-    "long_description": long_description,
-    "version": version,
-    "link": "https://github.com/Toricane/better-interactions",
-    "dependencies": ["interactions.ext.better_interactions"],
-    "requirements": ["discord-py-interactions>=4.1.0"],
-    "setup_requires": ["discord-py-interactions"],
-    "classifiers": [
+setup(
+    name="better-interactions",
+    version="3.0.0",
+    description="Better interactions for discord-py-interactions",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    url="https://github.com/Toricane/better-interactions",
+    author="Toricane",
+    author_email="prjwl028@gmail.com",
+    license="MIT",
+    packages=["interactions.ext.better_interactions"],
+    classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    "license": "MIT",
-    "author": "Toricane",
-    "author_email": "prjwl028@gmail.com",
-    "long_description_content_type": "text/markdown",
-}
-
-build(Base(**data))
+    install_requires=[
+        "discord-py-interactions>=4.0.1",
+        "interactions-wait-for",
+    ],
+)
