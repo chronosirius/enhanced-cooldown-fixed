@@ -125,22 +125,23 @@ class BetterExtension(interactions.client.Extension):
         #     log.debug("Registered on_component")
         return self
 
-    # async def on_component(self, ctx: interactions.ComponentContext):
-    #     print("somethingg")
-    #     bot = self.client
-    #     websocket = bot._websocket
-    #     # startswith component callbacks
-    #     if any(
-    #         hasattr(func, "startswith")
-    #         for custom_id, func in websocket._dispatch.events.items()
-    #     ):
-    #         for custom_id, func in websocket._dispatch.events.items():
-    #             if hasattr(func, "startswith"):
-    #                 startswith = func.startswith
-    #                 if startswith and ctx.data.custom_id.startswith(
-    #                     custom_id.replace("component_startswith_", "")
-    #                 ):
-    #                     return websocket._dispatch.dispatch(custom_id, ctx)
+
+# async def on_component(self, ctx: interactions.ComponentContext):
+#     print("somethingg")
+#     bot = self.client
+#     websocket = bot._websocket
+#     # startswith component callbacks
+#     if any(
+#         hasattr(func, "startswith")
+#         for custom_id, func in websocket._dispatch.events.items()
+#     ):
+#         for custom_id, func in websocket._dispatch.events.items():
+#             if hasattr(func, "startswith"):
+#                 startswith = func.startswith
+#                 if startswith and ctx.data.custom_id.startswith(
+#                     custom_id.replace("component_startswith_", "")
+#                 ):
+#                     return websocket._dispatch.dispatch(custom_id, ctx)
 
 
 _old_dispatch_event = None
@@ -212,11 +213,13 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
 
-            global _old_dispatch_event
-            _old_dispatch_event = bot._websocket._dispatch_event
-            bot._websocket._dispatch_event = types.MethodType(
-                _new_dispatch_event, bot._websocket
-            )
+            bot.event(self.on_component, "on_component")
+
+            # global _old_dispatch_event
+            # _old_dispatch_event = bot._websocket._dispatch_event
+            # bot._websocket._dispatch_event = types.MethodType(
+            #     _new_dispatch_event, bot._websocket
+            # )
 
             # old_websocket = bot._websocket
             # new_websocket = WebSocketExtension(
@@ -254,6 +257,23 @@ class BetterInteractions(interactions.client.Extension):
             bot.command = types.MethodType(command, bot)
 
         log.info("Hooks applied")
+
+    async def on_component(self, ctx: interactions.ComponentContext):
+        print("somethingg")
+        bot = self.client
+        websocket = bot._websocket
+        # startswith component callbacks
+        if any(
+            hasattr(func, "startswith")
+            for custom_id, func in websocket._dispatch.events.items()
+        ):
+            for custom_id, func in websocket._dispatch.events.items():
+                if hasattr(func, "startswith"):
+                    startswith = func.startswith
+                    if startswith and ctx.data.custom_id.startswith(
+                        custom_id.replace("component_startswith_", "")
+                    ):
+                        return websocket._dispatch.dispatch(custom_id, ctx)
 
 
 def setup(
