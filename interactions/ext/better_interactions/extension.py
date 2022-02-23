@@ -267,6 +267,7 @@ class BetterInteractions(interactions.client.Extension):
             hasattr(func, "startswith")
             for custom_id, func in websocket._dispatch.events.items()
         ):
+            print("yes")
             for custom_id, func in websocket._dispatch.events.items():
                 if hasattr(func, "startswith"):
                     startswith = func.startswith
