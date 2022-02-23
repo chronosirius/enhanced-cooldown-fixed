@@ -251,7 +251,6 @@ class BetterInteractions(interactions.client.Extension):
         log.info("Hooks applied")
 
     async def on_component(self, ctx: interactions.ComponentContext):
-        print("somethingg")
         bot = self.client
         websocket = bot._websocket
         # startswith component callbacks
@@ -259,7 +258,6 @@ class BetterInteractions(interactions.client.Extension):
         if any(
             hasattr(func[0], "startswith") for custom_id, func in websocket._dispatch.events.items()
         ):
-            print("yes")
             for custom_id, func in websocket._dispatch.events.items():
                 if hasattr(func[0], "startswith"):
                     startswith = func[0].startswith
