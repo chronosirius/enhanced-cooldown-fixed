@@ -201,6 +201,7 @@ class BetterInteractions(interactions.client.Extension):
                         regex = compile(func.regex)
                         print("regex", regex)
                         custom_id.replace("component_regex_", "")
+                        print("fullmatch", fullmatch(regex, custom_id))
                         if fullmatch(regex, custom_id):
                             log.info(f"{func} regex {func.regex} matched")
                             websocket._dispatch.dispatch(custom_id, ctx)
