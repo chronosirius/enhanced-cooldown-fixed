@@ -141,8 +141,7 @@ class BetterInteractions(interactions.client.Extension):
                             return websocket._dispatch.dispatch(custom_id, ctx)
                     elif hasattr(func, "regex"):
                         regex = compile(func.regex)
-                        custom_id.replace("component_regex_", "")
-                        if match(regex, custom_id):
+                        if match(regex, custom_id.replace("component_regex_", "")):
                             log.info(f"{func} regex {func.regex} matched")
                             return websocket._dispatch.dispatch(custom_id, ctx)
 
