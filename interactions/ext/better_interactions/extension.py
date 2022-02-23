@@ -263,6 +263,7 @@ class BetterInteractions(interactions.client.Extension):
         bot = self.client
         websocket = bot._websocket
         # startswith component callbacks
+        print(f"{websocket._dispatch.events.items()=}")
         if any(
             hasattr(func, "startswith")
             for custom_id, func in websocket._dispatch.events.items()
