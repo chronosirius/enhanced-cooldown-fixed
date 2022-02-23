@@ -143,6 +143,24 @@ class BetterExtension(interactions.client.Extension):
     #                     return websocket._dispatch.dispatch(custom_id, ctx)
 
 
+def _new_dispatch_event(self: interactions.WebSocketClient, event: str, data: dict):
+    self._old_dispatch_event(event, data)
+
+    if event == "INTERACTION_CREATE":
+        context: interactions.ComponentContext = self.__contextualize(data)
+        # startswith component callbacks
+        if context.data.custom_id and any(
+            hasattr(func, "startswith") for _, func in self._dispatch.events.items()
+        ):
+            for event in self._dispatch.events:
+                if hasattr(self._dispatch.events[event], "startswith"):
+                    startswith = self._dispatch.events[event].startswith
+                    if startswith and context.data.custom_id.startswith(
+                        event.replace("component_startswith_", "")
+                    ):
+                        return self._dispatch.dispatch(event, context)
+
+
 def _replace_values(old, new):
     """Change all values on new to the values on old. Useful if neither object has __dict__"""
     for item in dir(old):  # can't use __dict__, this should take everything
@@ -191,17 +209,22 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
 
-            old_websocket = bot._websocket
-            new_websocket = WebSocketExtension(
-                old_websocket._http.token,
-                old_websocket._intents,
-                old_websocket.session_id,
-                old_websocket.sequence,
+            bot._websocket._old_dispatch_event = bot._websocket._dispatch_event
+            bot._websocket._dispatch_event = types.MethodType(
+                _new_dispatch_event, bot._websocket
             )
 
-            _replace_values(old_websocket, new_websocket)
+            # old_websocket = bot._websocket
+            # new_websocket = WebSocketExtension(
+            #     old_websocket._http.token,
+            #     old_websocket._intents,
+            #     old_websocket.session_id,
+            #     old_websocket.sequence,
+            # )
 
-            bot._websocket = new_websocket
+            # _replace_values(old_websocket, new_websocket)
+
+            # bot._websocket = new_websocket
 
         if add_subcommand:
             from .subcommands import base
