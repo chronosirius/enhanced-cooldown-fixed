@@ -11,7 +11,7 @@ def component(
     bot: interactions.Client,
     component: Union[str, interactions.Button, interactions.SelectMenu],
     startswith: Optional[bool] = False,
-    regex: Optional[str] = None,
+    regex: Optional[bool] = False,
 ) -> Callable[..., Any]:
     """
     A decorator for listening to ``INTERACTION_CREATE`` dispatched gateway
@@ -36,8 +36,8 @@ def component(
     :type component: Union[str, Button, SelectMenu]
     :param startswith: Whether the component should be matched by the start of the custom_id.
     :type startswith: bool
-    :param regex: A regex to match the component's custom_id.
-    :type regex: str
+    :param regex: Whether to use regex matching for the component using value of custom_id.
+    :type regex: bool
     :return: A callable response.
     :rtype: Callable[..., Any]
     """
@@ -56,7 +56,7 @@ def component(
             coro.startswith = True
             bot.event(coro, name=f"component_startswith_{payload}")
         elif regex:
-            coro.regex = regex
+            coro.regex = payload
             bot.event(coro, name=f"component_regex_{payload}")
         else:
             bot.event(coro, name=f"component_{payload}")
