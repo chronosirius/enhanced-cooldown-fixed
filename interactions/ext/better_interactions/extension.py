@@ -209,12 +209,12 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
 
-            setattr(
-                bot._websocket, "_old_dispatch_event", bot._websocket._dispatch_event
+            _websocket = bot._websocket
+            setattr(_websocket, "_old_dispatch_event", _websocket._dispatch_event)
+            _websocket._dispatch_event = types.MethodType(
+                _new_dispatch_event, _websocket
             )
-            bot._websocket._dispatch_event = types.MethodType(
-                _new_dispatch_event, bot._websocket
-            )
+            bot._websocket = _websocket
 
             # old_websocket = bot._websocket
             # new_websocket = WebSocketExtension(
