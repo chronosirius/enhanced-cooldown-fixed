@@ -125,11 +125,13 @@ class BetterInteractions(interactions.client.Extension):
         bot = self.client
         websocket = bot._websocket
         # startswith component callbacks
+        print(websocket._dispatch.events.items())
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
             for custom_id, funcs in websocket._dispatch.events.items()
         ):
             for custom_id, funcs in websocket._dispatch.events.items():
+                custom_id: str
                 for func in funcs:
                     if hasattr(func, "startswith"):
                         if ctx.data.custom_id.startswith(
