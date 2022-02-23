@@ -265,13 +265,13 @@ class BetterInteractions(interactions.client.Extension):
         # startswith component callbacks
         print(f"{websocket._dispatch.events.items()=}")
         if any(
-            hasattr(func, "startswith")
+            hasattr(func[0], "startswith")
             for custom_id, func in websocket._dispatch.events.items()
         ):
             print("yes")
             for custom_id, func in websocket._dispatch.events.items():
-                if hasattr(func, "startswith"):
-                    startswith = func.startswith
+                if hasattr(func[0], "startswith"):
+                    startswith = func[0].startswith
                     if startswith and ctx.data.custom_id.startswith(
                         custom_id.replace("component_startswith_", "")
                     ):
