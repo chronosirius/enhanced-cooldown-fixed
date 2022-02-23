@@ -131,19 +131,18 @@ class BetterInteractions(interactions.client.Extension):
             for custom_id, funcs in websocket._dispatch.events.items()
         ):
             for custom_id, funcs in websocket._dispatch.events.items():
-                custom_id: str
                 for func in funcs:
                     if hasattr(func, "startswith"):
                         if ctx.data.custom_id.startswith(
                             custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(custom_id, ctx)
+                            websocket._dispatch.dispatch(custom_id, ctx)
                     elif hasattr(func, "regex"):
                         regex = compile(func.regex)
                         if match(regex, custom_id.replace("component_regex_", "")):
                             log.info(f"{func} regex {func.regex} matched")
-                            return websocket._dispatch.dispatch(custom_id, ctx)
+                            websocket._dispatch.dispatch(custom_id, ctx)
 
 
 def setup(
