@@ -11,6 +11,7 @@ def component(
     bot: interactions.Client,
     component: Union[str, interactions.Button, interactions.SelectMenu],
     startswith: Optional[bool] = False,
+    regex: Optional[str] = None,
 ) -> Callable[..., Any]:
     """
     A decorator for listening to ``INTERACTION_CREATE`` dispatched gateway
@@ -35,6 +36,8 @@ def component(
     :type component: Union[str, Button, SelectMenu]
     :param startswith: Whether the component should be matched by the start of the custom_id.
     :type startswith: bool
+    :param regex: A regex to match the component's custom_id.
+    :type regex: str
     :return: A callable response.
     :rtype: Callable[..., Any]
     """
@@ -45,11 +48,20 @@ def component(
             if isinstance(component, (interactions.Button, interactions.SelectMenu))
             else component
         )
-        if not startswith:
-            coro.startswith = False
-            return bot.event(coro, name=f"component_{payload}")
-        coro.startswith = True
-        log.debug(f"Component callback, {coro.startswith=}")
-        return bot.event(coro, name=f"component_startswith_{payload}")
+        if startswith and regex:
+            log.error("Cannot use both startswith and regex.")
+            raise ValueError("Cannot use both startswith and regex!")
+
+        if startswith:
+            coro.startswith = True
+            bot.event(coro, name=f"component_startswith_{payload}")
+        elif regex:
+            coro.regex = regex
+            bot.event(coro, name=f"component_regex_{payload}")
+        else:
+            bot.event(coro, name=f"component_{payload}")
+
+        log.debug(f"Component callback, {coro.startswith=}, {regex=}")
+        return coro
 
     return decorator

@@ -1,6 +1,7 @@
 import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
+from re import compile, fullmatch
 
 import interactions
 from interactions import Client
@@ -57,7 +58,9 @@ class WebSocketExtension(interactions.WebSocketClient):
             if (
                 data["type"] == interactions.InteractionType.MESSAGE_COMPONENT
                 and _context.data._json.get("custom_id")
-                and any(hasattr(func, "startswith") for _, func in self._dispatch.events)
+                and any(
+                    hasattr(func, "startswith") for _, func in self._dispatch.events
+                )
             ):
                 for event, func in self._dispatch.events.items():
                     if hasattr(func, "startswith") and func.startswith:
@@ -87,7 +90,10 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [client._loop.create_task(client._synchronize(command)) for command in commands]
+                [
+                    client._loop.create_task(client._synchronize(command))
+                    for command in commands
+                ]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -97,7 +103,10 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
+                    [
+                        client._scopes.add(_ if isinstance(_, int) else _.id)
+                        for _ in scope
+                    ]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
@@ -108,68 +117,7 @@ class BetterExtension(interactions.client.Extension):
         log.debug("Syncing subcommands...")
         sync_subcommands(self)
         log.debug("Synced subcommands")
-        # if (
-        #     hasattr(client, "__modify_component_callbacks__")
-        #     and "ON_COMPONENT" not in client._websocket._dispatch.events
-        # ):
-        #     client.__modify_component_callbacks__ = False
-        #     client.event(self.on_component, "on_component")
-        #     log.debug("Registered on_component")
         return self
-
-
-# async def on_component(self, ctx: interactions.ComponentContext):
-#     print("somethingg")
-#     bot = self.client
-#     websocket = bot._websocket
-#     # startswith component callbacks
-#     if any(
-#         hasattr(func, "startswith")
-#         for custom_id, func in websocket._dispatch.events.items()
-#     ):
-#         for custom_id, func in websocket._dispatch.events.items():
-#             if hasattr(func, "startswith"):
-#                 startswith = func.startswith
-#                 if startswith and ctx.data.custom_id.startswith(
-#                     custom_id.replace("component_startswith_", "")
-#                 ):
-#                     return websocket._dispatch.dispatch(custom_id, ctx)
-
-
-_old_dispatch_event = None
-
-
-def _new_dispatch_event(self: interactions.WebSocketClient, event: str, data: dict):
-    _old_dispatch_event(self, event, data)
-
-    if event == "INTERACTION_CREATE":
-        context: interactions.ComponentContext = self.__contextualize(data)
-        # startswith component callbacks
-        if context.data.custom_id and any(
-            hasattr(func, "startswith") for _, func in self._dispatch.events.items()
-        ):
-            for event in self._dispatch.events:
-                if hasattr(self._dispatch.events[event], "startswith"):
-                    startswith = self._dispatch.events[event].startswith
-                    if startswith and context.data.custom_id.startswith(
-                        event.replace("component_startswith_", "")
-                    ):
-                        return self._dispatch.dispatch(event, context)
-
-
-def _replace_values(old, new):
-    """Change all values on new to the values on old. Useful if neither object has __dict__"""
-    for item in dir(old):  # can't use __dict__, this should take everything
-        value = getattr(old, item)
-
-        if hasattr(value, "__call__") or isinstance(value, property):
-            # Don't need to get callables or properties, that would un-overwrite things
-            continue
-
-        try:
-            new.__setattr__(item, value)
-        except AttributeError:
-            pass
 
 
 class BetterInteractions(interactions.client.Extension):
@@ -206,24 +154,7 @@ class BetterInteractions(interactions.client.Extension):
             bot.component = types.MethodType(component, bot)
 
             bot.event(self.on_component, "on_component")
-
-            # global _old_dispatch_event
-            # _old_dispatch_event = bot._websocket._dispatch_event
-            # bot._websocket._dispatch_event = types.MethodType(
-            #     _new_dispatch_event, bot._websocket
-            # )
-
-            # old_websocket = bot._websocket
-            # new_websocket = WebSocketExtension(
-            #     old_websocket._http.token,
-            #     old_websocket._intents,
-            #     old_websocket.session_id,
-            #     old_websocket.sequence,
-            # )
-
-            # _replace_values(old_websocket, new_websocket)
-
-            # bot._websocket = new_websocket
+            log.debug("Registered on_component")
 
         if add_subcommand:
             from .subcommands import base
@@ -254,17 +185,22 @@ class BetterInteractions(interactions.client.Extension):
         bot = self.client
         websocket = bot._websocket
         # startswith component callbacks
-        print(f"{websocket._dispatch.events.items()=}")
         if any(
-            hasattr(func[0], "startswith") for custom_id, func in websocket._dispatch.events.items()
+            any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
+            for custom_id, funcs in websocket._dispatch.events.items()
         ):
-            for custom_id, func in websocket._dispatch.events.items():
-                if hasattr(func[0], "startswith"):
-                    startswith = func[0].startswith
-                    if startswith and ctx.data.custom_id.startswith(
-                        custom_id.replace("component_startswith_", "")
-                    ):
-                        return websocket._dispatch.dispatch(custom_id, ctx)
+            for custom_id, funcs in websocket._dispatch.events.items():
+                for func in funcs:
+                    if hasattr(func, "startswith"):
+                        if ctx.data.custom_id.startswith(
+                            custom_id.replace("component_startswith_", "")
+                        ):
+                            return websocket._dispatch.dispatch(custom_id, ctx)
+                    elif hasattr(func, "regex"):
+                        regex = compile(func.regex)
+                        custom_id.replace("component_regex_", "")
+                        if fullmatch(regex, custom_id):
+                            return websocket._dispatch.dispatch(custom_id, ctx)
 
 
 def setup(
