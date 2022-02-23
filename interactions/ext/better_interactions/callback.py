@@ -61,7 +61,7 @@ def component(
         else:
             bot.event(coro, name=f"component_{payload}")
 
-        log.debug(f"Component callback, {coro.startswith=}, {regex=}")
+        log.debug(f"Component callback, {startswith=}, {regex=}")
         return coro
 
     return decorator
