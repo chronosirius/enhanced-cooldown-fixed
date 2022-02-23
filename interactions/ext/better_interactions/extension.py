@@ -1,7 +1,7 @@
 import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
-from re import compile, fullmatch
+from re import fullmatch
 
 import interactions
 from interactions import Client
@@ -139,7 +139,7 @@ class BetterInteractions(interactions.client.Extension):
                             log.info(f"{func} startswith {func.startswith} matched")
                             websocket._dispatch.dispatch(custom_id, ctx)
                     elif hasattr(func, "regex"):
-                        regex = compile(func.regex)
+                        regex = func.regex
                         if fullmatch(regex, custom_id.replace("component_regex_", "")):
                             log.info(f"{func} regex {func.regex} matched")
                             websocket._dispatch.dispatch(custom_id, ctx)
