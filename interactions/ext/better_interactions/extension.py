@@ -143,8 +143,11 @@ class BetterExtension(interactions.client.Extension):
     #                     return websocket._dispatch.dispatch(custom_id, ctx)
 
 
+_old_dispatch_event = None
+
+
 def _new_dispatch_event(self: interactions.WebSocketClient, event: str, data: dict):
-    self._old_dispatch_event(event, data)
+    _old_dispatch_event(self, event, data)
 
     if event == "INTERACTION_CREATE":
         context: interactions.ComponentContext = self.__contextualize(data)
@@ -209,12 +212,11 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
 
-            _websocket = bot._websocket
-            setattr(_websocket, "_old_dispatch_event", _websocket._dispatch_event)
-            _websocket._dispatch_event = types.MethodType(
-                _new_dispatch_event, _websocket
+            global _old_dispatch_event
+            _old_dispatch_event = bot._websocket._dispatch_event
+            bot._websocket._dispatch_event = types.MethodType(
+                _new_dispatch_event, bot._websocket
             )
-            bot._websocket = _websocket
 
             # old_websocket = bot._websocket
             # new_websocket = WebSocketExtension(
