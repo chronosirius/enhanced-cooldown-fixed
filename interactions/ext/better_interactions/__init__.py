@@ -1,12 +1,11 @@
-# flake8: noqa
-from . import *
-from ._logging import Data, CustomFormatter, get_logger
-from .command_models import BetterOption
-from .commands import command, extension_command, autodefer
-from .subcommands import base, extension_base
+from . import _logging, callback, command_models, commands, components, extension, subcommands
+from ._logging import CustomFormatter, Data, get_logger
 from .callback import component
+from .command_models import BetterOption
+from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, SelectMenu, spread_to_rows
-from .extension import sync_subcommands, BetterExtension, BetterInteractions, setup
+from .extension import BetterExtension, BetterInteractions, setup, sync_subcommands
+from .subcommands import base, extension_base
 
 # fmt: off
 __all__ = [

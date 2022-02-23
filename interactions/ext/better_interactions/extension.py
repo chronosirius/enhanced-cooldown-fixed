@@ -57,9 +57,7 @@ class WebSocketExtension(interactions.WebSocketClient):
             if (
                 data["type"] == interactions.InteractionType.MESSAGE_COMPONENT
                 and _context.data._json.get("custom_id")
-                and any(
-                    hasattr(func, "startswith") for _, func in self._dispatch.events
-                )
+                and any(hasattr(func, "startswith") for _, func in self._dispatch.events)
             ):
                 for event, func in self._dispatch.events.items():
                     if hasattr(func, "startswith") and func.startswith:
@@ -89,10 +87,7 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [
-                    client._loop.create_task(client._synchronize(command))
-                    for command in commands
-                ]
+                [client._loop.create_task(client._synchronize(command)) for command in commands]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -102,10 +97,7 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [
-                        client._scopes.add(_ if isinstance(_, int) else _.id)
-                        for _ in scope
-                    ]
+                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
@@ -265,8 +257,7 @@ class BetterInteractions(interactions.client.Extension):
         # startswith component callbacks
         print(f"{websocket._dispatch.events.items()=}")
         if any(
-            hasattr(func[0], "startswith")
-            for custom_id, func in websocket._dispatch.events.items()
+            hasattr(func[0], "startswith") for custom_id, func in websocket._dispatch.events.items()
         ):
             print("yes")
             for custom_id, func in websocket._dispatch.events.items():
