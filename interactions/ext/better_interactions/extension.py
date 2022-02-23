@@ -212,10 +212,8 @@ class BetterInteractions(interactions.client.Extension):
             setattr(
                 bot._websocket, "_old_dispatch_event", bot._websocket._dispatch_event
             )
-            setattr(
-                bot._websocket,
-                "_dispatch_event",
-                types.MethodType(_new_dispatch_event, bot._websocket),
+            bot._websocket._dispatch_event = types.MethodType(
+                _new_dispatch_event, bot._websocket
             )
 
             # old_websocket = bot._websocket
