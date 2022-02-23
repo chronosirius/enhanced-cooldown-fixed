@@ -11,66 +11,6 @@ from ._logging import get_logger
 log: Logger = get_logger("extension")
 
 
-# class ExtendedWebSocket(interactions.api.gateway.WebSocket):
-#     def handle_dispatch(self, event: str, data: dict) -> None:
-#         super().handle_dispatch(event, data)
-#         if event == "INTERACTION_CREATE":
-#             if "type" not in data:
-#                 return
-#             context: interactions.ComponentContext = self.contextualize(data)
-#             # startswith component callbacks
-#             if context.data.custom_id and any(
-#                 hasattr(func, "startswith") for _, func in self.dispatch.events
-#             ):
-#                 for event in self.dispatch.events:
-#                     if hasattr(self.dispatch.events[event], "startswith"):
-#                         startswith = self.dispatch.events[event].startswith
-#                         if startswith and context.data.custom_id.startswith(
-#                             event.replace("component_startswith_", "")
-#                         ):
-#                             return self.dispatch.dispatch(event, context)
-
-
-# interactions.api.gateway.WebSocket = ExtendedWebSocket
-
-
-# async def on_component(self, context: interactions.ComponentContext):
-#     # startswith component callbacks
-#     if context.data.custom_id:
-#         for event in self.dispatch.events:
-#             try:
-#                 startswith = self.dispatch.events[event][0].startswith
-#             except AttributeError:
-#                 continue
-#             if startswith and context.data.custom_id.startswith(
-#                 event.replace("component_startswith_", "")
-#             ):
-#                 self.dispatch.dispatch(event, context)
-
-
-class WebSocketExtension(interactions.WebSocketClient):
-    def _dispatch_event(self, event: str, data: dict):
-        super()._dispatch_event(event, data)
-
-        if event != "TYPING_START" and event == "INTERACTION_CREATE":
-            _context: object = super().__contextualize(data)
-
-            if (
-                data["type"] == interactions.InteractionType.MESSAGE_COMPONENT
-                and _context.data._json.get("custom_id")
-                and any(
-                    hasattr(func, "startswith") for _, func in self._dispatch.events
-                )
-            ):
-                for event, func in self._dispatch.events.items():
-                    if hasattr(func, "startswith") and func.startswith:
-                        event.replace("components_startswith_", "")
-                        self._dispatch.dispatch(event, _context)
-
-
-interactions.api.gateway.WebSocketClient = WebSocketExtension
-
-
 def sync_subcommands(self):
     client = self.client
     if any(
