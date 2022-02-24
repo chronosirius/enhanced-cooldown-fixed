@@ -139,7 +139,7 @@ class BetterInteractions(interactions.client.Extension):
                             log.info(f"{func} startswith {func.startswith} matched")
                             websocket._dispatch.dispatch(custom_id, ctx)
                     elif hasattr(func, "regex"):
-                        print(f"{custom_id=}")
+                        print(f"{custom_id=}, {func=}, {func.regex=}")
                         if fullmatch(
                             func.regex, custom_id.replace("component_regex_", "")
                         ):
