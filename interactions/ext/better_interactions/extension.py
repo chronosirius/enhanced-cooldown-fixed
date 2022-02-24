@@ -137,14 +137,20 @@ class BetterInteractions(interactions.client.Extension):
                             decorator_custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            websocket._dispatch.dispatch(
+                                decorator_custom_id,
+                                interactions.ComponentContext(**ctx._json),
+                            )
                     elif hasattr(func, "regex"):
                         if fullmatch(
                             func.regex,
                             ctx.data.custom_id.replace("component_regex_", ""),
                         ):
                             log.info(f"{func} regex {func.regex} matched")
-                            websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            websocket._dispatch.dispatch(
+                                decorator_custom_id,
+                                interactions.ComponentContext(**ctx._json),
+                            )
 
 
 def setup(
