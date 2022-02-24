@@ -128,7 +128,7 @@ class BetterInteractions(interactions.client.Extension):
         print(websocket._dispatch.events.items())
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
-            for custom_id, funcs in websocket._dispatch.events.items()
+            for _, funcs in websocket._dispatch.events.items()
         ):
             for custom_id, funcs in websocket._dispatch.events.items():
                 for func in funcs:
@@ -139,8 +139,10 @@ class BetterInteractions(interactions.client.Extension):
                             log.info(f"{func} startswith {func.startswith} matched")
                             websocket._dispatch.dispatch(custom_id, ctx)
                     elif hasattr(func, "regex"):
-                        regex = func.regex
-                        if fullmatch(regex, custom_id.replace("component_regex_", "")):
+                        print(f"{custom_id=}")
+                        if fullmatch(
+                            func.regex, custom_id.replace("component_regex_", "")
+                        ):
                             log.info(f"{func} regex {func.regex} matched")
                             websocket._dispatch.dispatch(custom_id, ctx)
 
