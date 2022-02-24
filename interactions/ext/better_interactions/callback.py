@@ -1,6 +1,7 @@
 from typing import Any, Callable, Coroutine, Optional, Union
 
 import interactions
+from re import compile
 
 from ._logging import get_logger
 
@@ -56,7 +57,7 @@ def component(
             coro.startswith = True
             bot.event(coro, name=f"component_startswith_{payload}")
         elif regex:
-            coro.regex = payload
+            coro.regex = compile(payload)
             bot.event(coro, name=f"component_regex_{payload}")
         else:
             bot.event(coro, name=f"component_{payload}")
