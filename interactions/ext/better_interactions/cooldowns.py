@@ -11,14 +11,14 @@ from interactions import Channel, CommandContext, Guild, User
 class cooldown:
     def __init__(
         self,
-        function: Callable,
+        # function: Callable,
         cal: Optional[Coroutine] = None,
         cool: Optional[Union[float, int]] = 10,
         typ: Optional[Union[str, User, Channel, Guild]] = "user",
     ):
         if typ not in {"user", User, "guild", Guild, "channel", Channel}:
             exit()
-        self.function = function
+        self.function = None  # function
         self.js = {}
         self.cool = cool
         self.cal = cal
