@@ -17,11 +17,12 @@ class cooldown:
         typ: Optional[Union[str, User, Channel, Guild]] = "user",
     ):
         if typ not in {"user", User, "guild", Guild, "channel", Channel}:
-            exit()
+            raise TypeError("Invalid type provided for `typ`!")
         self.function = None  # function
         self.js = {}
         self.cool = cool
         self.cal = cal
+        self.typ = typ
 
     def _clean_timers(self):
         jsondata = [obj for obj in self.js if time() - self.js[obj] >= self.cool]
@@ -50,6 +51,8 @@ class cooldown:
         return (True, data)
 
     def __call__(self, func):
+        self.function = func
+
         @wraps(func)
         async def new_func(ctx: CommandContext, *args, **kwargs):
             data = self.data(ctx)
