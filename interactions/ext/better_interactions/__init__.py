@@ -1,4 +1,13 @@
-from . import _logging, callback, command_models, commands, components, extension, subcommands
+from . import (
+    _logging,
+    callback,
+    command_models,
+    commands,
+    components,
+    extension,
+    subcommands,
+    cooldown,
+)
 from ._logging import CustomFormatter, Data, get_logger
 from .callback import component
 from .command_models import BetterOption
@@ -6,6 +15,7 @@ from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, SelectMenu, spread_to_rows
 from .extension import BetterExtension, BetterInteractions, setup, sync_subcommands
 from .subcommands import base, extension_base
+from .cooldowns import cooldown
 
 # fmt: off
 __all__ = [
@@ -36,5 +46,7 @@ __all__ = [
         "BetterExtension",
         "BetterInteractions",
         "setup",
+    "cooldowns",
+        "cooldown",
 ]
 # fmt: on
