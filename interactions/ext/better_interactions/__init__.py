@@ -6,7 +6,7 @@ from . import (
     components,
     extension,
     subcommands,
-    cooldown,
+    cooldowns,
 )
 from ._logging import CustomFormatter, Data, get_logger
 from .callback import component
