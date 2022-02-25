@@ -30,10 +30,7 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [
-                    client._loop.create_task(client._synchronize(command))
-                    for command in commands
-                ]
+                [client._loop.create_task(client._synchronize(command)) for command in commands]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -43,10 +40,7 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [
-                        client._scopes.add(_ if isinstance(_, int) else _.id)
-                        for _ in scope
-                    ]
+                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
@@ -93,7 +87,7 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("Modifying component callbacks (modify_component_callbacks)")
             bot.component = types.MethodType(component, bot)
 
-            bot.event(self.on_component, "on_component")
+            bot.event(self._on_component, "on_component")
             log.debug("Registered on_component")
 
         if add_subcommand:
@@ -121,11 +115,8 @@ class BetterInteractions(interactions.client.Extension):
 
         log.info("Hooks applied")
 
-    async def on_component(self, ctx: interactions.ComponentContext):
-        bot = self.client
-        websocket = bot._websocket
-        # startswith component callbacks
-        print(websocket._dispatch.events.items())
+    async def _on_component(self, ctx: interactions.ComponentContext):
+        websocket = self.client._websocket
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
             for _, funcs in websocket._dispatch.events.items()
@@ -137,20 +128,14 @@ class BetterInteractions(interactions.client.Extension):
                             decorator_custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            websocket._dispatch.dispatch(
-                                decorator_custom_id,
-                                interactions.ComponentContext(**ctx._json),
-                            )
+                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
                     elif hasattr(func, "regex"):
                         if fullmatch(
                             func.regex,
                             ctx.data.custom_id.replace("component_regex_", ""),
                         ):
                             log.info(f"{func} regex {func.regex} matched")
-                            websocket._dispatch.dispatch(
-                                decorator_custom_id,
-                                interactions.ComponentContext(**ctx._json),
-                            )
+                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
 
 
 def setup(

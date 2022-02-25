@@ -1,7 +1,7 @@
+from re import compile
 from typing import Any, Callable, Coroutine, Optional, Union
 
 import interactions
-from re import compile
 
 from ._logging import get_logger
 
