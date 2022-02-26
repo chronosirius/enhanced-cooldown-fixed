@@ -27,9 +27,9 @@ def get_id(
     if type == "user" or type is User or type == "member" or type is Member:
         return str(ctx.author.user.id)
     elif type == "channel" or type is Channel:
-        return str(ctx.channel.id)
+        return str(ctx.channel_id)
     elif type == "guild" or type is Guild:
-        return str(ctx.guild.id)
+        return str(ctx.guild_id)
     else:
         raise TypeError("Invalid type provided for `type`!")
 
