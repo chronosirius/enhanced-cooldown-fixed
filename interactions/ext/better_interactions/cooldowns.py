@@ -149,7 +149,7 @@ def cooldown(
     def decorator(coro: Coroutine):
         coro.__last_called = {}
 
-        if not isinstance(error, Callable):
+        if not isinstance(error, (Callable, type(None))):
             raise TypeError(
                 "Invalid type provided for `error`! Must be a `Callable`, specifically a `Coroutine`!"
             )
@@ -158,10 +158,10 @@ def cooldown(
 
         @wraps(coro)
         async def wrapper(ctx: CommandContext, *args, **kwargs):
-            last_called = coro.__last_called
+            last_called: dict = coro.__last_called
             now = datetime.now()
             id = get_id(type, ctx)
-            unique_last_called = last_called.get(id, None)
+            unique_last_called = last_called.get(id)
 
             if unique_last_called and (now - unique_last_called < delta):
                 if error:
