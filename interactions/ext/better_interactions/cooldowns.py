@@ -22,6 +22,8 @@ def get_id(
     :param ctx: The context to get the ID from.
     :type ctx: CommandContext
     """
+    type = type.lower() if isinstance(type, str) else type
+
     if type == "user" or type is User or type == "member" or type is Member:
         return str(ctx.author.user.id)
     elif type == "channel" or type is Channel:
