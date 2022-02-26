@@ -4,7 +4,6 @@ Credit to @dontbanmeplz for the original code regarding cooldowns, and merging i
 from datetime import datetime, timedelta
 from functools import wraps
 from inspect import iscoroutinefunction
-from time import time as _time
 from typing import Callable, Coroutine, Optional, Type, Union
 
 from interactions import Channel, CommandContext, Guild, Member, User
@@ -166,14 +165,16 @@ def cooldown(
             unique_last_called = last_called.get(id)
 
             if unique_last_called and (now - unique_last_called < delta):
-                if error:
-                    if iscoroutinefunction(error):
-                        return await error(ctx, delta - (now - unique_last_called))
-                    else:
-                        return error(ctx, delta - (now - unique_last_called))
-                else:
-                    await ctx.send(
+                if not error:
+                    return await ctx.send(
                         f"This command is on cooldown for {delta - (now - unique_last_called)}!"
+                    )
+
+                else:
+                    return (
+                        await error(ctx, delta - (now - unique_last_called))
+                        if iscoroutinefunction(error)
+                        else error(ctx, delta - (now - unique_last_called))
                     )
 
             last_called[id] = now
