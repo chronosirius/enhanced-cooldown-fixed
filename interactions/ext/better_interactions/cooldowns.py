@@ -5,6 +5,7 @@ from functools import wraps
 from time import time as _time
 from typing import Callable, Coroutine, Optional, Union
 from datetime import datetime, timedelta
+from inspect import iscoroutinefunction
 
 from interactions import Channel, CommandContext, Guild, User, Member
 
@@ -148,8 +149,10 @@ def cooldown(
     def decorator(coro: Coroutine):
         coro.__last_called = {}
 
-        if not isinstance(error, Coroutine):
-            raise TypeError("Invalid type provided for `error`! Must be a `Coroutine`!")
+        if not isinstance(error, Callable):
+            raise TypeError(
+                "Invalid type provided for `error`! Must be a `Callable`, specifically a `Coroutine`!"
+            )
         if type not in {"user", User, "guild", Guild, "channel", Channel}:
             raise TypeError("Invalid type provided for `type`!")
 
@@ -162,7 +165,10 @@ def cooldown(
 
             if unique_last_called and (now - unique_last_called < delta):
                 if error:
-                    return await error(ctx, delta - (now - unique_last_called))
+                    if iscoroutinefunction(error):
+                        return await error(ctx, delta - (now - unique_last_called))
+                    else:
+                        return error(ctx, delta - (now - unique_last_called))
                 else:
                     await ctx.send(
                         f"This command is on cooldown for {delta - (now - unique_last_called)}!"
