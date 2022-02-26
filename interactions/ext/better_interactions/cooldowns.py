@@ -41,13 +41,27 @@ def cooldown(
     """
     A decorator for handling cooldowns.
 
-    :param delta_args: The arguments to pass to `datetime.timedelta`.
+    Parameters for ``datetime.timedelta`` are ``days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0``
+
+    ```py
+    from interactions.ext.better_interactions import cooldown
+
+    async def cooldown_error(ctx, delta):
+        ...
+
+    @client.command(...)
+    @cooldown(seconds=..., ..., error=cooldown_error, type=...)
+    async def cooldown_command(ctx, ...):
+        ...
+    ```
+
+    :param delta_args: The arguments to pass to ``datetime.timedelta``.
     :type delta_args: Tuple[Any]
     :param error: The error function to call if the command is on cooldown.
     :type error: Coroutine
     :param type: The type of ID to utilize for the cooldown.
     :type type: Union[str, User, Channel, Guild]
-    :param delta_kwargs: The keyword arguments to pass to `datetime.timedelta`.
+    :param delta_kwargs: The keyword arguments to pass to ``datetime.timedelta``.
     :type delta_kwargs: Dict[str, Any]
     """
     if not delta_args or delta_kwargs:
