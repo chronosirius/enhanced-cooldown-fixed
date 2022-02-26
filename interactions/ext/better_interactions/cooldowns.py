@@ -86,7 +86,7 @@ class cooldown:
         self.json = {}
 
     def reset_cooldown(self):
-        self.json = [obj for obj in self.json if _time() - self.json[obj] >= self.cool]
+        self.json = [obj for obj in self.json if _time() - self.json[obj] >= self.time]
 
     def cooldown_passed(self, ctx):
         if self.type in {"user", User}:
@@ -102,7 +102,7 @@ class cooldown:
         if not self.json.get(id, None):
             self.json[id] = data
             return True, data
-        if _time() - data < self.cool:
+        if _time() - data < self.time:
             return False, data
         data = _time()
         return True, data
@@ -114,7 +114,9 @@ class cooldown:
             if cooled:
                 return await func(ctx, *args, **kwargs)
             if self.cooldown_function:
-                return await self.cooldown_function(ctx, self.cool - (_time() - data[1]))
+                return await self.cooldown_function(
+                    ctx, self.time - (_time() - data[1])
+                )
             await ctx.send("This command is currently on cooldown!")
             # new_data = filter(lambda attr: attr not in dir(type(func)), dir(func))
             # for new_attr in new_data:
