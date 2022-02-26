@@ -66,7 +66,7 @@ def cooldown(
     :param delta_kwargs: The keyword arguments to pass to ``datetime.timedelta``.
     :type delta_kwargs: Dict[str, Any]
     """
-    if not delta_args or delta_kwargs:
+    if not (delta_args or delta_kwargs):
         raise ValueError(
             "Cooldown amount must be provided! Valid arguments and keyword arguments are listed in https://docs.python.org/3/library/datetime.html#datetime.timedelta"
         )
