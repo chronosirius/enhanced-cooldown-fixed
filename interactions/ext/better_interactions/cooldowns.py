@@ -114,9 +114,7 @@ class cooldown:
             if cooled:
                 return await func(ctx, *args, **kwargs)
             if self.cooldown_function:
-                return await self.cooldown_function(
-                    ctx, self.time - (_time() - data[1])
-                )
+                return await self.cooldown_function(ctx, self.time - (_time() - data))
             await ctx.send("This command is currently on cooldown!")
             # new_data = filter(lambda attr: attr not in dir(type(func)), dir(func))
             # for new_attr in new_data:
