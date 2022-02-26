@@ -126,19 +126,39 @@ class cooldown:
 """
 
 
-def cooldown(*delta_args, error, **delta_kwargs):
+def get_id(self, ctx):
+    if self.type in {"user", User}:
+        return str(ctx.author.user.id)
+    elif self.type in {"channel", Channel}:
+        return str(ctx.channel.id)
+    elif self.type in {"guild", Guild}:
+        return str(ctx.guild.id)
+
+
+def cooldown(
+    *delta_args,
+    error: Optional[Coroutine] = None,
+    type: Optional[Union[str, User, Channel, Guild]] = "user",
+    **delta_kwargs
+):
     delta = timedelta(*delta_args, **delta_kwargs)
 
     def decorator(func):
-        last_called = None
+        last_called: dict = {}
+        if type not in {"user", User, "guild", Guild, "channel", Channel}:
+            raise TypeError("Invalid type provided for `type`!")
 
         @wraps(func)
         async def wrapper(ctx, *args, **kwargs):
             nonlocal last_called
             now = datetime.now()
-            if last_called and (now - last_called < delta):
-                return await error(ctx, delta - (now - last_called))
-            last_called = now
+            id = get_id(type, ctx)
+            unique_last_called = last_called.get(id, None)
+
+            if unique_last_called and (now - unique_last_called < delta):
+                return await error(ctx, delta - (now - unique_last_called))
+
+            last_called[id] = now
             return await func(ctx, *args, **kwargs)
 
         return wrapper
