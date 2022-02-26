@@ -4,6 +4,7 @@ Credit to @dontbanmeplz for the original code regarding cooldowns, and merging i
 from functools import wraps
 from time import time as _time
 from typing import Callable, Coroutine, Optional, Union
+from datetime import datetime, timedelta
 
 from interactions import Channel, CommandContext, Guild, User
 
@@ -67,7 +68,7 @@ class cooldown:
         return new_func
 """
 
-
+"""
 class cooldown:
     def __init__(
         self,
@@ -104,7 +105,6 @@ class cooldown:
             return True, data
         if _time() - data < self.time:
             return False, data
-        data = _time()
         return True, data
 
     def __call__(self, func):
@@ -123,3 +123,24 @@ class cooldown:
 
         self.func = new_func
         return new_func
+"""
+
+
+def cooldown(*delta_args, error, **delta_kwargs):
+    delta = timedelta(*delta_args, **delta_kwargs)
+
+    def decorator(func):
+        last_called = None
+
+        @wraps(func)
+        async def wrapper(ctx, *args, **kwargs):
+            nonlocal last_called
+            now = datetime.now()
+            if last_called and (now - last_called < delta):
+                return await error(ctx, delta - (now - last_called))
+            last_called = now
+            return await func(ctx, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
