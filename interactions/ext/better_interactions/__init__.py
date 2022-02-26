@@ -4,18 +4,18 @@ from . import (
     command_models,
     commands,
     components,
+    cooldowns,
     extension,
     subcommands,
-    cooldowns,
 )
 from ._logging import CustomFormatter, Data, get_logger
 from .callback import component
 from .command_models import BetterOption
 from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, SelectMenu, spread_to_rows
+from .cooldowns import cooldown
 from .extension import BetterExtension, BetterInteractions, setup, sync_subcommands
 from .subcommands import base, extension_base
-from .cooldowns import cooldown
 
 # fmt: off
 __all__ = [

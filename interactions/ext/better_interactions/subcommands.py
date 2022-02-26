@@ -225,6 +225,7 @@ class SubcommandSetup:
                 )
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
+            print(f"{sub_command_group=}, {sub_command=}")
             if sub_command_group:
                 group = self.groups[sub_command_group]
                 subcommand = next(
@@ -353,6 +354,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         self.full_command = NonSynchronizedCommand(commands, self.base)
 
     def inner(self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
+        print(f"{sub_command_group=}, {sub_command=}")
         if sub_command_group:
             group = self.groups[sub_command_group]
             subcommand = next((sub for sub in group.subcommands if sub.name == sub_command), None)
