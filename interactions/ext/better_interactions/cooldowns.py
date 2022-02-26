@@ -1,13 +1,15 @@
 """
 Credit to @dontbanmeplz for the original code regarding cooldowns, and merging into better-interactions.
 """
-from functools import wraps
-from time import time as _time
-from typing import Callable, Coroutine, Optional, Union
 from datetime import datetime, timedelta
+from functools import wraps
 from inspect import iscoroutinefunction
+from time import time as _time
+from typing import Callable, Coroutine, Optional, Type, Union
 
-from interactions import Channel, CommandContext, Guild, User, Member
+from interactions import Channel, CommandContext, Guild, Member, User
+
+NoneType: Type[None] = type(None)
 
 """
 class cooldown:
@@ -149,7 +151,7 @@ def cooldown(
     def decorator(coro: Coroutine):
         coro.__last_called = {}
 
-        if not isinstance(error, (Callable, type(None))):
+        if not isinstance(error, (Callable, NoneType)):
             raise TypeError(
                 "Invalid type provided for `error`! Must be a `Callable`, specifically a `Coroutine`!"
             )
