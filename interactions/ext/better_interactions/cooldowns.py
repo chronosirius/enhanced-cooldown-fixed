@@ -169,7 +169,6 @@ def cooldown(
                     return await ctx.send(
                         f"This command is on cooldown for {delta - (now - unique_last_called)}!"
                     )
-
                 else:
                     return (
                         await error(ctx, delta - (now - unique_last_called))
