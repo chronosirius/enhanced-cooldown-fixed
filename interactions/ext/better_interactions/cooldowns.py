@@ -6,7 +6,7 @@ from time import time as _time
 from typing import Callable, Coroutine, Optional, Union
 from datetime import datetime, timedelta
 
-from interactions import Channel, CommandContext, Guild, User
+from interactions import Channel, CommandContext, Guild, User, Member
 
 """
 class cooldown:
@@ -126,12 +126,12 @@ class cooldown:
 """
 
 
-def get_id(self, ctx):
-    if self.type in {"user", User}:
+def get_id(type, ctx):
+    if type == "user" or type is User or type == "member" or type is Member:
         return str(ctx.author.user.id)
-    elif self.type in {"channel", Channel}:
+    elif type == "channel" or type is Channel:
         return str(ctx.channel.id)
-    elif self.type in {"guild", Guild}:
+    elif type == "guild" or type is Guild:
         return str(ctx.guild.id)
 
 
