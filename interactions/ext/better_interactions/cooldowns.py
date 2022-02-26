@@ -145,6 +145,11 @@ def cooldown(
     type: Optional[Union[str, User, Channel, Guild]] = "user",
     **delta_kwargs,
 ):
+    if not delta_args or delta_kwargs:
+        raise ValueError(
+            "Cooldown amount must be provided! Valid arguments and keyword arguments are listed in https://docs.python.org/3/library/datetime.html#datetime.timedelta"
+        )
+
     delta = timedelta(*delta_args, **delta_kwargs)
 
     def decorator(coro: Coroutine):
