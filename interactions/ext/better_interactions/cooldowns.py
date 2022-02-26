@@ -133,33 +133,44 @@ def get_id(type, ctx):
         return str(ctx.channel.id)
     elif type == "guild" or type is Guild:
         return str(ctx.guild.id)
+    else:
+        raise TypeError("Invalid type provided for `type`!")
 
 
 def cooldown(
     *delta_args,
     error: Optional[Coroutine] = None,
     type: Optional[Union[str, User, Channel, Guild]] = "user",
-    **delta_kwargs
+    **delta_kwargs,
 ):
     delta = timedelta(*delta_args, **delta_kwargs)
 
-    def decorator(func):
-        last_called: dict = {}
+    def decorator(coro: Coroutine):
+        coro.__last_called = {}
+
+        if not isinstance(error, Coroutine):
+            raise TypeError("Invalid type provided for `error`! Must be a `Coroutine`!")
         if type not in {"user", User, "guild", Guild, "channel", Channel}:
             raise TypeError("Invalid type provided for `type`!")
 
-        @wraps(func)
-        async def wrapper(ctx, *args, **kwargs):
-            nonlocal last_called
+        @wraps(coro)
+        async def wrapper(ctx: CommandContext, *args, **kwargs):
+            last_called = coro.__last_called
             now = datetime.now()
             id = get_id(type, ctx)
             unique_last_called = last_called.get(id, None)
 
             if unique_last_called and (now - unique_last_called < delta):
-                return await error(ctx, delta - (now - unique_last_called))
+                if error:
+                    return await error(ctx, delta - (now - unique_last_called))
+                else:
+                    await ctx.send(
+                        f"This command is on cooldown for {delta - (now - unique_last_called)}!"
+                    )
 
             last_called[id] = now
-            return await func(ctx, *args, **kwargs)
+            coro.__last_called = last_called
+            return await coro(ctx, *args, **kwargs)
 
         return wrapper
 
