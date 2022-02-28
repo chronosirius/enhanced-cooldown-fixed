@@ -156,7 +156,7 @@ class SubcommandSetup:
             )
 
             params = signature(coro).parameters
-            print(f"params: {params}")
+            print(f"{self.base=} {group=} {_name=} params: {params}")
             if options is MISSING and any(
                 isinstance(param.annotation, BetterOption)
                 for _, param in params.items()
