@@ -11,7 +11,7 @@ from ._logging import get_logger
 
 log: Logger = get_logger("extension")
 
-version = (
+_version = (
     Version(
         version="3.0.0",
         author=VersionAuthor(
@@ -20,7 +20,7 @@ version = (
         ),
     ),
 )
-base = Base(
+_base = Base(
     name="better-interactions",
     version="3.0.0",
     description="Better interactions for interactions.py",

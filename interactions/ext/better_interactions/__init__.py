@@ -19,8 +19,8 @@ from .extension import (
     BetterInteractions,
     setup,
     sync_subcommands,
-    base,
-    version,
+    _base,
+    _version,
 )
 from .subcommands import base, extension_base
 
@@ -53,8 +53,8 @@ __all__ = [
         "BetterExtension",
         "BetterInteractions",
         "setup",
-        "base",
-        "version",
+        "_base",
+        "_version",
     "cooldowns",
         "cooldown",
 ]
