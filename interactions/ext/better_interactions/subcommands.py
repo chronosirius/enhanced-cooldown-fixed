@@ -342,9 +342,46 @@ class ExternalSubcommandSetup(SubcommandSetup):
             coro.__base__ = self.base
             coro.__data__ = self
 
-            SubcommandSetup.subcommand(
-                self, group=group, name=name, description=description, options=options
+            _name = coro.__name__ if name is MISSING else name
+            _description = (
+                (getdoc(coro) or "No description")
+                if description is MISSING
+                else description
             )
+
+            params = signature(coro).parameters
+            print(f"{self.base=} {group=} {_name=} params: {params}")
+            if options is MISSING and any(
+                isinstance(param.annotation, BetterOption)
+                for _, param in params.items()
+            ):
+                _options = parameters_to_options(params)
+            else:
+                _options = options
+
+            if not len(params):
+                raise InteractionException(
+                    11,
+                    message="Your command needs at least one argument to return context.",
+                )
+
+            if group is MISSING:
+                print("works here 175")
+                self.subcommands[_name] = Subcommand(
+                    _name, _description, coro, _options
+                )
+            elif group not in self.groups:
+                print("works here 180")
+                self.groups[group] = Group(
+                    group,
+                    description,
+                    subcommand=Subcommand(_name, _description, coro, _options),
+                )
+            else:
+                print("works here 187")
+                self.groups[group].subcommands.append(
+                    Subcommand(_name, _description, coro, _options)
+                )
 
             return coro
 
