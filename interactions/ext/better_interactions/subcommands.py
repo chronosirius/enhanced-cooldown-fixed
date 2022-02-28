@@ -429,7 +429,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         else:
             subcommand = self.subcommands[sub_command]
 
-        return await subcommand.coro(ctx, *args, **kwargs)
+        return await subcommand.coro(self, ctx, *args, **kwargs)
 
 
 def base(
