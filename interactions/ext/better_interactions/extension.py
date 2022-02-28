@@ -24,13 +24,17 @@ def sync_subcommands(self):
         }
         commands = []
 
-        for subcommand in bases.values():
-            client.event(subcommand.inner, name=f"command_{subcommand.base}")
+        for base, subcommand in bases.items():
+            client.event(subcommand.inner, name=f"command_{base}")
+            print(f"{base} -> {subcommand.raw_commands}")
             commands.extend(subcommand.raw_commands)
 
         if client._automate_sync:
             if client._loop.is_running():
-                [client._loop.create_task(client._synchronize(command)) for command in commands]
+                [
+                    client._loop.create_task(client._synchronize(command))
+                    for command in commands
+                ]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -40,7 +44,10 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
+                    [
+                        client._scopes.add(_ if isinstance(_, int) else _.id)
+                        for _ in scope
+                    ]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
@@ -128,14 +135,18 @@ class BetterInteractions(interactions.client.Extension):
                             decorator_custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
                     elif hasattr(func, "regex"):
                         if fullmatch(
                             func.regex,
                             ctx.data.custom_id.replace("component_regex_", ""),
                         ):
                             log.info(f"{func} regex {func.regex} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
 
 
 def setup(
