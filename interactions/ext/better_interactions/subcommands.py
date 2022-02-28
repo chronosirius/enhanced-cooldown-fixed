@@ -338,6 +338,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
 
         def decorator(coro: Coroutine) -> Coroutine:
+            print("ExternalSubcommandSetup.subcommand decorator")
             coro.__subcommand__ = True
             coro.__base__ = self.base
             coro.__data__ = self
