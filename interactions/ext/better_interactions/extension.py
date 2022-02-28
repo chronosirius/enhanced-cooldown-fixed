@@ -26,7 +26,6 @@ def sync_subcommands(self):
 
         for base, subcommand in bases.items():
             client.event(subcommand.inner, name=f"command_{base}")
-            print(f"{base} -> {subcommand.raw_commands}")
             commands.extend(subcommand.raw_commands)
 
         if client._automate_sync:

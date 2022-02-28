@@ -156,7 +156,6 @@ class SubcommandSetup:
             )
 
             params = signature(coro).parameters
-            print(f"{self.base=} {group=} {_name=} params: {params}")
             if options is MISSING and any(
                 isinstance(param.annotation, BetterOption)
                 for _, param in params.items()
@@ -172,19 +171,16 @@ class SubcommandSetup:
                 )
 
             if group is MISSING:
-                print("works here 175")
                 self.subcommands[_name] = Subcommand(
                     _name, _description, coro, _options
                 )
             elif group not in self.groups:
-                print("works here 180")
                 self.groups[group] = Group(
                     group,
                     description,
                     subcommand=Subcommand(_name, _description, coro, _options),
                 )
             else:
-                print("works here 187")
                 self.groups[group].subcommands.append(
                     Subcommand(_name, _description, coro, _options)
                 )
@@ -247,7 +243,6 @@ class SubcommandSetup:
         async def inner(
             ctx, *args, sub_command_group=None, sub_command=None, **kwargs
         ) -> None:
-            print(f"{sub_command_group=}, {sub_command=} {args=}, {kwargs=}")
             if sub_command_group:
                 group = self.groups[sub_command_group]
                 subcommand = next(
@@ -338,7 +333,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
 
         def decorator(coro: Coroutine) -> Coroutine:
-            print("ExternalSubcommandSetup.subcommand decorator")
             coro.__subcommand__ = True
             coro.__base__ = self.base
             coro.__data__ = self
@@ -351,7 +345,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
             )
 
             params = signature(coro).parameters
-            print(f"{self.base=} {group=} {_name=} params: {params}")
             if options is MISSING and any(
                 isinstance(param.annotation, BetterOption)
                 for _, param in params.items()
@@ -367,19 +360,16 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 )
 
             if group is MISSING:
-                print("works here 175")
                 self.subcommands[_name] = Subcommand(
                     _name, _description, coro, _options
                 )
             elif group not in self.groups:
-                print("works here 180")
                 self.groups[group] = Group(
                     group,
                     description,
                     subcommand=Subcommand(_name, _description, coro, _options),
                 )
             else:
-                print("works here 187")
                 self.groups[group].subcommands.append(
                     Subcommand(_name, _description, coro, _options)
                 )
@@ -420,7 +410,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
     async def inner(
         self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
     ) -> None:
-        print(f"{sub_command_group=}, {sub_command=} {args=}, {kwargs=}")
         if sub_command_group:
             group = self.groups[sub_command_group]
             subcommand = next(
