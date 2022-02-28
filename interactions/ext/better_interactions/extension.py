@@ -5,10 +5,32 @@ from re import fullmatch
 
 import interactions
 from interactions import Client
+from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
 
 log: Logger = get_logger("extension")
+
+version = (
+    Version(
+        version="3.0.0",
+        author=VersionAuthor(
+            name="Toricane",
+            email="prjwl028@gmail.com",
+        ),
+    ),
+)
+base = Base(
+    name="better-interactions",
+    version="3.0.0",
+    description="Better interactions for interactions.py",
+    link="https://github.com/Toricane/better-interactions",
+    packages=["interactions.ext.better_interactions"],
+    requirements=[
+        "discord-py-interactions>=4.1.0",
+        "interactions-wait-for",
+    ],
+)
 
 
 def sync_subcommands(self):

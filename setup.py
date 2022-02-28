@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 setup(
     name="better-interactions",
     version="3.0.0",
-    description="Better interactions for discord-py-interactions",
+    description="Better interactions for interactions.py",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/Toricane/better-interactions",
@@ -21,7 +21,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "discord-py-interactions>=4.0.1",
+        "discord-py-interactions>=4.1.0",
         "interactions-wait-for",
     ],
 )
