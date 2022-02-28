@@ -172,16 +172,19 @@ class SubcommandSetup:
                 )
 
             if group is MISSING:
+                print("works here 175")
                 self.subcommands[_name] = Subcommand(
                     _name, _description, coro, _options
                 )
             elif group not in self.groups:
+                print("works here 180")
                 self.groups[group] = Group(
                     group,
                     description,
                     subcommand=Subcommand(_name, _description, coro, _options),
                 )
             else:
+                print("works here 187")
                 self.groups[group].subcommands.append(
                     Subcommand(_name, _description, coro, _options)
                 )
