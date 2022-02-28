@@ -14,7 +14,14 @@ from .command_models import BetterOption
 from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, SelectMenu, spread_to_rows
 from .cooldowns import cooldown
-from .extension import BetterExtension, BetterInteractions, setup, sync_subcommands
+from .extension import (
+    BetterExtension,
+    BetterInteractions,
+    setup,
+    sync_subcommands,
+    base,
+    version,
+)
 from .subcommands import base, extension_base
 
 # fmt: off
@@ -46,6 +53,8 @@ __all__ = [
         "BetterExtension",
         "BetterInteractions",
         "setup",
+        "base",
+        "version",
     "cooldowns",
         "cooldown",
 ]
