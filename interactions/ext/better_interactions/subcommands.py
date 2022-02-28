@@ -376,7 +376,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         self.raw_commands = commands
         self.full_command = NonSynchronizedCommand(commands, self.base)
 
-    def inner(
+    async def inner(
         self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
     ) -> None:
         print(f"{sub_command_group=}, {sub_command=} {args=}, {kwargs=}")
@@ -385,11 +385,10 @@ class ExternalSubcommandSetup(SubcommandSetup):
             subcommand = next(
                 (sub for sub in group.subcommands if sub.name == sub_command), None
             )
-
         else:
             subcommand = self.subcommands[sub_command]
 
-        return subcommand.coro(self, ctx, *args, **kwargs)
+        return await subcommand.coro(ctx, *args, **kwargs)
 
 
 def base(
