@@ -182,8 +182,9 @@ class SubcommandSetup:
                     subcommand=Subcommand(_name, _description, coro, _options),
                 )
             else:
-                subcommands = self.groups[group].subcommands
-                subcommands.append(Subcommand(_name, _description, coro, _options))
+                self.groups[group].subcommands.append(
+                    Subcommand(_name, _description, coro, _options)
+                )
             return coro
 
         return decorator
