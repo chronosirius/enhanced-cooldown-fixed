@@ -15,7 +15,7 @@ from interactions import (
 )
 
 from ._logging import get_logger
-from .command_models import parameters_to_options
+from .command_models import BetterOption, parameters_to_options
 
 log = get_logger("subcommand")
 
@@ -157,11 +157,13 @@ class SubcommandSetup:
 
             params = signature(coro).parameters
             print(f"params: {params}")
-            _options = (
-                parameters_to_options(params)
-                if options is MISSING and len(params) > 1
-                else options
-            )
+            if options is MISSING and any(
+                isinstance(param.annotation, BetterOption)
+                for _, param in params.items()
+            ):
+                _options = parameters_to_options(params)
+            else:
+                _options = options
 
             if not len(params):
                 raise InteractionException(
