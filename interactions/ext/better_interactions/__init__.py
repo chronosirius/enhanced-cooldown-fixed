@@ -19,10 +19,10 @@ from .extension import (
     BetterInteractions,
     setup,
     sync_subcommands,
-    _base,
-    _version,
+    base,
+    version,
 )
-from .subcommands import base, extension_base
+from .subcommands import subcommand_base, ext_subcommand_base
 
 # fmt: off
 __all__ = [
@@ -38,8 +38,8 @@ __all__ = [
             "extension_command",
             "autodefer",
         "subcommands",
-            "base",
-            "extension_base",
+            "subcommand_base",
+            "ext_subcommand_base",
     # "cmpt",
         "callback",
             "component",
@@ -53,8 +53,8 @@ __all__ = [
         "BetterExtension",
         "BetterInteractions",
         "setup",
-        "_base",
-        "_version",
+        "base",
+        "version",
     "cooldowns",
         "cooldown",
 ]

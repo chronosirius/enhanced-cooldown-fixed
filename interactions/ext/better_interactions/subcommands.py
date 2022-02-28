@@ -421,7 +421,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         return await subcommand.coro(self, ctx, *args, **kwargs)
 
 
-def base(
+def subcommand_base(
     self: Client,
     base: str,
     *,
@@ -452,7 +452,7 @@ def base(
     return SubcommandSetup(self, base, description, scope, default_permission)
 
 
-def extension_base(
+def ext_subcommand_base(
     base: str,
     *,
     description: Optional[str] = "No description",

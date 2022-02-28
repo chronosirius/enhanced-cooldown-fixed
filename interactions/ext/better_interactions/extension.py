@@ -11,7 +11,7 @@ from ._logging import get_logger
 
 log: Logger = get_logger("extension")
 
-_version = (
+version = (
     Version(
         version="3.0.0",
         author=VersionAuthor(
@@ -20,7 +20,7 @@ _version = (
         ),
     ),
 )
-_base = Base(
+base = Base(
     name="better-interactions",
     version="3.0.0",
     description="Better interactions for interactions.py",
@@ -119,10 +119,10 @@ class BetterInteractions(interactions.client.Extension):
             log.debug("Registered on_component")
 
         if add_subcommand:
-            from .subcommands import base
+            from .subcommands import subcommand_base
 
-            log.debug("Adding bot.base (add_subcommand)")
-            bot.base = types.MethodType(base, bot)
+            log.debug("Adding bot.subcommand_base (add_subcommand)")
+            bot.subcommand_base = types.MethodType(subcommand_base, bot)
 
         if add_method or add_interaction_events:
             log.debug("Adding bot.wait_for (add_method or add_interaction_events)")
