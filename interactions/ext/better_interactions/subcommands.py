@@ -302,6 +302,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
         self.raw_commands = None
         self.full_command = None
+        self.__self = None
 
     def subcommand(
         self,
