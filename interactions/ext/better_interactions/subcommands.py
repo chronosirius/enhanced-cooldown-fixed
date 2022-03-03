@@ -1,3 +1,4 @@
+from distutils.extension import Extension
 from inspect import getdoc, signature
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
@@ -12,6 +13,7 @@ from interactions import (
     InteractionException,
     Option,
     OptionType,
+    Extension,
 )
 
 from ._logging import get_logger
@@ -420,6 +422,14 @@ class ExternalSubcommandSetup(SubcommandSetup):
             subcommand = self.subcommands[sub_command]
 
         return await subcommand.coro(self.__self, ctx, *args, **kwargs)
+
+    def set_self(self, __self: Extension) -> None:
+        """
+        Allows ability to access Extension attributes
+
+        :param Extension __self: The extension
+        """
+        self.__self = __self
 
 
 def subcommand_base(
