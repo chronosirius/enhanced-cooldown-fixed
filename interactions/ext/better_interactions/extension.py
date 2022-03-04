@@ -2,6 +2,7 @@ import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 from re import fullmatch
+from typing import Optional
 
 import interactions
 from interactions import Client
@@ -28,7 +29,6 @@ base = Base(
     packages=["interactions.ext.better_interactions"],
     requirements=[
         "discord-py-interactions>=4.1.0",
-        "interactions-wait-for",
     ],
 )
 
@@ -87,11 +87,9 @@ class BetterInteractions(interactions.client.Extension):
     def __init__(
         self,
         bot: Client,
-        modify_component_callbacks: bool = True,
-        add_subcommand: bool = True,
-        add_method: bool = False,
-        add_interaction_events: bool = False,
-        modify_command: bool = True,
+        add_subcommand: Optional[bool] = True,
+        modify_callbacks: Optional[bool] = True,
+        modify_command: Optional[bool] = True,
     ):
         """
         Apply hooks to a bot to add additional features
@@ -99,10 +97,9 @@ class BetterInteractions(interactions.client.Extension):
         This function is required, as importing alone won't extend the classes
 
         :param Client bot: The bot instance or class to apply hooks to
-        :param bool modify_component_callbacks: Whether to modify the component callbacks
         :param bool add_subcommand: Whether to add the subcommand
-        :param bool add_method: If ``wait_for`` should be attached to the bot
-        :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
+        :param bool modify_callbacks: Whether to modify the callbacks
+        :param bool modify_command: Whether to modify the command
         """
         if not isinstance(bot, interactions.Client):
             log.critical("The bot must be an instance of Client")
@@ -110,30 +107,26 @@ class BetterInteractions(interactions.client.Extension):
         else:
             log.debug("The bot is an instance of Client")
 
-        if modify_component_callbacks:
-            from .callback import component
-
-            log.debug("Modifying component callbacks (modify_component_callbacks)")
-            bot.component = types.MethodType(component, bot)
-
-            bot.event(self._on_component, "on_component")
-            log.debug("Registered on_component")
-
         if add_subcommand:
             from .subcommands import subcommand_base
 
             log.debug("Adding bot.subcommand_base (add_subcommand)")
             bot.subcommand_base = types.MethodType(subcommand_base, bot)
 
-        if add_method or add_interaction_events:
-            log.debug("Adding bot.wait_for (add_method or add_interaction_events)")
-            from interactions.ext import wait_for
+        if modify_callbacks:
+            from .callbacks import component, modal
 
-            wait_for.setup(
-                bot,
-                add_method=add_method,
-                add_interaction_events=add_interaction_events,
-            )
+            log.debug("Modifying component callbacks (modify_callbacks)")
+            bot.component = types.MethodType(component, bot)
+
+            bot.event(self._on_component, "on_component")
+            log.debug("Registered on_component")
+
+            log.debug("Modifying modal callbacks (modify_callbacks)")
+            bot.modal = types.MethodType(modal, bot)
+
+            bot.event(self._on_modal, "on_modal")
+            log.debug("Registered on_modal")
 
         if modify_command:
             from .commands import command
@@ -170,14 +163,38 @@ class BetterInteractions(interactions.client.Extension):
                                 decorator_custom_id, ctx
                             )
 
+    async def _on_modal(self, ctx: interactions.CommandContext):
+        websocket = self.client._websocket
+        if any(
+            any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
+            for _, funcs in websocket._dispatch.events.items()
+        ):
+            for decorator_custom_id, funcs in websocket._dispatch.events.items():
+                for func in funcs:
+                    if hasattr(func, "startswith"):
+                        if ctx.data.custom_id.startswith(
+                            decorator_custom_id.replace("modal_startswith_", "")
+                        ):
+                            log.info(f"{func} startswith {func.startswith} matched")
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
+                    elif hasattr(func, "regex"):
+                        if fullmatch(
+                            func.regex,
+                            ctx.data.custom_id.replace("modal_regex_", ""),
+                        ):
+                            log.info(f"{func} regex {func.regex} matched")
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
+
 
 def setup(
     bot: Client,
-    modify_component_callbacks: bool = True,
-    add_subcommand: bool = True,
-    add_method: bool = False,
-    add_interaction_events: bool = False,
-    modify_command: bool = True,
+    add_subcommand: Optional[bool] = True,
+    modify_callbacks: Optional[bool] = True,
+    modify_command: Optional[bool] = True,
 ) -> None:
     """
     Setup the extension
@@ -185,17 +202,9 @@ def setup(
     This function is required, as importing alone won't extend the classes
 
     :param Client bot: The bot instance or class to apply hooks to
-    :param bool modify_component_callbacks: Whether to modify the component callbacks
     :param bool add_subcommand: Whether to add the subcommand
-    :param bool add_method: If ``wait_for`` should be attached to the bot
-    :param bool add_interaction_events: Whether to add ``on_message_component``, ``on_application_command``, and other interaction event
+    :param bool modify_callbacks: Whether to modify the callbacks
+    :param bool modify_command: Whether to modify the command
     """
     log.info("Setting up BetterInteractions")
-    return BetterInteractions(
-        bot,
-        modify_component_callbacks,
-        add_subcommand,
-        add_method,
-        add_interaction_events,
-        modify_command,
-    )
+    return BetterInteractions(bot, add_subcommand, modify_callbacks, modify_command)

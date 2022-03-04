@@ -1,6 +1,6 @@
 from . import (
     _logging,
-    callback,
+    callbacks,
     command_models,
     commands,
     components,
@@ -9,7 +9,7 @@ from . import (
     subcommands,
 )
 from ._logging import CustomFormatter, Data, get_logger
-from .callback import component
+from .callbacks import component, modal
 from .command_models import BetterOption
 from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, SelectMenu, spread_to_rows
@@ -41,8 +41,9 @@ __all__ = [
             "subcommand_base",
             "ext_subcommand_base",
     # "cmpt",
-        "callback",
+        "callbacks",
             "component",
+            "modal",
         "components",
             "ActionRow",
             "Button",
