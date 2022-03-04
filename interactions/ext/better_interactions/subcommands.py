@@ -1,4 +1,3 @@
-from distutils.extension import Extension
 from inspect import getdoc, signature
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
@@ -9,11 +8,11 @@ from interactions import (
     ApplicationCommand,
     ApplicationCommandType,
     Client,
+    Extension,
     Guild,
     InteractionException,
     Option,
     OptionType,
-    Extension,
 )
 
 from ._logging import get_logger

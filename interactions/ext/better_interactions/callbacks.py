@@ -1,6 +1,6 @@
+from functools import wraps
 from re import compile
 from typing import Any, Callable, Coroutine, Optional, Union
-from functools import wraps
 
 import interactions
 
@@ -110,9 +110,7 @@ def modal(
     """
 
     def decorator(coro: Coroutine) -> Any:
-        payload: str = (
-            modal.custom_id if isinstance(modal, interactions.Modal) else modal
-        )
+        payload: str = modal.custom_id if isinstance(modal, interactions.Modal) else modal
         if startswith and regex:
             log.error("Cannot use both startswith and regex.")
             raise ValueError("Cannot use both startswith and regex!")

@@ -22,15 +22,11 @@ log: Logger = get_logger("command")
 def command(
     self,
     *,
-    type: Optional[
-        Union[int, ApplicationCommandType]
-    ] = ApplicationCommandType.CHAT_INPUT,
+    type: Optional[Union[int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
     name: Optional[str] = MISSING,
     description: Optional[str] = MISSING,
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-    options: Optional[
-        Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]
-    ] = MISSING,
+    options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]] = MISSING,
     default_permission: Optional[bool] = MISSING,
 ) -> Callable[..., Any]:
     """
@@ -77,9 +73,7 @@ def command(
 
         params = signature(coro).parameters
         _options = (
-            parameters_to_options(params)
-            if options is MISSING and len(params) > 1
-            else options
+            parameters_to_options(params) if options is MISSING and len(params) > 1 else options
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
@@ -139,9 +133,7 @@ def autodefer(
 
     def inner(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        async def deferring_func(
-            ctx: Union[CommandContext, ComponentContext], *args, **kwargs
-        ):
+        async def deferring_func(ctx: Union[CommandContext, ComponentContext], *args, **kwargs):
             try:
                 loop = get_running_loop()
             except RuntimeError as e:
