@@ -71,8 +71,9 @@ def command(
         _name = coro.__name__ if name is MISSING else name
         _description = (
             getdoc(coro) or "No description" if description is MISSING else description
-        )
-        _description = _description[:100]
+        ).split("\n")[0]
+        if len(_description) > 100:
+            raise ValueError("Description must be less than 100 characters.")
 
         params = signature(coro).parameters
         _options = (
@@ -101,8 +102,9 @@ def extension_command(**kwargs):
         kwargs["name"] = coro.__name__ if name is MISSING else name
         kwargs["description"] = (
             getdoc(coro) or "No description" if description is MISSING else description
-        )
-        kwargs["description"] = kwargs["description"][:100]
+        ).split("\n")[0]
+        if len(kwargs["description"]) > 100:
+            raise ValueError("Description must be less than 100 characters.")
         coro.__command_data__ = ((), kwargs)
         log.debug(f"extension_command: {coro.__command_data__=}")
         return coro

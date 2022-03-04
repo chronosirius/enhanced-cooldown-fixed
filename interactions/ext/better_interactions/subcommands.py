@@ -155,7 +155,9 @@ class SubcommandSetup:
                 (getdoc(coro) or "No description")
                 if description is MISSING
                 else description
-            )
+            ).split("\n")[0]
+            if len(_description) > 100:
+                raise ValueError("Description must be less than 100 characters.")
 
             params = signature(coro).parameters
             if options is MISSING and any(
@@ -258,23 +260,6 @@ class SubcommandSetup:
         return self.client.event(inner, name=f"command_{self.base}")
 
 
-class NonSynchronizedCommand:
-    """
-    A class that represents a non-synchronized command inside extensions.
-
-    DO NOT INITIALIZE THIS CLASS DIRECTLY.
-
-    :param str commands: The raw commands data.
-    :param str description: The base of the command.
-    """
-
-    def __init__(self, commands: List[ApplicationCommand], base: str = None):
-        log.debug(f"NonSynchronizedCommand.__init__: {base=}")
-        self.__need_sync__ = True
-        self.commands = commands
-        self.base = base
-
-
 class ExternalSubcommandSetup(SubcommandSetup):
     """
     A class you get when using ``base_var = extension_base("base_name", ...)``
@@ -345,7 +330,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 (getdoc(coro) or "No description")
                 if description is MISSING
                 else description
-            )
+            ).split("\n")[0]
+            if len(_description) > 100:
+                raise ValueError("Description must be less than 100 characters.")
 
             params = signature(coro).parameters
             if options is MISSING and any(
@@ -408,7 +395,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
             options=options,
         )
         self.raw_commands = commands
-        self.full_command = NonSynchronizedCommand(commands, self.base)
 
     async def inner(
         self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
