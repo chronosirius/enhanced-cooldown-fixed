@@ -1,5 +1,6 @@
 from re import compile
 from typing import Any, Callable, Coroutine, Optional, Union
+from functools import wraps
 
 import interactions
 
@@ -127,5 +128,37 @@ def modal(
 
         log.debug(f"Modal callback, {startswith=}, {regex=}")
         return coro
+
+    return decorator
+
+
+@wraps(interactions.Client.component)
+def extension_component(
+    component: Union[str, interactions.Button, interactions.SelectMenu],
+    startswith: Optional[bool] = False,
+    regex: Optional[bool] = False,
+):
+    def decorator(func):
+        func.__component_data__ = (
+            (),
+            {"component": component, "startswith": startswith, "regex": regex},
+        )
+        return func
+
+    return decorator
+
+
+@wraps(interactions.Client.modal)
+def extension_modal(
+    modal: Union[interactions.Modal, str],
+    startswith: Optional[bool] = False,
+    regex: Optional[bool] = False,
+):
+    def decorator(func):
+        func.__modal_data__ = (
+            (),
+            {"modal": modal, "startswith": startswith, "regex": regex},
+        )
+        return func
 
     return decorator
