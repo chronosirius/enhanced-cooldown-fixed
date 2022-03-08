@@ -4,8 +4,7 @@ from logging import Logger
 from re import fullmatch
 from typing import Optional
 
-import interactions
-from interactions import Client
+from interactions import Client, CommandContext, ComponentContext, Extension
 from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
@@ -68,8 +67,8 @@ def sync_subcommands(self):
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
 
-class BetterExtension(interactions.client.Extension):
-    def __new__(cls, client: interactions.Client, *args, **kwargs):
+class BetterExtension(Extension):
+    def __new__(cls, client: Client, *args, **kwargs):
         self = super().__new__(cls, client, *args, **kwargs)
         log.debug("Syncing subcommands...")
         sync_subcommands(self)
@@ -77,7 +76,7 @@ class BetterExtension(interactions.client.Extension):
         return self
 
 
-class BetterInteractions(interactions.client.Extension):
+class BetterInteractions(Extension):
     def __init__(
         self,
         bot: Client,
@@ -95,7 +94,7 @@ class BetterInteractions(interactions.client.Extension):
         :param bool modify_callbacks: Whether to modify the callbacks
         :param bool modify_command: Whether to modify the command
         """
-        if not isinstance(bot, interactions.Client):
+        if not isinstance(bot, Client):
             log.critical("The bot must be an instance of Client")
             raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
         else:
@@ -131,7 +130,7 @@ class BetterInteractions(interactions.client.Extension):
 
         log.info("Hooks applied")
 
-    async def _on_component(self, ctx: interactions.ComponentContext):
+    async def _on_component(self, ctx: ComponentContext):
         websocket = self.client._websocket
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
@@ -153,7 +152,7 @@ class BetterInteractions(interactions.client.Extension):
                             log.info(f"{func} regex {func.regex} matched")
                             return websocket._dispatch.dispatch(decorator_custom_id, ctx)
 
-    async def _on_modal(self, ctx: interactions.CommandContext):
+    async def _on_modal(self, ctx: CommandContext):
         websocket = self.client._websocket
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
