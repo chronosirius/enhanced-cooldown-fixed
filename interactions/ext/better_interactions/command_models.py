@@ -62,7 +62,7 @@ class BetterOption:
         ...
     ```
 
-    :param Union[type, int, OptionType] type: The type of the option.
+    :param Union[type, int, OptionType] type?: The type of the option.
     :param Optional[str] description?: The description of the option.
     :param Optional[str] name?: The name of the option.
     :param Optional[List[Choice]] choices?: The choices of the option.
@@ -76,7 +76,7 @@ class BetterOption:
 
     def __init__(
         self,
-        type: Union[_type, int, OptionType],
+        type: Union[_type, int, OptionType] = None,
         description: Optional[str] = None,
         name: Optional[str] = None,
         choices: Optional[List[Choice]] = None,
@@ -88,7 +88,7 @@ class BetterOption:
         value: Optional[str] = None,
     ):
         log.debug("BetterOption.__init__")
-        if isinstance(type, int):
+        if isinstance(type, (int, type(None))):
             self.type = type
         elif type in (str, int, float):
             if type is str:
