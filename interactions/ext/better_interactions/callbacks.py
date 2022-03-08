@@ -50,7 +50,7 @@ def component(
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
         if hasattr(coro, "__extension"):
-            return coro
+            return bot.event(coro, name=f"component_{component}")
 
         payload: str = (
             Component(**component._json).custom_id
@@ -114,7 +114,7 @@ def modal(
 
     def decorator(coro: Coroutine) -> Any:
         if hasattr(coro, "__extension"):
-            return coro
+            return bot.event(coro, name=f"modal_{modal}")
 
         payload: str = modal.custom_id if isinstance(modal, Modal) else modal
         if startswith and regex:
