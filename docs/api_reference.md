@@ -128,3 +128,67 @@ base_var.finish()
 </ul>
 
 </ul>
+
+### *func* `subcommand_base`
+
+<ul>
+
+Use this function to initialize a base for future subcommands.
+
+Kwargs are optional.
+
+To use this function without loading the extension, pass in the client as the first argument.
+
+```py
+base_name = client.base(
+    "base_name",
+    description="Description of the base",
+    scope=123456789,
+    default_permission=True
+)
+# or
+from interactions.ext.better_interactions import subcommand_base
+base_name = subcommand_base(
+    client,
+    "base_name",
+    description="Description of the base",
+    scope=123456789,
+    default_permission=True
+)
+```
+
+Parameters:
+
+* `self: Client`: The client that the base belongs to. Not needed if you load the extension and use `client.base(...)`.
+* `base: str`: The base name of the base.
+* `description: str`: The description of the base.
+* `scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
+* `default_permission: bool`: The default permission of the base.
+
+</ul>
+
+### *func* `ext_subcommand_base`
+
+<ul>
+
+Use this function to initialize a base for future subcommands inside extensions.
+
+Kwargs are optional.
+
+```py
+base_name = ext_subcommand_base(
+    "base_name",
+    description="Description of the base",
+    scope=123456789,
+    default_permission=True
+)
+```
+
+Parameters:
+
+* `base: str`: The base name of the base.
+* `description: str`: The description of the base.
+* `scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
+* `default_permission: bool`: The default permission of the base.
+
+</ul>

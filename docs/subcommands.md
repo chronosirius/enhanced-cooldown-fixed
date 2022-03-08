@@ -8,13 +8,7 @@ Has features from [modified commands](./better_commands.md).
 
 ## Status
 
-In the release version of interactions.py 4.1.0, subcommands (commands like `/base subcommand`) are broken, but subcommands with groups (commands like `/base group subcommand`) are functional.
-
-For now, use this:
-
-``pip install -U git+https://github.com/EdVraz/library@unstable``
-
-instead of interactions.py 4.1.0, until the pull request has been merged
+100% working, all working well.
 
 ## How to use
 
@@ -153,3 +147,5 @@ def setup(bot):
 
 * [*class* `SubcommandSetup`](./api_reference.md#class-subcommandsetup)
 * [*class* `ExternalSubcommandSetup`](./api_reference.md#class-externalsubcommandsetup)
+* [*func* `subcommand_base`](./api_reference.md#func-subcommandbase)
+* [*func* `ext_subcommand_base`](./api_reference.md#func-extsubcommandbase)
