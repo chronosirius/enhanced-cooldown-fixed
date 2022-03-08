@@ -152,7 +152,7 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
                 focused=get_option(param).focused,
                 value=get_option(param).value,
             )
-            if param.annotation is Annotated
+            if type(param.annotation) is type(Annotated[str, int])
             else MISSING
         )
         for __name, param in params.items()
