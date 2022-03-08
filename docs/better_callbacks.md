@@ -26,7 +26,7 @@ bot.load("interactions.ext.better_interactions")
 
 Then, you can do stuff like this:
 
-Component callback:
+Example component callback that uses `startswith`:
 
 ```py
 @bot.component("test", startswith=True)
@@ -43,14 +43,14 @@ Examples of `custom_ids` that will invoke this callback:
 
 Examples of `custom_ids` that will not invoke this callback:
 
-1. TEST
-2. TeSt
-3. tesst
-4. _test
+1. `TEST`
+2. `TeSt`
+3. `tesst`
+4. `_test`
 
 etc.
 
-Modal callback:
+Example modal callback that uses regex:
 
 ```py
 @bot.modal(r"^[a-z0-9_-]{1,32}$", regex=True)
@@ -71,5 +71,7 @@ Examples of `custom_ids` that will not invoke this callback:
 2. `TeSt`
 3. `test!@#`
 4. `testuwah9d8wha9jf9wf*(&W(&F))`
+
+The `startswith` and `regex` can be used in both component and modal callbacks, but only one can be specified per callback, not both.
 
 ## [API Reference](./api_reference.md)
