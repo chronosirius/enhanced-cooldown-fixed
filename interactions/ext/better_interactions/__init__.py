@@ -9,30 +9,23 @@ from . import (
     subcommands,
 )
 from ._logging import CustomFormatter, Data, get_logger
-from .callbacks import component, modal, extension_component, extension_modal
+from .callbacks import component, extension_component, extension_modal, modal
 from .command_models import BetterOption
 from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, SelectMenu, spread_to_rows
 from .cooldowns import cooldown
-from .extension import (
-    BetterExtension,
-    BetterInteractions,
-    base,
-    setup,
-    sync_subcommands,
-    version,
-)
+from .extension import BetterExtension, BetterInteractions, base, setup, sync_subcommands, version
 from .subcommands import ext_subcommand_base, subcommand_base
 
 # fmt: off
 __all__ = [
     "_logging",
-        "Data",
+        "Data",  # noqa E131
         "CustomFormatter",
         "get_logger",
     # "cmd",
         "command_models",
-            "BetterOption",
+            "BetterOption",  # noqa E131
         "commands",
             "command",
             "extension_command",

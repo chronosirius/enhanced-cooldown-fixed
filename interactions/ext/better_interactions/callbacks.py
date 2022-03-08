@@ -2,7 +2,7 @@ from functools import wraps
 from re import compile
 from typing import Any, Callable, Coroutine, Optional, Union
 
-from interactions import Client, Button, SelectMenu, Modal, Component
+from interactions import Button, Client, Component, Modal, SelectMenu
 
 from ._logging import get_logger
 
