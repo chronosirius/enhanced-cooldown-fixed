@@ -2,7 +2,7 @@ from functools import wraps
 from re import compile
 from typing import Any, Callable, Coroutine, Optional, Union
 
-import interactions
+from interactions import Client, Button, SelectMenu, Modal, Component
 
 from ._logging import get_logger
 
@@ -10,8 +10,8 @@ log = get_logger("callback")
 
 
 def component(
-    bot: interactions.Client,
-    component: Union[str, interactions.Button, interactions.SelectMenu],
+    bot: Client,
+    component: Union[str, Button, SelectMenu],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ) -> Callable[..., Any]:
@@ -48,10 +48,13 @@ def component(
     :rtype: Callable[..., Any]
     """
 
-    def decorator(coro: Coroutine) -> Any:
+    def decorator(coro: Coroutine) -> Callable[..., Any]:
+        if hasattr(coro, "__extension"):
+            return coro
+
         payload: str = (
-            interactions.Component(**component._json).custom_id
-            if isinstance(component, (interactions.Button, interactions.SelectMenu))
+            Component(**component._json).custom_id
+            if isinstance(component, (Button, SelectMenu))
             else component
         )
         if startswith and regex:
@@ -74,8 +77,8 @@ def component(
 
 
 def modal(
-    bot: interactions.Client,
-    modal: Union[interactions.Modal, str],
+    bot: Client,
+    modal: Union[Modal, str],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ) -> Callable[..., Any]:
@@ -110,7 +113,10 @@ def modal(
     """
 
     def decorator(coro: Coroutine) -> Any:
-        payload: str = modal.custom_id if isinstance(modal, interactions.Modal) else modal
+        if hasattr(coro, "__extension"):
+            return coro
+
+        payload: str = modal.custom_id if isinstance(modal, Modal) else modal
         if startswith and regex:
             log.error("Cannot use both startswith and regex.")
             raise ValueError("Cannot use both startswith and regex!")
@@ -130,32 +136,68 @@ def modal(
     return decorator
 
 
-@wraps(interactions.Client.component)
+@wraps(Client.component)
 def extension_component(
-    component: Union[str, interactions.Button, interactions.SelectMenu],
+    component: Union[str, Button, SelectMenu],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ):
     def decorator(func):
+        if startswith and regex:
+            log.error("Cannot use both startswith and regex.")
+            raise ValueError("Cannot use both startswith and regex!")
+
+        func.__extension = True
+        payload: str = (
+            Component(**component._json).custom_id
+            if isinstance(component, (Button, SelectMenu))
+            else component
+        )
+
+        if startswith:
+            func.startswith = True
+            payload = f"startswith_{payload}"
+        elif regex:
+            func.regex = compile(payload)
+            payload = f"regex_{payload}"
+
+        log.debug(f"Extension component callback, {startswith=}, {regex=}")
+
         func.__component_data__ = (
             (),
-            {"component": component, "startswith": startswith, "regex": regex},
+            {"component": payload, "startswith": startswith, "regex": regex},
         )
         return func
 
     return decorator
 
 
-@wraps(interactions.Client.modal)
+@wraps(Client.modal)
 def extension_modal(
-    modal: Union[interactions.Modal, str],
+    modal: Union[Modal, str],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ):
     def decorator(func):
+        if startswith and regex:
+            log.error("Cannot use both startswith and regex.")
+            raise ValueError("Cannot use both startswith and regex!")
+
+        func.__extension = True
+        payload: str = modal.custom_id if isinstance(modal, Modal) else modal
+
+        if startswith:
+            func.startswith = True
+            payload = f"startswith_{payload}"
+        elif regex:
+            func.regex = compile(payload)
+            payload = f"regex_{payload}"
+
+        log.debug(f"Extension modal callback, {startswith=}, {regex=}")
+
         func.__modal_data__ = (
             (),
-            {"modal": modal, "startswith": startswith, "regex": regex},
+            {"modal": payload, "startswith": startswith, "regex": regex},
         )
         return func
 
