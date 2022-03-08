@@ -1,7 +1,16 @@
 from inspect import _empty
-from typing import TYPE_CHECKING, List, Optional, Union
+from typing import TYPE_CHECKING, List, Optional, Union, Annotated, get_args
 
-from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
+from interactions import (
+    MISSING,
+    Channel,
+    ChannelType,
+    Choice,
+    Option,
+    OptionType,
+    Role,
+    User,
+)
 
 from ._logging import get_logger
 
@@ -9,6 +18,40 @@ if TYPE_CHECKING:
     from collections import OrderedDict
 
 log = get_logger("command_models")
+_type: type = type
+
+
+def get_type(param):
+    return get_args(param.annotation)[0] or get_args(param.annotation)[1].type
+
+
+def get_option(param):
+    return get_args(param.annotation)[1]
+
+
+def type_to_int(param):
+    type: Union[_type, int, OptionType] = get_type(param)
+    if isinstance(type, int):
+        return type
+    elif type in (str, int, float):
+        if type is str:
+            return OptionType.STRING
+        elif type is int:
+            return OptionType.INTEGER
+        elif type is float:
+            return OptionType.NUMBER
+        elif type is bool:
+            return OptionType.BOOLEAN
+    elif isinstance(type, OptionType):
+        return type
+    elif type is User:
+        return OptionType.USER
+    elif type is Channel:
+        return OptionType.CHANNEL
+    elif type is Role:
+        return OptionType.ROLE
+    else:
+        raise TypeError(f"Invalid type: {type}")
 
 
 class BetterOption:
@@ -33,7 +76,7 @@ class BetterOption:
 
     def __init__(
         self,
-        type: Union[type, int, OptionType],
+        type: Union[_type, int, OptionType],
         description: Optional[str] = None,
         name: Optional[str] = None,
         choices: Optional[List[Choice]] = None,
@@ -96,6 +139,20 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
                 value=param.annotation.value,
             )
             if isinstance(param.annotation, BetterOption)
+            else Option(
+                type=type_to_int(param),
+                name=__name if not get_option(param).name else get_option(param).name,
+                description=get_option(param).description,
+                required=param.default is _empty,
+                choices=get_option(param).choices,
+                channel_types=get_option(param).channel_types,
+                min_value=get_option(param).min_value,
+                max_value=get_option(param).max_value,
+                autocomplete=get_option(param).autocomplete,
+                focused=get_option(param).focused,
+                value=get_option(param).value,
+            )
+            if isinstance(param.annotation, Annotated)
             else MISSING
         )
         for __name, param in params.items()
