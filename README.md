@@ -64,11 +64,11 @@ Improved `Button`, `SelectMenu`, and `ActionRow` components, with error correcti
 
 Click [here](./docs/better_components.md) to see more information and examples on better components!
 
-## Better component callback
+## Better callbacks
 
-The new component callbacks are modified so you can enable checking if the `custom_id` of the component starts with the one provided in the decorator, or use regex.
+The new component and modal callbacks are modified so you can enable checking if the `custom_id` of the component or model starts with the one provided in the decorator, or use regex.
 
-Click [here](./docs/better_component_callback.md) to see more information and examples on better component callbacks!
+Click [here](./docs/better_callbacks.md) to see more information and examples on better callbacks!
 
 ## Cooldown
 
