@@ -88,7 +88,7 @@ class BetterOption:
         value: Optional[str] = None,
     ):
         log.debug("BetterOption.__init__")
-        if isinstance(type, (int, type(None))):
+        if isinstance(type, (int, _type(None))):
             self.type = type
         elif type in (str, int, float):
             if type is str:
