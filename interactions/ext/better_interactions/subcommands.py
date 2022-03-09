@@ -164,7 +164,7 @@ class SubcommandSetup:
             else:
                 _options = options
 
-            if not len(params):
+            if not params:
                 raise InteractionException(
                     11,
                     message="Your command needs at least one argument to return context.",
@@ -323,7 +323,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
             else:
                 _options = options
 
-            if not len(params):
+            if not params:
                 raise InteractionException(
                     11,
                     message="Your command needs at least one argument to return context.",
