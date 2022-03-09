@@ -143,13 +143,15 @@ class BetterInteractions(Extension):
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
                             return websocket._dispatch.dispatch(decorator_custom_id, ctx)
-                    elif hasattr(func, "regex"):
-                        if fullmatch(
-                            func.regex,
-                            ctx.data.custom_id.replace("component_regex_", ""),
-                        ):
-                            log.info(f"{func} regex {func.regex} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                    elif (
+                        hasattr(func, "regex")
+                        and fullmatch(
+                        func.regex,
+                        ctx.data.custom_id.replace("component_regex_", ""),
+                    )
+                    ):
+                        log.info(f"{func} regex {func.regex} matched")
+                        return websocket._dispatch.dispatch(decorator_custom_id, ctx)
 
     async def _on_modal(self, ctx: CommandContext):
         websocket = self.client._websocket
@@ -165,13 +167,15 @@ class BetterInteractions(Extension):
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
                             return websocket._dispatch.dispatch(decorator_custom_id, ctx)
-                    elif hasattr(func, "regex"):
-                        if fullmatch(
-                            func.regex,
-                            ctx.data.custom_id.replace("modal_regex_", ""),
-                        ):
-                            log.info(f"{func} regex {func.regex} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                    elif (
+                        hasattr(func, "regex")
+                        and fullmatch(
+                        func.regex,
+                        ctx.data.custom_id.replace("modal_regex_", ""),
+                    )
+                    ):
+                        log.info(f"{func} regex {func.regex} matched")
+                        return websocket._dispatch.dispatch(decorator_custom_id, ctx)
 
 
 def setup(
