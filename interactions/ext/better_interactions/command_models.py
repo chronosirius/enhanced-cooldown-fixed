@@ -1,7 +1,16 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, List, Optional, Union, get_args
 
-from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
+from interactions import (
+    MISSING,
+    Channel,
+    ChannelType,
+    Choice,
+    Option,
+    OptionType,
+    Role,
+    User,
+)
 
 from ._logging import get_logger
 
@@ -29,7 +38,7 @@ def type_to_int(param):
     type: Union[_type, int, OptionType] = get_type(param)
     if isinstance(type, int):
         return type
-    if type in (str, int, float):
+    if type in (str, int, float, bool):
         if type is str:
             return OptionType.STRING
         if type is int:
@@ -57,7 +66,6 @@ class BetterOption:
     async def command(ctx, name: BetterOption(int, "description") = 5):
         ...
     ```
-
     :param Union[type, int, OptionType] type?: The type of the option.
     :param Optional[str] description?: The description of the option.
     :param Optional[str] name?: The name of the option.
