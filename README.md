@@ -18,11 +18,8 @@ pip install -U better-interactions
 - [Table of Contents](#table-of-contents)
 - [What is this library?](#what-is-this-library)
 - [What does this have?](#what-does-this-have)
-  - [Subcommands](#subcommands)
-  - [Better commands](#better-commands)
-  - [Better components](#better-components)
-  - [Better component callback](#better-component-callback)
-  - [Cooldown](#cooldown)
+- [Guide](#guide)
+- [Documentation](#documentation)
 
 ## What is this library?
 
@@ -40,40 +37,15 @@ Listed below are all the features this library currently has:
 
 ---------------------
 
-## [API Reference](./docs/api_reference.md)
+## Guide
+
+- [Home](https://github.com/Toricane/better-interactions/wiki)
+- [Subcommands](https://github.com/Toricane/better-interactions/wiki/subcommands.md)
+- [Better commands](https://github.com/Toricane/better-interactions/wiki/better_commands.md)
+- [Better components](https://github.com/Toricane/better-interactions/wiki/better_components.md)
+- [Better callbacks](https://github.com/Toricane/better-interactions/wiki/better_callbacks.md)
+- [Cooldown](https://github.com/Toricane/better-interactions/wiki/cooldown.md)
+
+## Documentation
 
 [![API Reference](https://img.shields.io/badge/API-Reference-blue.svg)](./docs/api_reference.md)
-
-## Subcommands
-
-Subcommands are technically options for commands, meaning to make subcommands, you may need long chains of options and if/elif/else conditionals.
-
-This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
-
-Click [here](./docs/subcommands.md) to see more information and examples on subcommands!
-
-## Better commands
-
-Better commands are commands that have a default name and description.
-
-Click [here](./docs/better_commands.md) to see more information and examples on better commands!
-
-## Better components
-
-Improved `Button`, `SelectMenu`, and `ActionRow` components, with error correction, `spread_to_rows`, and more.
-
-Click [here](./docs/better_components.md) to see more information and examples on better components!
-
-## Better callbacks
-
-The new component and modal callbacks are modified so you can enable checking if the `custom_id` of the component or model starts with the one provided in the decorator, or use regex.
-
-Click [here](./docs/better_callbacks.md) to see more information and examples on better callbacks!
-
-## Cooldown
-
-The `cooldown` decorator is a simple and easy way to add a cooldown or slowmode to a command, with customization.
-
-Credit to [@dontbanmeplz](https://github.com/dontbanmeplz) for the original code.
-
-Click [here](./docs/cooldown.md) to see more information and examples on cooldown!
