@@ -65,12 +65,12 @@ def Button(
 
     if style == ButtonStyle.LINK and not url:
         raise ValueError("`url` must be specified if `style` is `ButtonStyle.LINK`!")
-    elif url and style != ButtonStyle.LINK:
+    if url and style != ButtonStyle.LINK:
         raise ValueError("`url` can only be specified if `style` is `ButtonStyle.LINK`!")
 
     if style != ButtonStyle.LINK and not custom_id:
         raise ValueError("`custom_id` must be specified if `style` is not `ButtonStyle.LINK`!")
-    elif custom_id and style == ButtonStyle.LINK:
+    if custom_id and style == ButtonStyle.LINK:
         raise ValueError("`custom_id` can only be specified if `style` is not `ButtonStyle.LINK`!")
 
     return B(

@@ -97,8 +97,7 @@ class BetterInteractions(Extension):
         if not isinstance(bot, Client):
             log.critical("The bot must be an instance of Client")
             raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
-        else:
-            log.debug("The bot is an instance of Client")
+        log.debug("The bot is an instance of Client")
 
         if add_subcommand:
             from .subcommands import subcommand_base
