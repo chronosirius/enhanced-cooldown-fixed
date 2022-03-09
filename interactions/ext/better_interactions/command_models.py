@@ -29,14 +29,14 @@ def type_to_int(param):
     type: Union[_type, int, OptionType] = get_type(param)
     if isinstance(type, int):
         return type
-    elif type in (str, int, float):
+    if type in (str, int, float):
         if type is str:
             return OptionType.STRING
-        elif type is int:
+        if type is int:
             return OptionType.INTEGER
-        elif type is float:
+        if type is float:
             return OptionType.NUMBER
-        elif type is bool:
+        if type is bool:
             return OptionType.BOOLEAN
     elif isinstance(type, OptionType):
         return type

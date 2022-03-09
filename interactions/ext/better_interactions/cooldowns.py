@@ -24,12 +24,11 @@ def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext
 
     if type == "user" or type is User or type == "member" or type is Member:
         return str(ctx.author.user.id)
-    elif type == "channel" or type is Channel:
+    if type == "channel" or type is Channel:
         return str(ctx.channel_id)
-    elif type == "guild" or type is Guild:
+    if type == "guild" or type is Guild:
         return str(ctx.guild_id)
-    else:
-        raise TypeError("Invalid type provided for `type`!")
+    raise TypeError("Invalid type provided for `type`!")
 
 
 def cooldown(
@@ -93,12 +92,11 @@ def cooldown(
                     return await ctx.send(
                         f"This command is on cooldown for {delta - (now - unique_last_called)}!"
                     )
-                else:
-                    return (
-                        await error(ctx, delta - (now - unique_last_called))
-                        if iscoroutinefunction(error)
-                        else error(ctx, delta - (now - unique_last_called))
-                    )
+                return (
+                    await error(ctx, delta - (now - unique_last_called))
+                    if iscoroutinefunction(error)
+                    else error(ctx, delta - (now - unique_last_called))
+                )
 
             last_called[id] = now
             coro.__last_called = last_called
