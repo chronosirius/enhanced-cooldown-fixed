@@ -143,12 +143,9 @@ class BetterInteractions(Extension):
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
                             return websocket._dispatch.dispatch(decorator_custom_id, ctx)
-                    elif (
-                        hasattr(func, "regex")
-                        and fullmatch(
+                    elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("component_regex_", ""),
-                    )
                     ):
                         log.info(f"{func} regex {func.regex} matched")
                         return websocket._dispatch.dispatch(decorator_custom_id, ctx)
@@ -167,12 +164,9 @@ class BetterInteractions(Extension):
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
                             return websocket._dispatch.dispatch(decorator_custom_id, ctx)
-                    elif (
-                        hasattr(func, "regex")
-                        and fullmatch(
+                    elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("modal_regex_", ""),
-                    )
                     ):
                         log.info(f"{func} regex {func.regex} matched")
                         return websocket._dispatch.dispatch(decorator_custom_id, ctx)

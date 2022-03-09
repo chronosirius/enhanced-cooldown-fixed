@@ -1,26 +1,14 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, List, Optional, Union, get_args
 
-from interactions import (
-    MISSING,
-    Channel,
-    ChannelType,
-    Choice,
-    Option,
-    OptionType,
-    Role,
-    User,
-)
+from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
 
 from ._logging import get_logger
 
 if TYPE_CHECKING:
     from collections import OrderedDict
 
-try:
-    from typing import Annotated
-except ImportError:
-    from typing import Union as Annotated
+from typing_extensions import _AnnotatedAlias
 
 log = get_logger("command_models")
 _type: type = type
@@ -156,7 +144,7 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
                 focused=get_option(param).focused,
                 value=get_option(param).value,
             )
-            if isinstance(param.annotation, _type(Annotated[str, int]))
+            if isinstance(param.annotation, _AnnotatedAlias)
             else MISSING
         )
         for __name, param in params.items()
