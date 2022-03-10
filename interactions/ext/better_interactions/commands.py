@@ -93,7 +93,7 @@ def command(
             _scope,
             scope is MISSING,
             hasattr(self, "__debug_scope"),
-            not debug_scope,
+            debug_scope,
         )
 
         params = signature(coro).parameters
