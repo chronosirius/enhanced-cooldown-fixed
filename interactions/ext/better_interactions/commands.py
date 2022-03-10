@@ -88,13 +88,6 @@ def command(
             if scope is MISSING and hasattr(self, "__debug_scope") and debug_scope
             else scope
         )
-        print(
-            _name,
-            _scope,
-            scope is MISSING,
-            hasattr(self, "__debug_scope"),
-            debug_scope,
-        )
 
         params = signature(coro).parameters
         _options = (
