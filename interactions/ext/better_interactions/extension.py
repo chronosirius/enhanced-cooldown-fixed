@@ -83,8 +83,6 @@ def sync_subcommands(self):
 
 class BetterExtension(Extension):
     def __new__(cls, client: Client, *args, **kwargs):
-        # self = object.__new__(cls)
-
         for func in getmembers(cls, predicate=iscoroutinefunction):
             if hasattr(func, "__command_data__"):
                 scope = func.__command_data__[1].get("scope", MISSING)
