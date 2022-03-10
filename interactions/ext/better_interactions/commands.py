@@ -32,6 +32,7 @@ def command(
         Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]
     ] = MISSING,
     default_permission: Optional[bool] = MISSING,
+    debug_scope: Optional[bool] = True,
 ) -> Callable[..., Any]:
     """
     A modified decorator for creating slash commands.
@@ -68,6 +69,8 @@ def command(
     :type options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]]
     :param default_permission?: The default permission of accessibility for the application command. Defaults to ``True``.
     :type default_permission: Optional[bool]
+    :param debug_scope?: If the debug_scope applies to this command. Defaults to ``True``.
+    :type debug_scope: Optional[bool]
     :return: A callable response.
     :rtype: Callable[..., Any]
     """
@@ -80,6 +83,11 @@ def command(
         ).split("\n")[0]
         if len(_description) > 100:
             raise ValueError("Description must be less than 100 characters.")
+        _scope = (
+            self.__debug_scope
+            if scope is MISSING and hasattr(self, "__debug_scope")
+            else scope
+        )
 
         params = signature(coro).parameters
         _options = (
@@ -93,7 +101,7 @@ def command(
             type=type,
             name=_name,
             description=_description,
-            scope=scope,
+            scope=_scope,
             options=_options,
             default_permission=default_permission,
         )(coro)

@@ -2,9 +2,16 @@ import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 from re import fullmatch
-from typing import Optional
+from typing import Optional, Union, List
 
-from interactions import Client, CommandContext, ComponentContext, Extension
+from interactions import (
+    Client,
+    CommandContext,
+    ComponentContext,
+    Extension,
+    Guild,
+    MISSING,
+)
 from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
@@ -76,6 +83,20 @@ def sync_subcommands(self):
 
 class BetterExtension(Extension):
     def __new__(cls, client: Client, *args, **kwargs):
+        self = object.__new__(cls)
+
+        for func in getmembers(self, predicate=iscoroutinefunction):
+            if hasattr(func, "__command_data__"):
+                scope = func.__command_data__[1].get("scope", MISSING)
+                debug_scope = func.__command_data__[1].get("debug_scope", True)
+                del func.__command_data__[1]["debug_scope"]
+                if (
+                    scope is MISSING
+                    and debug_scope
+                    and hasattr(client, "__debug_scope")
+                ):
+                    func.__command_data__[1]["scope"] = client.__debug_scope
+
         self = super().__new__(cls, client, *args, **kwargs)
         log.debug("Syncing subcommands...")
         sync_subcommands(self)
@@ -90,6 +111,7 @@ class BetterInteractions(Extension):
         add_subcommand: Optional[bool] = True,
         modify_callbacks: Optional[bool] = True,
         modify_command: Optional[bool] = True,
+        debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
     ):
         """
         Apply hooks to a bot to add additional features
@@ -133,6 +155,10 @@ class BetterInteractions(Extension):
             log.debug("Modifying bot.command (modify_command)")
             bot.old_command = bot.command
             bot.command = types.MethodType(command, bot)
+
+        if debug_scope is not None:
+            log.debug("Setting debug_scope (debug_scope)")
+            bot.__debug_scope = debug_scope
 
         log.info("Hooks applied")
 
@@ -188,6 +214,7 @@ def setup(
     add_subcommand: Optional[bool] = True,
     modify_callbacks: Optional[bool] = True,
     modify_command: Optional[bool] = True,
+    debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
 ) -> None:
     """
     Setup the extension
@@ -198,6 +225,9 @@ def setup(
     :param bool add_subcommand: Whether to add the subcommand
     :param bool modify_callbacks: Whether to modify the callbacks
     :param bool modify_command: Whether to modify the command
+    :param Union[int, Guild, List[int], List[Guild]] debug_scope: The scope to be applied on all global commands
     """
     log.info("Setting up BetterInteractions")
-    return BetterInteractions(bot, add_subcommand, modify_callbacks, modify_command)
+    return BetterInteractions(
+        bot, add_subcommand, modify_callbacks, modify_command, debug_scope
+    )
