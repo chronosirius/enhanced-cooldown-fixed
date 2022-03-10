@@ -183,7 +183,7 @@ def TextInput(
     )
 
 
-def Modal(custom_id: str, title: str, components: List[Component]) -> M:
+def Modal(custom_id: str, title: str, components: List[TI]) -> M:
     """
     A helper function that passes arguments to `Modal`
     """
