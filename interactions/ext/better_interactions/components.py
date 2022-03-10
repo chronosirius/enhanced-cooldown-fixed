@@ -139,6 +139,32 @@ def SelectMenu(
     )
 
 
+def TextInput(
+    custom_id: str,
+    label: str,
+    style: Optional[TST] = TST.SHORT,
+    value: Optional[str] = None,
+    required: Optional[bool] = True,
+    placeholder: Optional[str] = None,
+    min_length: Optional[int] = None,
+    max_length: Optional[int] = None,
+) -> TI:
+    return TI(
+        custom_id=custom_id,
+        label=label,
+        style=style,
+        value=value,
+        required=required,
+        placeholder=placeholder,
+        min_length=min_length,
+        max_length=max_length,
+    )
+
+
+def Modal(custom_id: str, title: str, components: List[Component]) -> M:
+    return M(custom_id=custom_id, title=title, components=components)
+
+
 def spread_to_rows(*components: Union[AR, B, SM], max_in_row: int = 5) -> List[AR]:
     """
     A helper function that spreads your components into `ActionRow`s of a set size
@@ -186,29 +212,3 @@ def spread_to_rows(*components: Union[AR, B, SM], max_in_row: int = 5) -> List[A
         raise ValueError("Number of rows exceeds 5.")
 
     return rows
-
-
-def TextInput(
-    custom_id: str,
-    label: str,
-    style: Optional[TST] = TST.SHORT,
-    value: Optional[str] = None,
-    required: Optional[bool] = True,
-    placeholder: Optional[str] = None,
-    min_length: Optional[int] = None,
-    max_length: Optional[int] = None,
-) -> TI:
-    return TI(
-        custom_id=custom_id,
-        label=label,
-        style=style,
-        value=value,
-        required=required,
-        placeholder=placeholder,
-        min_length=min_length,
-        max_length=max_length,
-    )
-
-
-def Modal(custom_id: str, title: str, components: List[Component]) -> M:
-    return M(custom_id=custom_id, title=title, components=components)
