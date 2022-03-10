@@ -50,25 +50,25 @@ Subcommands are technically options for commands, meaning to make subcommands, y
 
 This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
 
-Click [here](./docs/subcommands.md) to see more information and examples on subcommands!
+Click [here](./subcommands.md) to see more information and examples on subcommands!
 
 ## Better commands
 
-Better commands are commands that have a default name and description.
+Better commands are commands that have a default name and description, and the ability to typehint options.
 
-Click [here](./docs/better_commands.md) to see more information and examples on better commands!
+Click [here](./better_commands.md) to see more information and examples on better commands!
 
 ## Better components
 
 Improved `Button`, `SelectMenu`, and `ActionRow` components, with error correction, `spread_to_rows`, and more.
 
-Click [here](./docs/better_components.md) to see more information and examples on better components!
+Click [here](./better_components.md) to see more information and examples on better components!
 
 ## Better callbacks
 
 The new component and modal callbacks are modified so you can enable checking if the `custom_id` of the component or model starts with the one provided in the decorator, or use regex.
 
-Click [here](./docs/better_callbacks.md) to see more information and examples on better callbacks!
+Click [here](./better_callbacks.md) to see more information and examples on better callbacks!
 
 ## Cooldown
 
@@ -76,4 +76,4 @@ The `cooldown` decorator is a simple and easy way to add a cooldown or slowmode 
 
 Credit to [@dontbanmeplz](https://github.com/dontbanmeplz) for the original code.
 
-Click [here](./docs/cooldown.md) to see more information and examples on cooldown!
+Click [here](./cooldown.md) to see more information and examples on cooldown!

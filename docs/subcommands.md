@@ -144,8 +144,3 @@ def setup(bot):
 ```
 
 ## [API Reference](./api_reference.md#subcommands)
-
-* [*class* `SubcommandSetup`](./api_reference.md#class-subcommandsetup)
-* [*class* `ExternalSubcommandSetup`](./api_reference.md#class-externalsubcommandsetup)
-* [*func* `subcommand_base`](./api_reference.md#func-subcommandbase)
-* [*func* `ext_subcommand_base`](./api_reference.md#func-extsubcommandbase)

@@ -27,4 +27,4 @@ async def cooldown_10(ctx):
     await ctx.send("Cooldown 10 seconds")
 ```
 
-## [API Reference](./api_reference.md)
+## [API Reference](./api_reference.md#cooldown)

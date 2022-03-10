@@ -20,4 +20,4 @@ These can be imported directly from `interactions.ext.better_interactions`. They
 
 100% all is well!
 
-## [API Reference](./api_reference.md)
+## [API Reference](./api_reference.md#better-components)

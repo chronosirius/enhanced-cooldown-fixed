@@ -69,4 +69,16 @@ These are all different ways of providing options in the respective parameters.
 
 This will also work for `Extension`s! Use the `extension_command` decorator from this library.
 
-## [API Reference](./api_reference.md)
+### Debug scope
+
+Tired of specifying the scope of the command? Use the `debug_scope` keyword argument when loading the extension.
+
+Specify it with the scope you want to use.
+
+```py
+bot.load("interactions.ext.better_interactions", debug_scope=...)
+```
+
+If you don't want it to affect a command, add `debug_scope=False` to the command decorator.
+
+## [API Reference](./api_reference.md#better-commands)

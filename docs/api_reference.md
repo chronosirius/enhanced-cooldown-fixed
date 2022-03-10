@@ -262,6 +262,7 @@ Parameters:
 * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the command.
 * `?options: list[Option]`: The options of the command.
 * `?default_permission: bool`: The default permission of the command.
+* `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
 
 </ul>
 
