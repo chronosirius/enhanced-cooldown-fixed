@@ -33,15 +33,33 @@ The function name is the default name, while the docstring is the default descri
 To specify options in the parameter, use this syntax:
 
 ```py
-import interactions
+from interactions import OptionType, Channel
 from interactions.ext.better_interactions import BetterOption
 
 @bot.command()
 async def options(
     ctx,
     option1: BetterOption(str, "option description"),
-    option2: BetterOption(interactions.OptionType.MENTIONABLE, "option description"),
-    option3: BetterOption(interactions.Channel, "option description"),
+    option2: BetterOption(OptionType.MENTIONABLE, "option description"),
+    option3: BetterOption(Channel, "option description"),
+):
+    """Says something!"""
+    await ctx.send("something")
+```
+
+Another, more IDE friendly, and recommended way is to use `typing_extensions.Annotated`:
+
+```py
+from interactions import OptionType, Channel
+from interactions.ext.better_interactions import BetterOption
+from typing_extensions import Annotated
+
+@bot.command()
+async def options(
+    ctx,
+    option1: Annotated[str, BetterOption(description="...")],
+    option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
+    option3: Annotated[Channel, BetterOption(description="...")],
 ):
     """Says something!"""
     await ctx.send("something")

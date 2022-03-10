@@ -14,9 +14,19 @@ from ._logging import get_logger
 log = get_logger("components")
 
 
-def ActionRow(*args: Union[B, SM]) -> AR:
+def ActionRow(*args: Union[B, SM, TI]) -> AR:
     """
     A helper function that passes arguments to `ActionRow`
+
+    Previous:
+    ```py
+    row = ActionRow(components=[...])
+    ```
+
+    Now:
+    ```py
+    row = ActionRow(...)
+    ```
 
     :param *args: The components to add to the ActionRow
     :type *args: Union[Button, SelectMenu]
@@ -37,7 +47,7 @@ def Button(
     disabled: Optional[bool] = False,
 ) -> B:
     """
-    A helper function that passes arguments to `Button`
+    A helper function that passes arguments to `Button`.
 
     :param style: The style of the button
     :type style: Union[ButtonStyle, int]
@@ -66,12 +76,18 @@ def Button(
     if style == ButtonStyle.LINK and not url:
         raise ValueError("`url` must be specified if `style` is `ButtonStyle.LINK`!")
     if url and style != ButtonStyle.LINK:
-        raise ValueError("`url` can only be specified if `style` is `ButtonStyle.LINK`!")
+        raise ValueError(
+            "`url` can only be specified if `style` is `ButtonStyle.LINK`!"
+        )
 
     if style != ButtonStyle.LINK and not custom_id:
-        raise ValueError("`custom_id` must be specified if `style` is not `ButtonStyle.LINK`!")
+        raise ValueError(
+            "`custom_id` must be specified if `style` is not `ButtonStyle.LINK`!"
+        )
     if custom_id and style == ButtonStyle.LINK:
-        raise ValueError("`custom_id` can only be specified if `style` is not `ButtonStyle.LINK`!")
+        raise ValueError(
+            "`custom_id` can only be specified if `style` is not `ButtonStyle.LINK`!"
+        )
 
     return B(
         style=style,
@@ -84,8 +100,8 @@ def Button(
 
 
 def SelectMenu(
-    options: List[SelectOption],
     custom_id: str,
+    options: List[SelectOption],
     *,
     placeholder: Optional[str] = None,
     min_values: Optional[int] = None,
@@ -95,10 +111,10 @@ def SelectMenu(
     """
     A helper function that passes arguments to `SelectMenu`
 
-    :param options: The options to display
-    :type options: List[SelectOption]
     :param custom_id: The custom id of the SelectMenu
     :type custom_id: str
+    :param options: The options to display
+    :type options: List[SelectOption]
     :param placeholder: The placeholder of the SelectMenu
     :type placeholder: Optional[str]
     :param min_values: The minimum number of values that can be selected
@@ -111,11 +127,11 @@ def SelectMenu(
     :rtype: SelectMenu
     """
     log.debug(
-        f"Creating SelectMenu with {options=}, {custom_id=}, {placeholder=}, {min_values=}, {max_values=}, {disabled=}"
+        f"Creating SelectMenu with {custom_id=}, {options=}, {placeholder=}, {min_values=}, {max_values=}, {disabled=}"
     )
     return SM(
-        options=options,
         custom_id=custom_id,
+        options=options,
         placeholder=placeholder,
         min_values=min_values,
         max_values=max_values,

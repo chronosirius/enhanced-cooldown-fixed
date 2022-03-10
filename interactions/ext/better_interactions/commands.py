@@ -22,30 +22,40 @@ log: Logger = get_logger("command")
 def command(
     self,
     *,
-    type: Optional[Union[int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
+    type: Optional[
+        Union[int, ApplicationCommandType]
+    ] = ApplicationCommandType.CHAT_INPUT,
     name: Optional[str] = MISSING,
     description: Optional[str] = MISSING,
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-    options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]] = MISSING,
+    options: Optional[
+        Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]
+    ] = MISSING,
     default_permission: Optional[bool] = MISSING,
 ) -> Callable[..., Any]:
     """
-    A decorator for registering an application command to the Discord API,
-    as well as being able to listen for ``INTERACTION_CREATE`` dispatched
-    gateway events.
-    The structure of a chat-input command:
-    .. code-block:: python
-        @command(name="command-name", description="this is a command.")
-        async def command_name(ctx):
-            ...
-    You are also able to establish it as a message or user command by simply passing
-    the ``type`` kwarg field into the decorator:
-    .. code-block:: python
-        @command(type=interactions.ApplicationCommandType.MESSAGE, name="Message Command")
-        async def message_command(ctx):
-            ...
-    The ``scope`` kwarg field may also be used to designate the command in question
-    applicable to a guild or set of guilds.
+    A modified decorator for creating slash commands.
+
+    Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
+
+    Full-blown example:
+
+    ```py
+    from interactions import OptionType, Channel
+    from interactions.ext.better_interactions import BetterOption
+    from typing_extensions import Annotated
+
+    @bot.command()
+    async def options(
+        ctx,
+        option1: Annotated[str, BetterOption(description="...")],
+        option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
+        option3: Annotated[Channel, BetterOption(description="...")],
+    ):
+        \"""Says something!\"""
+        await ctx.send("something")
+    ```
+
     :param type?: The type of application command. Defaults to :meth:`interactions.enums.ApplicationCommandType.CHAT_INPUT` or ``1``.
     :type type: Optional[Union[str, int, ApplicationCommandType]]
     :param name: The name of the application command. This *is* required but kept optional to follow kwarg rules.
@@ -73,7 +83,9 @@ def command(
 
         params = signature(coro).parameters
         _options = (
-            parameters_to_options(params) if options is MISSING and len(params) > 1 else options
+            parameters_to_options(params)
+            if options is MISSING and len(params) > 1
+            else options
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
@@ -90,6 +102,14 @@ def command(
 
 
 def extension_command(**kwargs):
+    """
+    A modified decorator for creating slash commands inside `Extension`s.
+
+    Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
+
+    Same parameters as `interactions.ext.better_interactions.command`.
+    """
+
     def decorator(coro):
         name = kwargs.get("name", MISSING)
         description = kwargs.get("description", MISSING)
@@ -112,8 +132,9 @@ def autodefer(
     edit_origin: Optional[bool] = False,
 ):
     """
-    Set up a command to be automatically deferred after some time
-    Note: This will not work if blocking code is used (such as the requests module)
+    Set up a command to be automatically deferred after some time.
+
+    Note: This will not work if blocking code is used (such as the requests module).
 
     Usage:
     ```py
@@ -123,17 +144,19 @@ def autodefer(
         ...
     ```
 
-    :param delay: How long to wait before deferring
+    :param delay: How long to wait before deferring in seconds.
     :type delay: Optional[Union[float, int]]
-    :param ephemeral: If the command should be deferred hidden
+    :param ephemeral: If the command should be deferred hidden.
     :type ephemeral: Optional[bool]
-    :param edit_origin: If the command should be deferred with the origin message
+    :param edit_origin: If the command should be deferred with the origin message.
     :type edit_origin: Optional[bool]
     """
 
     def inner(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        async def deferring_func(ctx: Union[CommandContext, ComponentContext], *args, **kwargs):
+        async def deferring_func(
+            ctx: Union[CommandContext, ComponentContext], *args, **kwargs
+        ):
             try:
                 loop = get_running_loop()
             except RuntimeError as e:
