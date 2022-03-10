@@ -85,7 +85,7 @@ def command(
             raise ValueError("Description must be less than 100 characters.")
         _scope = (
             self.__debug_scope
-            if scope is MISSING and hasattr(self, "__debug_scope") and not debug_scope
+            if scope is MISSING and hasattr(self, "__debug_scope") and debug_scope
             else scope
         )
         print(

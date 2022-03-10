@@ -158,7 +158,7 @@ class BetterInteractions(Extension):
 
         if debug_scope is not None:
             log.debug("Setting debug_scope (debug_scope)")
-            bot.__debug_scope = debug_scope
+            setattr(bot, "__debug_scope", debug_scope)
 
         log.info("Hooks applied")
 
