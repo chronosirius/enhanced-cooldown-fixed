@@ -168,6 +168,9 @@ def TextInput(
     min_length: Optional[int] = None,
     max_length: Optional[int] = None,
 ) -> TI:
+    """
+    A helper function that passes arguments to `TextInput`
+    """
     return TI(
         custom_id=custom_id,
         label=label,
@@ -181,6 +184,9 @@ def TextInput(
 
 
 def Modal(custom_id: str, title: str, components: List[Component]) -> M:
+    """
+    A helper function that passes arguments to `Modal`
+    """
     return M(custom_id=custom_id, title=title, components=components)
 
 
