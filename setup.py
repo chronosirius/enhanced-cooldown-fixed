@@ -22,5 +22,6 @@ setup(
     ],
     install_requires=[
         "discord-py-interactions>=4.1.0",
+        "typing_extensions",
     ],
 )
