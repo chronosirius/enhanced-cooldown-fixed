@@ -106,6 +106,9 @@ def SelectOption(
     emoji: Optional[Emoji] = None,
     disabled: Optional[bool] = False,
 ) -> SO:
+    """
+    A helper function that passes arguments to `SelectOption`
+    """
     return SO(
         label=label,
         value=value,
