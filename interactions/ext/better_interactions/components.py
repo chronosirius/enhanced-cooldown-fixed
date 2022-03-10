@@ -5,7 +5,7 @@ from interactions import Button as B
 from interactions import ButtonStyle, Component, Emoji
 from interactions import Modal as M
 from interactions import SelectMenu as SM
-from interactions import SelectOption
+from interactions import SelectOption as SO
 from interactions import TextInput as TI
 from interactions import TextStyleType as TST
 
@@ -99,9 +99,25 @@ def Button(
     )
 
 
+def SelectOption(
+    label: str,
+    value: str,
+    description: Optional[str] = None,
+    emoji: Optional[Emoji] = None,
+    disabled: Optional[bool] = False,
+) -> SO:
+    return SO(
+        label=label,
+        value=value,
+        description=description,
+        emoji=emoji,
+        disabled=disabled,
+    )
+
+
 def SelectMenu(
     custom_id: str,
-    options: List[SelectOption],
+    options: List[SO],
     *,
     placeholder: Optional[str] = None,
     min_values: Optional[int] = None,
