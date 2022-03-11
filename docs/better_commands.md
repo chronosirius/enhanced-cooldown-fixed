@@ -2,7 +2,7 @@
 
 Better commands are modified commands that have a default name and description.
 
-Also, you can typehint the parameters of the function instead of specifying them in the decorator. This feature is compatible with [subcommands](./subcommands.md).
+Also, you can typehint the parameters of the function instead of specifying them in the decorator. This feature is compatible with [subcommands](./Subcommands).
 
 ## Status
 
@@ -81,4 +81,4 @@ bot.load("interactions.ext.better_interactions", debug_scope=...)
 
 If you don't want it to affect a command, add `debug_scope=False` to the command decorator.
 
-## [API Reference](./api_reference.md#better-commands)
+## [API Reference](./API-Reference#better-commands)

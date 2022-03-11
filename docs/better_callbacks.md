@@ -74,4 +74,4 @@ Examples of `custom_ids` that will not invoke this callback:
 
 The `startswith` and `regex` can be used in both component and modal callbacks, but only one can be specified per callback, not both.
 
-## [API Reference](./api_reference.md#better-callbacks)
+## [API Reference](./API-Reference#better-callbacks)

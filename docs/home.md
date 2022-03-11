@@ -40,9 +40,9 @@ Listed below are all the features this library currently has:
 
 ---------------------
 
-## [API Reference](./docs/api_reference.md)
+## [API Reference](./API-Reference)
 
-[![API Reference](https://img.shields.io/badge/API-Reference-blue.svg)](./docs/api_reference.md)
+[![API Reference](https://img.shields.io/badge/API-Reference-blue.svg)](./API-Reference)
 
 ## Subcommands
 
@@ -50,25 +50,25 @@ Subcommands are technically options for commands, meaning to make subcommands, y
 
 This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
 
-Click [here](./subcommands.md) to see more information and examples on subcommands!
+Click [here](./Subcommands) to see more information and examples on subcommands!
 
 ## Better commands
 
 Better commands are commands that have a default name and description, and the ability to typehint options.
 
-Click [here](./better_commands.md) to see more information and examples on better commands!
+Click [here](./Better-commands) to see more information and examples on better commands!
 
 ## Better components
 
 Improved `Button`, `SelectMenu`, and `ActionRow` components, with error correction, `spread_to_rows`, and more.
 
-Click [here](./better_components.md) to see more information and examples on better components!
+Click [here](./Better-components) to see more information and examples on better components!
 
 ## Better callbacks
 
 The new component and modal callbacks are modified so you can enable checking if the `custom_id` of the component or model starts with the one provided in the decorator, or use regex.
 
-Click [here](./better_callbacks.md) to see more information and examples on better callbacks!
+Click [here](./Better-callbacks) to see more information and examples on better callbacks!
 
 ## Cooldown
 
@@ -76,4 +76,4 @@ The `cooldown` decorator is a simple and easy way to add a cooldown or slowmode 
 
 Credit to [@dontbanmeplz](https://github.com/dontbanmeplz) for the original code.
 
-Click [here](./cooldown.md) to see more information and examples on cooldown!
+Click [here](./Cooldown) to see more information and examples on cooldown!

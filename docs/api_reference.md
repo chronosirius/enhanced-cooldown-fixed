@@ -1,44 +1,5 @@
 # API Reference
 
-## Table of Contents
-
-* [API Reference](#api-reference)
-* [Table of Contents](#table-of-contents)
-* [Extensions](#extensions)
-  * [BetterExtension](#class-betterextension)
-  * [BetterInteractions](#class-betterinteractions)
-* [Subcommands](#subcommands)
-  * [Subcommand](#class-subcommand)
-  * [Group](#class-group)
-  * [SubcommandSetup](#class-subcommandsetup)
-    * [subcommand](#func-subcommand)
-    * [finish](#func-finish)
-  * [ExternalSubcommandSetup](#class-externalsubcommandsetup)
-    * [subcommand](#func-subcommand-same-as-subcommandsetup)
-    * [finish](#func-finish-same-as-subcommandsetup)
-  * [subcommand_base](#func-subcommandbase)
-  * [ext_subcommand_base](#func-extsubcommandbase)
-* [Better commands](#better-commands)
-  * [command](#func-command)
-  * [extension_command](#func-extension_command)
-  * [autodefer](#func-autodefer)
-  * [BetterOption](#class-betteroption)
-* [Better components](#better-components)
-  * [ActionRow](#func-actionrow)
-  * [Button](#func-button)
-  * [SelectOption](#func-selectoption)
-  * [SelectMenu](#func-selectmenu)
-  * [TextInput](#func-textinput)
-  * [Modal](#func-modal)
-  * [spread_to_rows](#func-spread_to_rows)
-* [Better callbacks](#better-callbacks)
-  * [component](#func-component)
-  * [modal](#func-modal-callback)
-  * [extension_component](#func-extension_component)
-  * [extension_modal](#func-extension_modal)
-* [Cooldown](#cooldown)
-  * [cooldown](#func-cooldown)
-
 ## Extensions
 
 ### *class* `BetterExtension`
@@ -75,6 +36,8 @@ It applies hooks to the client for additional and modified features.
 client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
 ```
 
+<ul>
+
 Parameters:
 
 * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
@@ -82,6 +45,8 @@ Parameters:
 * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
 * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
 * `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
+
+</ul>
 
 </ul>
 
@@ -156,6 +121,8 @@ Decorator that creates a subcommand for the corresponding base.
 
 `name` is required.
 
+</ul>
+
 ```py
 @base_var.subcommand(
     group="group_name",
@@ -165,6 +132,12 @@ Decorator that creates a subcommand for the corresponding base.
 )
 ```
 
+<ul>
+
+<ul>
+
+<ul>
+
 Parameters:
 
 * `?group: str`: The group of the subcommand.
@@ -173,6 +146,14 @@ Parameters:
 * `?options: list[Option]`: The options of the subcommand.
 
 </ul>
+
+</ul>
+
+</ul>
+
+<ul>
+
+<ul>
 
 #### *func* `finish`
 
@@ -185,6 +166,10 @@ Use this when you are done creating subcommands for a specified base.
 ```py
 base_var.finish()
 ```
+
+</ul>
+
+</ul>
 
 </ul>
 
@@ -219,6 +204,8 @@ Decorator that creates a subcommand for the corresponding base.
 
 `name` is required.
 
+</ul>
+
 ```py
 @base_var.subcommand(
     group="group_name",
@@ -228,6 +215,12 @@ Decorator that creates a subcommand for the corresponding base.
 )
 ```
 
+<ul>
+
+<ul>
+
+<ul>
+
 Parameters:
 
 * `?group: str`: The group of the subcommand.
@@ -236,6 +229,14 @@ Parameters:
 * `?options: list[Option]`: The options of the subcommand.
 
 </ul>
+
+</ul>
+
+</ul>
+
+<ul>
+
+<ul>
 
 #### *func* `finish` (same as `SubcommandSetup`)
 
@@ -248,6 +249,10 @@ Use this when you are done creating subcommands for a specified base.
 ```py
 base_var.finish()
 ```
+
+</ul>
+
+</ul>
 
 </ul>
 
@@ -283,6 +288,8 @@ base_name = subcommand_base(
 )
 ```
 
+<ul>
+
 Parameters:
 
 * `(?)self: Client`: The client that the base belongs to. *Not needed if you load the extension and use `client.base(...)`.*
@@ -290,6 +297,8 @@ Parameters:
 * `?description: str`: The description of the base.
 * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
 * `?default_permission: bool`: The default permission of the base.
+
+</ul>
 
 </ul>
 
@@ -310,12 +319,16 @@ base_name = ext_subcommand_base(
 )
 ```
 
+<ul>
+
 Parameters:
 
 * `base: str`: The base name of the base.
 * `?description: str`: The description of the base.
 * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
 * `?default_permission: bool`: The default permission of the base.
+
+</ul>
 
 </ul>
 
@@ -347,6 +360,8 @@ async def options(
     await ctx.send("something")
 ```
 
+<ul>
+
 Parameters:
 
 * `?type: int | ApplicationCommandType`: The type of application command. Defaults to `ApplicationCommandType.CHAT_INPUT`.
@@ -356,6 +371,8 @@ Parameters:
 * `?options: list[Option]`: The options of the command.
 * `?default_permission: bool`: The default permission of the command.
 * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
+
+</ul>
 
 </ul>
 
@@ -398,11 +415,15 @@ async def foo(ctx, ...):
     ...
 ```
 
+<ul>
+
 Parameters:
 
 * `?delay: float | int`: How long to wait before deferring in seconds. Defaults to `2`.
 * `?ephemeral: bool`: If the command should be deferred hidden. Defaults to `False`.
 * `?edit_origin: bool`: If the command should be deferred with the origin message. Defaults to `False`.
+
+</ul>
 
 </ul>
 
@@ -414,13 +435,19 @@ An alternative way of providing options by typehinting.
 
 Basic example:
 
+</ul>
+
 ```py
 @bot.command(...)
 async def command(ctx, name: BetterOption(int, "description") = 5):
     ...
 ```
 
+<ul>
+
 Full-blown example:
+
+</ul>
 
 ```py
 from interactions import OptionType, Channel
@@ -437,6 +464,8 @@ async def options(
     """Says something!"""
     await ctx.send("something")
 ```
+
+<ul>
 
 Parameters:
 
@@ -463,15 +492,23 @@ A helper function that passes arguments to `ActionRow`.
 
 Previous:
 
+</ul>
+
 ```py
 row = ActionRow(components=[...])
 ```
 
+<ul>
+
 Now:
+
+</ul>
 
 ```py
 row = ActionRow(...)
 ```
+
+<ul>
 
 Parameters:
 
@@ -491,15 +528,23 @@ A helper function that passes arguments to `Button`.
 
 Previous:
 
+</ul>
+
 ```py
 button = Button(style=1, label="1", custom_id="1", ...)
 ```
 
+<ul>
+
 Now:
+
+</ul>
 
 ```py
 button = Button(1, "1", custom_id="1", ...)
 ```
+
+<ul>
 
 Parameters:
 
@@ -524,15 +569,23 @@ A helper function that passes arguments to `SelectOption`.
 
 Before:
 
+</ul>
+
 ```py
 option = SelectOption(label="1", value="1", ...)
 ```
 
+<ul>
+
 Now:
+
+</ul>
 
 ```py
 option = SelectOption("1", "1", ...)
 ```
+
+<ul>
 
 Parameters:
 
@@ -556,15 +609,23 @@ A helper function that passes arguments to `SelectMenu`.
 
 Previous:
 
+</ul>
+
 ```py
 select = SelectMenu(custom_id="s", options=[...], ...)
 ```
 
+<ul>
+
 Now:
+
+</ul>
 
 ```py
 select = SelectMenu("s", [...], ...)
 ```
+
+<ul>
 
 Parameters:
 
@@ -589,15 +650,23 @@ A helper function that passes arguments to `TextInput`.
 
 Before:
 
+</ul>
+
 ```py
 ti = TextInput(custom_id="ti", label="ti", style=1, ...)
 ```
 
+<ul>
+
 Now:
+
+</ul>
 
 ```py
 ti = TextInput("ti", "ti", 1, ...)
 ```
+
+<ul>
 
 Parameters:
 
@@ -624,15 +693,23 @@ A helper function that passes arguments to `Modal`.
 
 Before:
 
+</ul>
+
 ```py
 modal = Modal(custom_id="modal", title="Modal", components=[...])
 ```
 
+<ul>
+
 Now:
+
+</ul>
 
 ```py
 modal = Modal("modal", "Modal", [...])
 ```
+
+<ul>
 
 Parameters:
 
@@ -652,9 +729,13 @@ Returns:
 
 A helper function that spreads your components into `ActionRow`s of a set size.
 
+</ul>
+
 ```py
 rows = spread_to_rows(..., max_in_row=...)
 ```
+
+<ul>
 
 Parameters:
 
@@ -675,6 +756,8 @@ Returns:
 
 A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
+</ul>
+
 ```py
 bot.load("interactions.ext.better_interactions")
 
@@ -688,6 +771,8 @@ async def test(ctx):
 async def test(ctx):
     ...
 ```
+
+<ul>
 
 The startswith callback is called if the `custom_id` starts with the given string.
 
@@ -707,6 +792,8 @@ Parameters:
 
 A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
+</ul>
+
 ```py
 bot.load("interactions.ext.better_interactions")
 
@@ -720,6 +807,8 @@ async def test(ctx):
 async def test(ctx):
     ...
 ```
+
+<ul>
 
 The startswith callback is called if the `custom_id` starts with the given string.
 
@@ -739,6 +828,8 @@ Parameters:
 
 A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback inside of `Extension`s.
 
+</ul>
+
 ```py
 # main.py:
 bot.load("interactions.ext.better_interactions")
@@ -753,6 +844,8 @@ async def test(self, ctx):
 async def test(self, ctx):
     ...
 ```
+
+<ul>
 
 The startswith callback is called if the `custom_id` starts with the given string.
 
@@ -772,6 +865,8 @@ Parameters:
 
 A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback inside of `Extension`s.
 
+</ul>
+
 ```py
 # main.py:
 bot.load("interactions.ext.better_interactions")
@@ -786,6 +881,8 @@ async def test(self, ctx):
 async def test(self, ctx):
     ...
 ```
+
+<ul>
 
 The startswith callback is called if the `custom_id` starts with the given string.
 
@@ -809,6 +906,8 @@ A decorator for handling cooldowns.
 
 Parameters for `datetime.timedelta` are `days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0`.
 
+</ul>
+
 ```py
 from interactions.ext.better_interactions import cooldown
 
@@ -820,6 +919,8 @@ async def cooldown_error(ctx, delta):
 async def cooldown_command(ctx, ...):
     ...
 ```
+
+<ul>
 
 Parameters:
 

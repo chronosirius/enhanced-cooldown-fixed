@@ -143,4 +143,4 @@ def setup(bot):
     return Cog(bot)
 ```
 
-## [API Reference](./api_reference.md#subcommands)
+## [API Reference](./API-Reference#subcommands)
