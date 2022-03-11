@@ -40,12 +40,12 @@ Listed below are all the features this library currently has:
 ## Guide
 
 - [Home](https://github.com/Toricane/better-interactions/wiki)
-- [Subcommands](https://github.com/Toricane/better-interactions/wiki/subcommands.md)
-- [Better commands](https://github.com/Toricane/better-interactions/wiki/better_commands.md)
-- [Better components](https://github.com/Toricane/better-interactions/wiki/better_components.md)
-- [Better callbacks](https://github.com/Toricane/better-interactions/wiki/better_callbacks.md)
-- [Cooldown](https://github.com/Toricane/better-interactions/wiki/cooldown.md)
+- [Subcommands](https://github.com/Toricane/better-interactions/wiki/Subcommands)
+- [Better commands](https://github.com/Toricane/better-interactions/wiki/Better-commands)
+- [Better components](https://github.com/Toricane/better-interactions/wiki/Better-components)
+- [Better callbacks](https://github.com/Toricane/better-interactions/wiki/Better-callbacks)
+- [Cooldown](https://github.com/Toricane/better-interactions/wiki/Cooldown)
 
 ## Documentation
 
-[![API Reference](https://img.shields.io/badge/API-Reference-blue.svg)](./docs/api_reference.md)
+[![API Reference](https://img.shields.io/badge/API-Reference-blue.svg)](https://github.com/Toricane/better-interactions/wiki/API-Reference)
