@@ -35,7 +35,7 @@ Listed below are all the features this library currently has:
 - [Subcommands](#subcommands)
 - [Better commands](#better-commands)
 - [Better components](#better-components)
-- [Better component callback](#better-component-callback)
+- [Better callbacks](#better-callbacks)
 - [Cooldown](#cooldown)
 
 ---------------------
