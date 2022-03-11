@@ -4,7 +4,12 @@
 
 * [API Reference](#api-reference)
 * [Table of Contents](#table-of-contents)
+* [Extensions](#extensions)
+  * [BetterExtension](#class-betterextension)
+  * [BetterInteractions](#class-betterinteractions)
 * [Subcommands](#subcommands)
+  * [Subcommand](#class-subcommand)
+  * [Group](#class-group)
   * [SubcommandSetup](#class-subcommandsetup)
     * [subcommand](#func-subcommand)
     * [finish](#func-finish)
@@ -17,6 +22,7 @@
   * [command](#func-command)
   * [extension_command](#func-extension_command)
   * [autodefer](#func-autodefer)
+  * [BetterOption](#class-betteroption)
 * [Better components](#better-components)
   * [ActionRow](#func-actionrow)
   * [Button](#func-button)
@@ -33,7 +39,94 @@
 * [Cooldown](#cooldown)
   * [cooldown](#func-cooldown)
 
+## Extensions
+
+### *class* `BetterExtension`
+
+<ul>
+
+Enables modified external commands, subcommands, callbacks, and more.
+
+Use this class instead of `Extension` when using extensions.
+
+```py
+# extension.py
+from interactions.ext.better_interactions import BetterExtension
+
+class Example(BetterExtension):
+    ...
+
+def setup(client):
+    Example(client)
+```
+
+</ul>
+
+### *class* `BetterInteractions`
+
+<ul>
+
+This is the core of this library, initialized when loading the extension.
+
+It applies hooks to the client for additional and modified features.
+
+```py
+# main.py
+client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
+```
+
+Parameters:
+
+* `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
+* `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
+* `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
+* `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
+* `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
+
+</ul>
+
 ## Subcommands
+
+### *class* `Subcommand`
+
+<ul>
+
+A class that represents a subcommand.
+
+DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+Parameters:
+
+* `name: str`: The name of the subcommand.
+* `description: str`: The description of the subcommand.
+* `coro: Coroutine`: The coroutine to run when the subcommand is called.
+* `options: dict`: The options of the subcommand.
+
+Attributes other than above:
+
+* `_options: Option`: The subcommand as an `Option`.
+
+</ul>
+
+### *class* `Group`
+
+<ul>
+
+A class that represents a subcommand group.
+
+DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+Parameters:
+
+* `group: str`: The name of the subcommand group.
+* `description: str`: The description of the subcommand group.
+* `subcommand: Subcommand`: The initial subcommand in the group.
+
+Properties:
+
+* `_options: Option`: The subcommand group as an `Option`.
+
+</ul>
 
 ### *class* `SubcommandSetup`
 
@@ -276,6 +369,16 @@ Makes `name` and `description` optional, and adds ability to use `BetterOption`s
 
 Same parameters as `interactions.ext.better_interactions.command`.
 
+Parameters:
+
+* `?type: int | ApplicationCommandType`: The type of application command. Defaults to `ApplicationCommandType.CHAT_INPUT`.
+* `?name: str`: The name of the command. Defaults to function name.
+* `?description: str`: The description of the command. Defaults to function docstring or `"No description"`.
+* `?scope: int | Guild | list[int] | list[Guild]`: The scope of the command.
+* `?options: list[Option]`: The options of the command.
+* `?default_permission: bool`: The default permission of the command.
+* `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
+
 </ul>
 
 ### *func* `autodefer`
@@ -300,6 +403,53 @@ Parameters:
 * `?delay: float | int`: How long to wait before deferring in seconds. Defaults to `2`.
 * `?ephemeral: bool`: If the command should be deferred hidden. Defaults to `False`.
 * `?edit_origin: bool`: If the command should be deferred with the origin message. Defaults to `False`.
+
+</ul>
+
+### *class* `BetterOption`
+
+<ul>
+
+An alternative way of providing options by typehinting.
+
+Basic example:
+
+```py
+@bot.command(...)
+async def command(ctx, name: BetterOption(int, "description") = 5):
+    ...
+```
+
+Full-blown example:
+
+```py
+from interactions import OptionType, Channel
+from interactions.ext.better_interactions import BetterOption
+from typing_extensions import Annotated
+
+@bot.command()
+async def options(
+    ctx,
+    option1: Annotated[str, BetterOption(description="...")],
+    option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
+    option3: Annotated[Channel, BetterOption(description="...")],
+):
+    """Says something!"""
+    await ctx.send("something")
+```
+
+Parameters:
+
+* `?type: type | int | OptionType`: The type of the option.
+* `?description: str`: The description of the option. Defaults to the docstring or `"No description"`.
+* `?name: str`: The name of the option. Defaults to the argument name.
+* `?choices: list[Choice]`: The choices of the option.
+* `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
+* `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
+* `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*
+* `?autocomplete: bool`: If the option should be autocompleted.
+* `?focused: bool`: If the option should be focused.
+* `?value: str`: The value of the option.
 
 </ul>
 

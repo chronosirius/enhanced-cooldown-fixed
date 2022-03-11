@@ -16,22 +16,27 @@ log = get_logger("components")
 
 def ActionRow(*args: Union[B, SM, TI]) -> AR:
     """
-    A helper function that passes arguments to `ActionRow`
+    A helper function that passes arguments to `ActionRow`.
 
     Previous:
+
     ```py
     row = ActionRow(components=[...])
     ```
 
     Now:
+
     ```py
     row = ActionRow(...)
     ```
 
-    :param *args: The components to add to the ActionRow
-    :type *args: Union[Button, SelectMenu]
-    :return: The ActionRow
-    :rtype: ActionRow
+    Parameters:
+
+    * `*args: tuple[Button | SelectMenu | TextInput]`: The components to add to the `ActionRow`.
+
+    Returns:
+
+    `ActionRow`
     """
     log.debug(f"Creating ActionRow with {list(args)}")
     return AR(components=list(args))
@@ -49,20 +54,30 @@ def Button(
     """
     A helper function that passes arguments to `Button`.
 
-    :param style: The style of the button
-    :type style: Union[ButtonStyle, int]
-    :param label: The label of the button
-    :type label: str
-    :param custom_id: The custom id of the Button
-    :type custom_id: Optional[str]
-    :param url: The url of the Button
-    :type url: Optional[str]
-    :param emoji: The emoji of the Button
-    :type emoji: Optional[Emoji]
-    :param disabled: Whether the Button is disabled
-    :type disabled: Optional[bool]
-    :return: The Button
-    :rtype: Button
+    Previous:
+
+    ```py
+    button = Button(style=1, label="1", custom_id="1", ...)
+    ```
+
+    Now:
+
+    ```py
+    button = Button(1, "1", custom_id="1", ...)
+    ```
+
+    Parameters:
+
+    * `style: ButtonStyle | int`: The style of the button.
+    * `label: str`: The label of the button.
+    * `(?)custom_id: str`: The custom id of the button. *Required if the button is not a `ButtonStyle.LINK`.*
+    * `(?)url: str`: The URL of the button. *Required if the button is a `ButtonStyle.LINK`.*
+    * `?emoji: Emoji`: The emoji of the button.
+    * `?disabled: bool`: Whether the button is disabled. Defaults to `False`.
+
+    Returns:
+
+    `Button`
     """
     log.debug(
         f"Creating Button with {style=}, {label=}, {custom_id=}, {url=}, {emoji=}, {disabled=}"
@@ -107,8 +122,35 @@ def SelectOption(
     disabled: Optional[bool] = False,
 ) -> SO:
     """
-    A helper function that passes arguments to `SelectOption`
+    A helper function that passes arguments to `SelectOption`.
+
+    Before:
+
+    ```py
+    option = SelectOption(label="1", value="1", ...)
+    ```
+
+    Now:
+
+    ```py
+    option = SelectOption("1", "1", ...)
+    ```
+
+    Parameters:
+
+    * `label: str`: The label of the option.
+    * `value: str`: The value of the option.
+    * `?description: str`: The description of the option.
+    * `?emoji: Emoji`: The emoji of the option.
+    * `?disabled: bool`: Whether the option is disabled. Defaults to `False`.
+
+    Returns:
+
+    `SelectOption`
     """
+    log.debug(
+        f"Creating SelectOption with {label=}, {value=}, {description=}, {emoji=}, {disabled=}"
+    )
     return SO(
         label=label,
         value=value,
@@ -128,22 +170,32 @@ def SelectMenu(
     disabled: Optional[bool] = False,
 ) -> SM:
     """
-    A helper function that passes arguments to `SelectMenu`
+    A helper function that passes arguments to `SelectMenu`.
 
-    :param custom_id: The custom id of the SelectMenu
-    :type custom_id: str
-    :param options: The options to display
-    :type options: List[SelectOption]
-    :param placeholder: The placeholder of the SelectMenu
-    :type placeholder: Optional[str]
-    :param min_values: The minimum number of values that can be selected
-    :type min_values: Optional[int]
-    :param max_values: The maximum number of values that can be selected
-    :type max_values: Optional[int]
-    :param disabled: Whether the SelectMenu is disabled
-    :type disabled: Optional[bool]
-    :return: The SelectMenu
-    :rtype: SelectMenu
+    Previous:
+
+    ```py
+    select = SelectMenu(custom_id="s", options=[...], ...)
+    ```
+
+    Now:
+
+    ```py
+    select = SelectMenu("s", [...], ...)
+    ```
+
+    Parameters:
+
+    * `custom_id: str`: The custom id of the select menu.
+    * `options: list[SelectOption]`: The options of the select menu.
+    * `?placeholder: str`: The placeholder of the select menu.
+    * `?min_values: int`: The minimum number of values that can be selected.
+    * `?max_values: int`: The maximum number of values that can be selected.
+    * `?disabled: bool`: Whether the select menu is disabled. Defaults to `False`.
+
+    Returns:
+
+    `SelectMenu`
     """
     log.debug(
         f"Creating SelectMenu with {custom_id=}, {options=}, {placeholder=}, {min_values=}, {max_values=}, {disabled=}"
@@ -169,8 +221,38 @@ def TextInput(
     max_length: Optional[int] = None,
 ) -> TI:
     """
-    A helper function that passes arguments to `TextInput`
+    A helper function that passes arguments to `TextInput`.
+
+    Before:
+
+    ```py
+    ti = TextInput(custom_id="ti", label="ti", style=1, ...)
+    ```
+
+    Now:
+
+    ```py
+    ti = TextInput("ti", "ti", 1, ...)
+    ```
+
+    Parameters:
+
+    * `custom_id: str`: The custom id of the text input.
+    * `label: str`: The label of the text input.
+    * `?style: TextInputStyle | int`: The style of the text input.
+    * `?value: str`: The value of the text input.
+    * `?required: bool`: Whether the text input is required. Defaults to `True`.
+    * `?placeholder: str`: The placeholder of the text input.
+    * `?min_length: int`: The minimum length of the text input.
+    * `?max_length: int`: The maximum length of the text input.
+
+    Returns:
+
+    `TextInput`
     """
+    log.debug(
+        f"Creating TextInput with {custom_id=}, {label=}, {style=}, {value=}, {required=}, {placeholder=}, {min_length=}, {max_length=}"
+    )
     return TI(
         custom_id=custom_id,
         label=label,
@@ -185,22 +267,50 @@ def TextInput(
 
 def Modal(custom_id: str, title: str, components: List[TI]) -> M:
     """
-    A helper function that passes arguments to `Modal`
+    A helper function that passes arguments to `Modal`.
+
+    Before:
+
+    ```py
+    modal = Modal(custom_id="modal", title="Modal", components=[...])
+    ```
+
+    Now:
+
+    ```py
+    modal = Modal("modal", "Modal", [...])
+    ```
+
+    Parameters:
+
+    * `custom_id: str`: The custom id of the modal.
+    * `title: str`: The title of the modal.
+    * `components: list[TextInput]`: The components of the modal.
+
+    Returns:
+
+    `Modal`
     """
+    log.debug(f"Creating Modal with {custom_id=}, {title=}, {components=}")
     return M(custom_id=custom_id, title=title, components=components)
 
 
 def spread_to_rows(*components: Union[AR, B, SM], max_in_row: int = 5) -> List[AR]:
     """
-    A helper function that spreads your components into `ActionRow`s of a set size
+    A helper function that spreads your components into `ActionRow`s of a set size.
 
-    :param *components: The components to spread, use `None` to explicit start a new row
-    :type *components: Union[AR, Button, SelectMenu]
-    :param max_in_row: The maximum number of components in each row
-    :type max_in_row: int
-    :return: The components spread to rows
-    :rtype: List[ActionRow]
-    :raises: ValueError: Too many or few components or rows
+    ```py
+    rows = spread_to_rows(..., max_in_row=...)
+    ```
+
+    Parameters:
+
+    * `*components: tuple[ActionRow | Button | SelectMenu]`: The components to spread, use `None` to explicit start a new row.
+    * `?max_in_row: int`: The maximum number of components in a row. Defaults to `5`.
+
+    Returns:
+
+    `list[ActionRow]`
     """
     log.debug(f"spread_to_rows with {components=}, {max_in_row=}")
     # todo: incorrect format errors

@@ -1,7 +1,16 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, List, Optional, Union, get_args
 
-from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
+from interactions import (
+    MISSING,
+    Channel,
+    ChannelType,
+    Choice,
+    Option,
+    OptionType,
+    Role,
+    User,
+)
 
 from ._logging import get_logger
 
@@ -15,14 +24,17 @@ _type: type = type
 
 
 def get_type(param):
+    """Gets the type of the parameter."""
     return get_args(param.annotation)[0] or get_args(param.annotation)[1].type
 
 
 def get_option(param):
+    """Gets the `BetterOption` of the parameter."""
     return get_args(param.annotation)[1]
 
 
 def type_to_int(param):
+    """Converts the type to an integer."""
     type: Union[_type, int, OptionType] = get_type(param)
     if isinstance(type, int):
         return type
@@ -49,21 +61,46 @@ def type_to_int(param):
 
 class BetterOption:
     """
-    An alternative way of providing options.
+    An alternative way of providing options by typehinting.
+
+    Basic example:
+
     ```py
+    @bot.command(...)
     async def command(ctx, name: BetterOption(int, "description") = 5):
         ...
     ```
-    :param Union[type, int, OptionType] type?: The type of the option.
-    :param Optional[str] description?: The description of the option.
-    :param Optional[str] name?: The name of the option.
-    :param Optional[List[Choice]] choices?: The choices of the option.
-    :param Optional[List[ChannelType]] channel_types?: The channel types of the option.
-    :param Optional[int] min_value?: The minimum value of the option.
-    :param Optional[int] max_value?: The maximum value of the option.
-    :param Optional[bool] autocomplete?: Whether the option should autocomplete.
-    :param Optional[bool] focused?: Whether the option should be focused.
-    :param Optional[str] value?: The value of the option.
+
+    Full-blown example:
+
+    ```py
+    from interactions import OptionType, Channel
+    from interactions.ext.better_interactions import BetterOption
+    from typing_extensions import Annotated
+
+    @bot.command()
+    async def options(
+        ctx,
+        option1: Annotated[str, BetterOption(description="...")],
+        option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
+        option3: Annotated[Channel, BetterOption(description="...")],
+    ):
+        \"""Says something!\"""
+        await ctx.send("something")
+    ```
+
+    Parameters:
+
+    * `?type: type | int | OptionType`: The type of the option.
+    * `?description: str`: The description of the option. Defaults to the docstring or `"No description"`.
+    * `?name: str`: The name of the option. Defaults to the argument name.
+    * `?choices: list[Choice]`: The choices of the option.
+    * `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
+    * `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
+    * `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*
+    * `?autocomplete: bool`: If the option should be autocompleted.
+    * `?focused: bool`: If the option should be focused.
+    * `?value: str`: The value of the option.
     """
 
     def __init__(
@@ -114,6 +151,7 @@ class BetterOption:
 
 
 def parameters_to_options(params: "OrderedDict") -> List[Option]:
+    """Converts `BetterOption`s to `Option`s."""
     log.debug("parameters_to_options:")
     _options = [
         (

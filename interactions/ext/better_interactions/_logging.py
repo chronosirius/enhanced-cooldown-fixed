@@ -23,7 +23,11 @@ class CustomFormatter(logging.Formatter):
         logging.INFO: Fore.GREEN + format_str + Fore.RESET,
         logging.WARNING: Fore.YELLOW + format_str + Fore.RESET,
         logging.ERROR: Fore.RED + format_str + Fore.RESET,
-        logging.CRITICAL: Style.BRIGHT + Fore.RED + format_str + Fore.RESET + Style.NORMAL,
+        logging.CRITICAL: Style.BRIGHT
+        + Fore.RED
+        + format_str
+        + Fore.RESET
+        + Style.NORMAL,
     }
 
     def __init__(self):
@@ -40,6 +44,7 @@ def get_logger(
     logger: Optional[Union[logging.Logger, str]] = None,
     handler: Optional[logging.Handler] = logging.StreamHandler(),
 ) -> logging.Logger:
+    """Gets a logger for the library."""
     _logger = logging.getLogger(logger) if isinstance(logger, str) else logger
     _logger_name = logger if isinstance(logger, str) else logger.name
     if len(_logger.handlers) > 1:

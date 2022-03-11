@@ -57,22 +57,15 @@ def command(
         await ctx.send("something")
     ```
 
-    :param type?: The type of application command. Defaults to :meth:`interactions.enums.ApplicationCommandType.CHAT_INPUT` or ``1``.
-    :type type: Optional[Union[str, int, ApplicationCommandType]]
-    :param name: The name of the application command. This *is* required but kept optional to follow kwarg rules.
-    :type name: Optional[str]
-    :param description?: The description of the application command. This should be left blank if you are not using ``CHAT_INPUT``.
-    :type description: Optional[str]
-    :param scope?: The "scope"/applicable guilds the application command applies to.
-    :type scope: Optional[Union[int, Guild, List[int], List[Guild]]]
-    :param options?: The "arguments"/options of an application command. This should be left blank if you are not using ``CHAT_INPUT``.
-    :type options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]]
-    :param default_permission?: The default permission of accessibility for the application command. Defaults to ``True``.
-    :type default_permission: Optional[bool]
-    :param debug_scope?: If the debug_scope applies to this command. Defaults to ``True``.
-    :type debug_scope: Optional[bool]
-    :return: A callable response.
-    :rtype: Callable[..., Any]
+    Parameters:
+
+    * `?type: int | ApplicationCommandType`: The type of application command. Defaults to `ApplicationCommandType.CHAT_INPUT`.
+    * `?name: str`: The name of the command. Defaults to function name.
+    * `?description: str`: The description of the command. Defaults to function docstring or `"No description"`.
+    * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the command.
+    * `?options: list[Option]`: The options of the command.
+    * `?default_permission: bool`: The default permission of the command.
+    * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
@@ -116,6 +109,16 @@ def extension_command(**kwargs):
     Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
 
     Same parameters as `interactions.ext.better_interactions.command`.
+
+    Parameters:
+
+    * `?type: int | ApplicationCommandType`: The type of application command. Defaults to `ApplicationCommandType.CHAT_INPUT`.
+    * `?name: str`: The name of the command. Defaults to function name.
+    * `?description: str`: The description of the command. Defaults to function docstring or `"No description"`.
+    * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the command.
+    * `?options: list[Option]`: The options of the command.
+    * `?default_permission: bool`: The default permission of the command.
+    * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
 
     def decorator(coro):
@@ -145,6 +148,7 @@ def autodefer(
     Note: This will not work if blocking code is used (such as the requests module).
 
     Usage:
+
     ```py
     @bot.command(...)
     @autodefer(...)
@@ -152,12 +156,11 @@ def autodefer(
         ...
     ```
 
-    :param delay: How long to wait before deferring in seconds.
-    :type delay: Optional[Union[float, int]]
-    :param ephemeral: If the command should be deferred hidden.
-    :type ephemeral: Optional[bool]
-    :param edit_origin: If the command should be deferred with the origin message.
-    :type edit_origin: Optional[bool]
+    Parameters:
+
+    * `?delay: float | int`: How long to wait before deferring in seconds. Defaults to `2`.
+    * `?ephemeral: bool`: If the command should be deferred hidden. Defaults to `False`.
+    * `?edit_origin: bool`: If the command should be deferred with the origin message. Defaults to `False`.
     """
 
     def inner(func: Callable[..., Any]) -> Callable[..., Any]:

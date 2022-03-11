@@ -22,6 +22,23 @@ log = get_logger("subcommand")
 
 
 class Subcommand:
+    """
+    A class that represents a subcommand.
+
+    DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+    Parameters:
+
+    * `name: str`: The name of the subcommand.
+    * `description: str`: The description of the subcommand.
+    * `coro: Coroutine`: The coroutine to run when the subcommand is called.
+    * `options: dict`: The options of the subcommand.
+
+    Attributes other than above:
+
+    * `_options: Option`: The subcommand as an `Option`.
+    """
+
     def __init__(
         self,
         name: str,
@@ -29,16 +46,6 @@ class Subcommand:
         coro: Coroutine,
         options: List[Option] = MISSING,
     ):
-        """
-        A class that represents a subcommand.
-
-        DO NOT INITIALIZE THIS CLASS DIRECTLY.
-
-        :param str name: The name of the subcommand.
-        :param str description: The description of the subcommand.
-        :param Coroutine coro: The coroutine that will be executed when the subcommand is called.
-        :param List[Option] options: The options of the subcommand.
-        """
         log.debug(f"Subcommand.__init__: {name=}")
         self.name: str = name
         self.description: str = description
@@ -60,16 +67,23 @@ class Subcommand:
 
 
 class Group:
+    """
+    A class that represents a subcommand group.
+
+    DO NOT INITIALIZE THIS CLASS DIRECTLY.
+
+    Parameters:
+
+    * `group: str`: The name of the subcommand group.
+    * `description: str`: The description of the subcommand group.
+    * `subcommand: Subcommand`: The initial subcommand in the group.
+
+    Properties:
+
+    * `_options: Option`: The subcommand group as an `Option`.
+    """
+
     def __init__(self, group: str, description: str, subcommand: Subcommand):
-        """
-        A class that represents a subcommand group.
-
-        DO NOT INITIALIZE THIS CLASS DIRECTLY.
-
-        :param str group: The name of the subcommand group.
-        :param str description: The description of the subcommand group.
-        :param Subcommand subcommand: The initial subcommand.
-        """
         log.debug(f"Group.__init__: {group=}, {subcommand=}")
         self.group: str = group
         self.description: str = description
@@ -92,15 +106,17 @@ class Group:
 
 class SubcommandSetup:
     """
-    A class you get when using ``base_var = client.base("base_name", ...)``
+    A class you get when using `base_var = client.base("base_name", ...)`
 
-    Use this class to create subcommands by using the ``@base_name.subcommand(...)`` decorator.
+    Use this class to create subcommands by using the `@base_name.subcommand(...)` decorator.
 
-    :param Client client: The client that the subcommand belongs to.
-    :param str base: The base name of the subcommand.
-    :param str description: The description of the subcommand.
-    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the subcommand.
-    :param bool default_permission: The default permission of the subcommand.
+    Parameters:
+
+    * `(?)client: Client`: The client that the subcommand belongs to. *Not required if you load the extension.*
+    * `base: str`: The base name of the subcommand.
+    * `?description: str`: The description of the subcommand. Defaults to `"No description"`.
+    * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the subcommand.
+    * `?default_permission: bool`: The default permission of the subcommand.
     """
 
     def __init__(
@@ -142,10 +158,13 @@ class SubcommandSetup:
             options=[...]
         )
         ```
-        :param str group: The group of the subcommand.
-        :param str name: The name of the subcommand.
-        :param str description: The description of the subcommand.
-        :param List[Option] options: The options of the subcommand.
+
+        Parameters:
+
+        * `?group: str`: The group of the subcommand.
+        * `name: str`: The name of the subcommand.
+        * `?description: str`: The description of the subcommand.
+        * `?options: list[Option]`: The options of the subcommand.
         """
         log.debug(f"SubcommandSetup.subcommand: {self.base=}, {group=}, {name=}")
 
@@ -197,6 +216,7 @@ class SubcommandSetup:
         Function that finishes the setup of the base command.
 
         Use this when you are done creating subcommands for a specified base.
+
         ```py
         base_var.finish()
         ```
@@ -262,14 +282,16 @@ class SubcommandSetup:
 
 class ExternalSubcommandSetup(SubcommandSetup):
     """
-    A class you get when using ``base_var = extension_base("base_name", ...)``
+    A class you get when using `base_var = extension_base("base_name", ...)`
 
-    Use this class to create subcommands by using the ``@base_name.subcommand(...)`` decorator.
+    Use this class to create subcommands by using the `@base_name.subcommand(...)` decorator.
 
-    :param str base: The base name of the subcommand.
-    :param str description: The description of the subcommand.
-    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the subcommand.
-    :param bool default_permission: The default permission of the subcommand.
+    Parameters:
+
+    * `base: str`: The base name of the subcommand.
+    * `?description: str`: The description of the subcommand.
+    * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the subcommand.
+    * `?default_permission: bool`: The default permission of the subcommand.
     """
 
     def __init__(
@@ -302,7 +324,8 @@ class ExternalSubcommandSetup(SubcommandSetup):
         """
         Decorator that creates a subcommand for the corresponding base.
 
-        All arguments are optional.
+        `name` is required.
+
         ```py
         @base_var.subcommand(
             group="group_name",
@@ -311,10 +334,13 @@ class ExternalSubcommandSetup(SubcommandSetup):
             options=[...]
         )
         ```
-        :param str group: The group of the subcommand.
-        :param str name: The name of the subcommand.
-        :param str description: The description of the subcommand.
-        :param List[Option] options: The options of the subcommand.
+
+        Parameters:
+
+        * `?group: str`: The group of the subcommand.
+        * `name: str`: The name of the subcommand.
+        * `?description: str`: The description of the subcommand.
+        * `?options: list[Option]`: The options of the subcommand.
         """
         log.debug(
             f"ExternalSubcommandSetup.subcommand: {self.base=}, {group=}, {name=}"
@@ -370,9 +396,10 @@ class ExternalSubcommandSetup(SubcommandSetup):
 
     def finish(self) -> Callable[..., Any]:
         """
-        Function that finishes the setup of the base command inside extensions.
+        Function that finishes the setup of the base command.
 
         Use this when you are done creating subcommands for a specified base.
+
         ```py
         base_var.finish()
         ```
@@ -428,9 +455,11 @@ def subcommand_base(
 ) -> SubcommandSetup:
     """
     Use this function to initialize a base for future subcommands.
+
     Kwargs are optional.
 
     To use this function without loading the extension, pass in the client as the first argument.
+
     ```py
     base_name = client.base(
         "base_name",
@@ -448,11 +477,14 @@ def subcommand_base(
         default_permission=True
     )
     ```
-    :param Client self: The client. This is only used if you do not load the extension.
-    :param str base: The base name.
-    :param str description: The description of the base.
-    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
-    :param bool default_permission: The default permission of the base.
+
+    Parameters:
+
+    * `(?)self: Client`: The client that the base belongs to. *Not needed if you load the extension and use `client.base(...)`.*
+    * `base: str`: The base name of the base.
+    * `?description: str`: The description of the base.
+    * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
+    * `?default_permission: bool`: The default permission of the base.
     """
     log.debug(f"base: {base=}")
     return SubcommandSetup(self, base, description, scope, default_permission)
@@ -466,7 +498,8 @@ def ext_subcommand_base(
     default_permission: Optional[bool] = None,
 ) -> ExternalSubcommandSetup:
     """
-    Use this function to initialize a base for future subcommands inside of extensions.
+    Use this function to initialize a base for future subcommands inside extensions.
+
     Kwargs are optional.
 
     ```py
@@ -477,10 +510,13 @@ def ext_subcommand_base(
         default_permission=True
     )
     ```
-    :param str base: The base name.
-    :param str description: The description of the base.
-    :param Union[int, Guild, List[int], List[Guild]] scope: The scope of the base.
-    :param bool default_permission: The default permission of the base.
+
+    Parameters:
+
+    * `base: str`: The base name of the base.
+    * `?description: str`: The description of the base.
+    * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
+    * `?default_permission: bool`: The default permission of the base.
     """
     log.debug(f"extension_base: {base=}")
     return ExternalSubcommandSetup(base, description, scope, default_permission)

@@ -16,36 +16,31 @@ def component(
     regex: Optional[bool] = False,
 ) -> Callable[..., Any]:
     """
-    A decorator for listening to ``INTERACTION_CREATE`` dispatched gateway
-    events involving components.
+    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
-    The structure for a component callback:
+    ```py
+    bot.load("interactions.ext.better_interactions")
 
-    .. code-block:: python
-        # Method 1
-        @component(interactions.Button(
-            style=interactions.ButtonStyle.PRIMARY,
-            label="click me!",
-            custom_id="click_me_button",
-        ))
-        async def button_response(ctx):
-            ...
-        # Method 2
-        @component("custom_id")
-        async def button_response(ctx):
-            ...
+    # startswith:
+    @bot.component("test", startswith=True)
+    async def test(ctx):
+        ...
 
-    The context of the component callback decorator inherits the same
-    as of the command decorator.
+    # regex:
+    @bot.component(r"^[a-z0-9_-]{1,32}$", regex=True)
+    async def test(ctx):
+        ...
+    ```
 
-    :param component: The component you wish to callback for.
-    :type component: Union[str, Button, SelectMenu]
-    :param startswith: Whether the component should be matched by the start of the custom_id.
-    :type startswith: bool
-    :param regex: Whether to use regex matching for the component using value of custom_id.
-    :type regex: bool
-    :return: A callable response.
-    :rtype: Callable[..., Any]
+    The startswith callback is called if the `custom_id` starts with the given string.
+
+    The regex callback is called if the `custom_id` matches the given regex.
+
+    Parameters:
+
+    * `component: str | Button | SelectMenu`: The component custom_id or regex to listen to.
+    * `startswith: bool`: Whether the component custom_id should start with the given string. Defaults to `False`.
+    * `regex: bool`: Whether the component custom_id should match the given regex. Defaults to `False`.
     """
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
@@ -83,33 +78,31 @@ def modal(
     regex: Optional[bool] = False,
 ) -> Callable[..., Any]:
     """
-    A decorator for listening to ``INTERACTION_CREATE`` dispatched gateway
-    events involving modals.
+    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
-    The structure for a modal callback:
-    .. code-block:: python
-        @modal(interactions.Modal(
-            interactions.TextInput(
-                style=interactions.TextStyleType.PARAGRAPH,
-                custom_id="how_was_your_day_field",
-                label="How has your day been?",
-                placeholder="Well, so far...",
-            ),
-        ))
-        async def modal_response(ctx):
-            ...
+    ```py
+    bot.load("interactions.ext.better_interactions")
 
-    The context of the modal callback decorator inherits the same
-    as of the component decorator.
+    # startswith:
+    @bot.modal("test", startswith=True)
+    async def test(ctx):
+        ...
 
-    :param modal: The modal or custom_id of modal you wish to callback for.
-    :type modal: Union[Modal, str]
-    :param startswith: Whether the modal should be matched by the start of the custom_id.
-    :type startswith: bool
-    :param regex: Whether to use regex matching for the modal using value of custom_id.
-    :type regex: bool
-    :return: A callable response.
-    :rtype: Callable[..., Any]
+    # regex:
+    @bot.modal(r"^[a-z0-9_-]{1,32}$", regex=True)
+    async def test(ctx):
+        ...
+    ```
+
+    The startswith callback is called if the `custom_id` starts with the given string.
+
+    The regex callback is called if the `custom_id` matches the given regex.
+
+    Parameters:
+
+    * `modal: str | Modal`: The modal custom_id or regex to listen to.
+    * `startswith: bool`: Whether the modal custom_id should start with the given string. Defaults to `False`.
+    * `regex: bool`: Whether the modal custom_id should match the given regex. Defaults to `False`.
     """
 
     def decorator(coro: Coroutine) -> Any:
@@ -142,6 +135,35 @@ def extension_component(
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ):
+    """
+    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback inside of `Extension`s.
+
+    ```py
+    # main.py:
+    bot.load("interactions.ext.better_interactions")
+
+    # startswith:
+    @extension_component("test", startswith=True)
+    async def test(self, ctx):
+        ...
+
+    # regex:
+    @extension_component(r"^[a-z0-9_-]{1,32}$", regex=True)
+    async def test(self, ctx):
+        ...
+    ```
+
+    The startswith callback is called if the `custom_id` starts with the given string.
+
+    The regex callback is called if the `custom_id` matches the given regex.
+
+    Parameters:
+
+    * `component: str | Button | SelectMenu`: The component custom_id or regex to listen to.
+    * `startswith: bool`: Whether the component custom_id should start with the given string. Defaults to `False`.
+    * `regex: bool`: Whether the component custom_id should match the given regex. Defaults to `False`.
+    """
+
     def decorator(func):
         if startswith and regex:
             log.error("Cannot use both startswith and regex.")
@@ -178,6 +200,35 @@ def extension_modal(
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ):
+    """
+    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback inside of `Extension`s.
+
+    ```py
+    # main.py:
+    bot.load("interactions.ext.better_interactions")
+
+    # startswith:
+    @extension_modal("test", startswith=True)
+    async def test(self, ctx):
+        ...
+
+    # regex:
+    @extension_modal(r"^[a-z0-9_-]{1,32}$", regex=True)
+    async def test(self, ctx):
+        ...
+    ```
+
+    The startswith callback is called if the `custom_id` starts with the given string.
+
+    The regex callback is called if the `custom_id` matches the given regex.
+
+    Parameters:
+
+    * `modal: str | Modal`: The modal custom_id or regex to listen to.
+    * `startswith: bool`: Whether the modal custom_id should start with the given string. Defaults to `False`.
+    * `regex: bool`: Whether the modal custom_id should match the given regex. Defaults to `False`.
+    """
+
     def decorator(func):
         if startswith and regex:
             log.error("Cannot use both startswith and regex.")

@@ -41,6 +41,7 @@ base = Base(
 
 
 def sync_subcommands(self):
+    """Syncs the subcommands in the extension."""
     client = self.client
     if any(
         hasattr(func, "__subcommand__")
@@ -82,6 +83,23 @@ def sync_subcommands(self):
 
 
 class BetterExtension(Extension):
+    """
+    Enables modified external commands, subcommands, callbacks, and more.
+
+    Use this class instead of `Extension` when using extensions.
+
+    ```py
+    # extension.py
+    from interactions.ext.better_interactions import BetterExtension
+
+    class Example(BetterExtension):
+        ...
+
+    def setup(client):
+        Example(client)
+    ```
+    """
+
     def __new__(cls, client: Client, *args, **kwargs):
         for func in getmembers(cls, predicate=iscoroutinefunction):
             if hasattr(func, "__command_data__"):
@@ -103,28 +121,41 @@ class BetterExtension(Extension):
 
 
 class BetterInteractions(Extension):
+    """
+    This is the core of this library, initialized when loading the extension.
+
+    It applies hooks to the client for additional and modified features.
+
+    ```py
+    # main.py
+    client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
+    ```
+
+    Parameters:
+
+    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
+    * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
+    * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
+    * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
+    * `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
+    """
+
     def __init__(
         self,
         bot: Client,
+        debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
         add_subcommand: Optional[bool] = True,
         modify_callbacks: Optional[bool] = True,
         modify_command: Optional[bool] = True,
-        debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
     ):
-        """
-        Apply hooks to a bot to add additional features
-
-        This function is required, as importing alone won't extend the classes
-
-        :param Client bot: The bot instance or class to apply hooks to
-        :param bool add_subcommand: Whether to add the subcommand
-        :param bool modify_callbacks: Whether to modify the callbacks
-        :param bool modify_command: Whether to modify the command
-        """
         if not isinstance(bot, Client):
             log.critical("The bot must be an instance of Client")
             raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
         log.debug("The bot is an instance of Client")
+
+        if debug_scope is not None:
+            log.debug("Setting debug_scope (debug_scope)")
+            setattr(bot, "__debug_scope", debug_scope)
 
         if add_subcommand:
             from .subcommands import subcommand_base
@@ -153,10 +184,6 @@ class BetterInteractions(Extension):
             log.debug("Modifying bot.command (modify_command)")
             bot.old_command = bot.command
             bot.command = types.MethodType(command, bot)
-
-        if debug_scope is not None:
-            log.debug("Setting debug_scope (debug_scope)")
-            setattr(bot, "__debug_scope", debug_scope)
 
         log.info("Hooks applied")
 
@@ -215,17 +242,24 @@ def setup(
     debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
 ) -> None:
     """
-    Setup the extension
+    This function initializes the core of the library, `BetterInteractions`.
 
-    This function is required, as importing alone won't extend the classes
+    It applies hooks to the client for additional and modified features.
 
-    :param Client bot: The bot instance or class to apply hooks to
-    :param bool add_subcommand: Whether to add the subcommand
-    :param bool modify_callbacks: Whether to modify the callbacks
-    :param bool modify_command: Whether to modify the command
-    :param Union[int, Guild, List[int], List[Guild]] debug_scope: The scope to be applied on all global commands
+    ```py
+    # main.py
+    client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
+    ```
+
+    Parameters:
+
+    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
+    * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
+    * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
+    * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
+    * `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
     """
     log.info("Setting up BetterInteractions")
     return BetterInteractions(
-        bot, add_subcommand, modify_callbacks, modify_command, debug_scope
+        bot, debug_scope, add_subcommand, modify_callbacks, modify_command
     )

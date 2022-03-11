@@ -11,15 +11,10 @@ from interactions import Channel, CommandContext, Guild, Member, User
 NoneType: Type[None] = type(None)
 
 
-def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext) -> str:
-    """
-    Returns the appropriate ID for the type provided.
-
-    :param type: The type of ID to get.
-    :type type: Union[str, User, Channel, Guild]
-    :param ctx: The context to get the ID from.
-    :type ctx: CommandContext
-    """
+def get_id(
+    type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext
+) -> str:
+    """Returns the appropriate ID for the type provided."""
     type = type.lower() if isinstance(type, str) else type
 
     if type == "user" or type is User or type == "member" or type is Member:
@@ -40,7 +35,7 @@ def cooldown(
     """
     A decorator for handling cooldowns.
 
-    Parameters for ``datetime.timedelta`` are ``days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0``
+    Parameters for `datetime.timedelta` are `days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0`.
 
     ```py
     from interactions.ext.better_interactions import cooldown
@@ -54,14 +49,12 @@ def cooldown(
         ...
     ```
 
-    :param delta_args: The arguments to pass to ``datetime.timedelta``.
-    :type delta_args: Tuple[Any]
-    :param error: The error function to call if the command is on cooldown.
-    :type error: Coroutine
-    :param type: The type of ID to utilize for the cooldown.
-    :type type: Union[str, User, Channel, Guild]
-    :param delta_kwargs: The keyword arguments to pass to ``datetime.timedelta``.
-    :type delta_kwargs: Dict[str, Any]
+    Parameters:
+
+    * `*delta_args: tuple[datetime.timedelta arguments]`: The arguments to pass to `datetime.timedelta`.
+    * `?error: Coroutine`: The function to call if the user is on cooldown. Defaults to `None`.
+    * `?type: str | User | Channel | Guild`: The type of cooldown. Defaults to `None`.
+    * `**delta_kwargs: dict[datetime.timedelta arguments]`: The keyword arguments to pass to `datetime.timedelta`.
     """
     if not (delta_args or delta_kwargs):
         raise ValueError(
