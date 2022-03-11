@@ -21,7 +21,7 @@ pip install -U better-interactions
   - [Subcommands](#subcommands)
   - [Better commands](#better-commands)
   - [Better components](#better-components)
-  - [Better component callback](#better-component-callback)
+  - [Better callbacks](#better-callbacks)
   - [Cooldown](#cooldown)
 
 ## What is this library?
