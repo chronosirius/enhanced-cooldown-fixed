@@ -188,6 +188,7 @@ class BetterInteractions(Extension):
         log.info("Hooks applied")
 
     async def _on_component(self, ctx: ComponentContext):
+        """on_component callback for modified callbacks."""
         websocket = self.client._websocket
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
@@ -211,6 +212,7 @@ class BetterInteractions(Extension):
                         return websocket._dispatch.dispatch(decorator_custom_id, ctx)
 
     async def _on_modal(self, ctx: CommandContext):
+        """on_modal callback for modified callbacks."""
         websocket = self.client._websocket
         if any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
