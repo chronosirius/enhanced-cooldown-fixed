@@ -117,7 +117,7 @@ bot.start()
 
 ```py
 from interactions.ext.enhanced import (
-    extension_base,
+    ext_subcommand_base,
     EnhancedExtension,
 )
 
@@ -126,7 +126,7 @@ class Cog(EnhancedExtension):
     def __init__(self, bot):
         self.bot = bot
 
-    the_base = extension_base("the_base", scope=874781880489222154)
+    the_base = ext_subcommand_base("the_base", scope=874781880489222154)
 
     @the_base.subcommand(name="name1", description="subcommand")
     async def b(self, ctx):
