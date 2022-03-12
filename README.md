@@ -1,4 +1,4 @@
-# better-interactions
+# enhanced
 
 [![Discord](https://img.shields.io/discord/924871439776108544?color=blue&label=discord&style=for-the-badge)](https://discord.gg/Y78bpT5aNv) [![PyPI - Downloads](https://img.shields.io/pypi/dm/interactions-better-components?color=blue&style=for-the-badge)](https://pypi.org/project/better-interactions/)
 
@@ -23,7 +23,7 @@ pip install -U better-interactions
 
 ## What is this library?
 
-This is `better-interactions`, a library for `interactions.py` which modifies interactions, and adds useful helper functions.
+This is `enhanced`, a library for `interactions.py` which modifies interactions, and adds useful helper functions.
 
 ## What does this have?
 
