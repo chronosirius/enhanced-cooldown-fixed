@@ -9,7 +9,7 @@ There are 2 callbacks:
 
 The purpose of callbacks is so you can interact with multiple `custom_id`s, instead of the one specified.
 
-You can either use `startswith` and see if the`custom_id` starts with the specified string, or use `regex` and see if the `custom_id` matches a regex provided.
+You can either use `startswith` and see if the `custom_id` starts with the specified string, or use `regex` and see if the `custom_id` matches a regex provided.
 
 ## Status
 
