@@ -1,16 +1,7 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, List, Optional, Union, get_args
 
-from interactions import (
-    MISSING,
-    Channel,
-    ChannelType,
-    Choice,
-    Option,
-    OptionType,
-    Role,
-    User,
-)
+from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
 
 from ._logging import get_logger
 
@@ -29,7 +20,7 @@ def get_type(param):
 
 
 def get_option(param):
-    """Gets the `BetterOption` of the parameter."""
+    """Gets the `EnhancedOption` of the parameter."""
     return get_args(param.annotation)[1]
 
 
@@ -59,7 +50,7 @@ def type_to_int(param):
         raise TypeError(f"Invalid type: {type}")
 
 
-class BetterOption:
+class EnhancedOption:
     """
     An alternative way of providing options by typehinting.
 
@@ -67,7 +58,7 @@ class BetterOption:
 
     ```py
     @bot.command(...)
-    async def command(ctx, name: BetterOption(int, "description") = 5):
+    async def command(ctx, name: EnhancedOption(int, "description") = 5):
         ...
     ```
 
@@ -75,15 +66,15 @@ class BetterOption:
 
     ```py
     from interactions import OptionType, Channel
-    from interactions.ext.better_interactions import BetterOption
+    from interactions.ext.enhanced import EnhancedOption
     from typing_extensions import Annotated
 
     @bot.command()
     async def options(
         ctx,
-        option1: Annotated[str, BetterOption(description="...")],
-        option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
-        option3: Annotated[Channel, BetterOption(description="...")],
+        option1: Annotated[str, EnhancedOption(description="...")],
+        option2: Annotated[OptionType.MENTIONABLE, EnhancedOption(description="...")],
+        option3: Annotated[Channel, EnhancedOption(description="...")],
     ):
         \"""Says something!\"""
         await ctx.send("something")
@@ -116,7 +107,7 @@ class BetterOption:
         focused: Optional[bool] = None,
         value: Optional[str] = None,
     ):
-        log.debug("BetterOption.__init__")
+        log.debug("EnhancedOption.__init__")
         if isinstance(type, (int, _type(None))):
             self.type = type
         elif type in (str, int, float):
@@ -151,7 +142,7 @@ class BetterOption:
 
 
 def parameters_to_options(params: "OrderedDict") -> List[Option]:
-    """Converts `BetterOption`s to `Option`s."""
+    """Converts `EnhancedOption`s to `Option`s."""
     log.debug("parameters_to_options:")
     _options = [
         (
@@ -168,7 +159,7 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
                 focused=param.annotation.focused,
                 value=param.annotation.value,
             )
-            if isinstance(param.annotation, BetterOption)
+            if isinstance(param.annotation, EnhancedOption)
             else Option(
                 type=type_to_int(param),
                 name=__name if not get_option(param).name else get_option(param).name,
@@ -190,7 +181,7 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
 
     if any(opt is MISSING for opt in _options):
         raise TypeError(
-            "You must typehint with `BetterOption` or specify `options=[]` in the decorator!"
+            "You must typehint with `EnhancedOption` or specify `options=[]` in the decorator!"
         )
     log.debug(f"  _options: {_options}\n")
 

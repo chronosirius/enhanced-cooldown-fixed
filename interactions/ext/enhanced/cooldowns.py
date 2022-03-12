@@ -11,9 +11,7 @@ from interactions import Channel, CommandContext, Guild, Member, User
 NoneType: Type[None] = type(None)
 
 
-def get_id(
-    type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext
-) -> str:
+def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext) -> str:
     """Returns the appropriate ID for the type provided."""
     type = type.lower() if isinstance(type, str) else type
 

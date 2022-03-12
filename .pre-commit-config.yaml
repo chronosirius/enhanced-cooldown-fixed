@@ -43,6 +43,14 @@ repos:
       language: python
       types: [file, python]
       args: [--line-length=100]
+  - repo: https://github.com/psf/black
+    rev: 22.1.0
+    hooks:
+    - id: black
+      name: Black Formatting
+      language: python
+      types: [file, python]
+      args: [--line-length=100]
   - repo: https://github.com/PyCQA/flake8
     rev: 4.0.1
     hooks:

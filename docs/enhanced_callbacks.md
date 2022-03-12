@@ -1,6 +1,6 @@
-# Better callbacks
+# Enhanced callbacks
 
-Better callbacks are modified callbacks that let you use the ability to add more in the `custom_id`.
+Enhanced callbacks are modified callbacks that let you use the ability to add more in the `custom_id`.
 
 There are 2 callbacks:
 
@@ -21,7 +21,7 @@ In your bot, you must use this line:
 
 ```py
 bot = interactions.Client(...)
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 ```
 
 Then, you can do stuff like this:
@@ -74,4 +74,4 @@ Examples of `custom_ids` that will not invoke this callback:
 
 The `startswith` and `regex` can be used in both component and modal callbacks, but only one can be specified per callback, not both.
 
-## [API Reference](./API-Reference#better-callbacks)
+## [API Reference](./API-Reference#enhanced-callbacks)

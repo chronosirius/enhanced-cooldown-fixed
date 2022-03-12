@@ -19,7 +19,7 @@ def component(
     A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
     ```py
-    bot.load("interactions.ext.better_interactions")
+    bot.load("interactions.ext.enhanced")
 
     # startswith:
     @bot.component("test", startswith=True)
@@ -81,7 +81,7 @@ def modal(
     A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
     ```py
-    bot.load("interactions.ext.better_interactions")
+    bot.load("interactions.ext.enhanced")
 
     # startswith:
     @bot.modal("test", startswith=True)
@@ -140,7 +140,7 @@ def extension_component(
 
     ```py
     # main.py:
-    bot.load("interactions.ext.better_interactions")
+    bot.load("interactions.ext.enhanced")
 
     # startswith:
     @extension_component("test", startswith=True)
@@ -205,7 +205,7 @@ def extension_modal(
 
     ```py
     # main.py:
-    bot.load("interactions.ext.better_interactions")
+    bot.load("interactions.ext.enhanced")
 
     # startswith:
     @extension_modal("test", startswith=True)

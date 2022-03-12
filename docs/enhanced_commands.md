@@ -1,6 +1,6 @@
-# Better commands
+# Enhanced commands
 
-Better commands are modified commands that have a default name and description.
+Enhanced commands are modified commands that have a default name and description.
 
 Also, you can typehint the parameters of the function instead of specifying them in the decorator. This feature is compatible with [subcommands](./Subcommands).
 
@@ -14,7 +14,7 @@ In your bot, you must use this line:
 
 ```py
 bot = interactions.Client(...)
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 ```
 
 Then, you can do stuff like this:
@@ -34,14 +34,14 @@ To specify options in the parameter, use this syntax:
 
 ```py
 from interactions import OptionType, Channel
-from interactions.ext.better_interactions import BetterOption
+from interactions.ext.enhanced import EnhancedOption
 
 @bot.command()
 async def options(
     ctx,
-    option1: BetterOption(str, "option description"),
-    option2: BetterOption(OptionType.MENTIONABLE, "option description"),
-    option3: BetterOption(Channel, "option description"),
+    option1: EnhancedOption(str, "option description"),
+    option2: EnhancedOption(OptionType.MENTIONABLE, "option description"),
+    option3: EnhancedOption(Channel, "option description"),
 ):
     """Says something!"""
     await ctx.send("something")
@@ -51,15 +51,15 @@ Another, more IDE friendly, and recommended way is to use `typing_extensions.Ann
 
 ```py
 from interactions import OptionType, Channel
-from interactions.ext.better_interactions import BetterOption
+from interactions.ext.enhanced import EnhancedOption
 from typing_extensions import Annotated
 
 @bot.command()
 async def options(
     ctx,
-    option1: Annotated[str, BetterOption(description="...")],
-    option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
-    option3: Annotated[Channel, BetterOption(description="...")],
+    option1: Annotated[str, EnhancedOption(description="...")],
+    option2: Annotated[OptionType.MENTIONABLE, EnhancedOption(description="...")],
+    option3: Annotated[Channel, EnhancedOption(description="...")],
 ):
     """Says something!"""
     await ctx.send("something")
@@ -76,9 +76,9 @@ Tired of specifying the scope of the command? Use the `debug_scope` keyword argu
 Specify it with the scope you want to use.
 
 ```py
-bot.load("interactions.ext.better_interactions", debug_scope=...)
+bot.load("interactions.ext.enhanced", debug_scope=...)
 ```
 
 If you don't want it to affect a command, add `debug_scope=False` to the command decorator.
 
-## [API Reference](./API-Reference#better-commands)
+## [API Reference](./API-Reference#enhanced-commands)

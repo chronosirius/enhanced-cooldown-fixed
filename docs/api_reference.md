@@ -2,7 +2,7 @@
 
 ## Extensions
 
-### *class* `BetterExtension`
+### *class* `EnhancedExtension`
 
 <ul>
 
@@ -12,9 +12,9 @@ Use this class instead of `Extension` when using extensions.
 
 ```py
 # extension.py
-from interactions.ext.better_interactions import BetterExtension
+from interactions.ext.enhanced import EnhancedExtension
 
-class Example(BetterExtension):
+class Example(EnhancedExtension):
     ...
 
 def setup(client):
@@ -23,7 +23,7 @@ def setup(client):
 
 </ul>
 
-### *class* `BetterInteractions`
+### *class* `Enhanced`
 
 <ul>
 
@@ -33,14 +33,14 @@ It applies hooks to the client for additional and modified features.
 
 ```py
 # main.py
-client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
+client.load("interactions.ext.enhanced", ...)  # optional args/kwargs
 ```
 
 <ul>
 
 Parameters:
 
-* `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
+* `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
 * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
 * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
 * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
@@ -278,7 +278,7 @@ base_name = client.base(
     default_permission=True
 )
 # or
-from interactions.ext.better_interactions import subcommand_base
+from interactions.ext.enhanced import subcommand_base
 base_name = subcommand_base(
     client,
     "base_name",
@@ -332,7 +332,7 @@ Parameters:
 
 </ul>
 
-## Better commands
+## Enhanced commands
 
 ### *func* command
 
@@ -340,21 +340,21 @@ Parameters:
 
 A modified decorator for creating slash commands.
 
-Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
+Makes `name` and `description` optional, and adds ability to use `EnhancedOption`s.
 
 Full-blown example:
 
 ```py
 from interactions import OptionType, Channel
-from interactions.ext.better_interactions import BetterOption
+from interactions.ext.enhanced import EnhancedOption
 from typing_extensions import Annotated
 
 @bot.command()
 async def options(
     ctx,
-    option1: Annotated[str, BetterOption(description="...")],
-    option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
-    option3: Annotated[Channel, BetterOption(description="...")],
+    option1: Annotated[str, EnhancedOption(description="...")],
+    option2: Annotated[OptionType.MENTIONABLE, EnhancedOption(description="...")],
+    option3: Annotated[Channel, EnhancedOption(description="...")],
 ):
     """Says something!"""
     await ctx.send("something")
@@ -382,9 +382,9 @@ Parameters:
 
 A modified decorator for creating slash commands inside `Extension`s.
 
-Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
+Makes `name` and `description` optional, and adds ability to use `EnhancedOption`s.
 
-Same parameters as `interactions.ext.better_interactions.command`.
+Same parameters as `interactions.ext.enhanced.command`.
 
 Parameters:
 
@@ -427,7 +427,7 @@ Parameters:
 
 </ul>
 
-### *class* `BetterOption`
+### *class* `EnhancedOption`
 
 <ul>
 
@@ -439,7 +439,7 @@ Basic example:
 
 ```py
 @bot.command(...)
-async def command(ctx, name: BetterOption(int, "description") = 5):
+async def command(ctx, name: EnhancedOption(int, "description") = 5):
     ...
 ```
 
@@ -451,15 +451,15 @@ Full-blown example:
 
 ```py
 from interactions import OptionType, Channel
-from interactions.ext.better_interactions import BetterOption
+from interactions.ext.enhanced import EnhancedOption
 from typing_extensions import Annotated
 
 @bot.command()
 async def options(
     ctx,
-    option1: Annotated[str, BetterOption(description="...")],
-    option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
-    option3: Annotated[Channel, BetterOption(description="...")],
+    option1: Annotated[str, EnhancedOption(description="...")],
+    option2: Annotated[OptionType.MENTIONABLE, EnhancedOption(description="...")],
+    option3: Annotated[Channel, EnhancedOption(description="...")],
 ):
     """Says something!"""
     await ctx.send("something")
@@ -482,7 +482,7 @@ Parameters:
 
 </ul>
 
-## Better components
+## Enhanced components
 
 ### *func* `ActionRow`
 
@@ -748,7 +748,7 @@ Returns:
 
 </ul>
 
-## Better callbacks
+## Enhanced callbacks
 
 ### *func* `component`
 
@@ -759,7 +759,7 @@ A modified decorator that allows you to add more information to the `custom_id` 
 </ul>
 
 ```py
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 
 # startswith:
 @bot.component("test", startswith=True)
@@ -795,7 +795,7 @@ A modified decorator that allows you to add more information to the `custom_id` 
 </ul>
 
 ```py
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 
 # startswith:
 @bot.modal("test", startswith=True)
@@ -832,7 +832,7 @@ A modified decorator that allows you to add more information to the `custom_id` 
 
 ```py
 # main.py:
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 
 # startswith:
 @extension_component("test", startswith=True)
@@ -869,7 +869,7 @@ A modified decorator that allows you to add more information to the `custom_id` 
 
 ```py
 # main.py:
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 
 # startswith:
 @extension_modal("test", startswith=True)
@@ -909,7 +909,7 @@ Parameters for `datetime.timedelta` are `days=0, seconds=0, microseconds=0, mill
 </ul>
 
 ```py
-from interactions.ext.better_interactions import cooldown
+from interactions.ext.enhanced import cooldown
 
 async def cooldown_error(ctx, delta):
     ...

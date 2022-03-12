@@ -2,16 +2,9 @@ import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 from re import fullmatch
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
-from interactions import (
-    Client,
-    CommandContext,
-    ComponentContext,
-    Extension,
-    Guild,
-    MISSING,
-)
+from interactions import MISSING, Client, CommandContext, ComponentContext, Extension, Guild
 from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
@@ -28,11 +21,11 @@ version = (
     ),
 )
 base = Base(
-    name="better-interactions",
+    name="enhanced",
     version="3.0.0",
-    description="Better interactions for interactions.py",
-    link="https://github.com/Toricane/better-interactions",
-    packages=["interactions.ext.better_interactions"],
+    description="Enhanced interactions for interactions.py",
+    link="https://github.com/interactions-py/enhanced",
+    packages=["interactions.ext.enhanced"],
     requirements=[
         "discord-py-interactions>=4.1.0",
         "typing_extensions",
@@ -61,10 +54,7 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [
-                    client._loop.create_task(client._synchronize(command))
-                    for command in commands
-                ]
+                [client._loop.create_task(client._synchronize(command)) for command in commands]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -74,15 +64,12 @@ def sync_subcommands(self):
             scope = subcommand.scope
             if scope is not None:
                 if isinstance(scope, list):
-                    [
-                        client._scopes.add(_ if isinstance(_, int) else _.id)
-                        for _ in scope
-                    ]
+                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
 
-class BetterExtension(Extension):
+class EnhancedExtension(Extension):
     """
     Enables modified external commands, subcommands, callbacks, and more.
 
@@ -90,9 +77,9 @@ class BetterExtension(Extension):
 
     ```py
     # extension.py
-    from interactions.ext.better_interactions import BetterExtension
+    from interactions.ext.enhanced import EnhancedExtension
 
-    class Example(BetterExtension):
+    class Example(EnhancedExtension):
         ...
 
     def setup(client):
@@ -106,11 +93,7 @@ class BetterExtension(Extension):
                 scope = func.__command_data__[1].get("scope", MISSING)
                 debug_scope = func.__command_data__[1].get("debug_scope", True)
                 del func.__command_data__[1]["debug_scope"]
-                if (
-                    scope is MISSING
-                    and debug_scope
-                    and hasattr(client, "__debug_scope")
-                ):
+                if scope is MISSING and debug_scope and hasattr(client, "__debug_scope"):
                     func.__command_data__[1]["scope"] = client.__debug_scope
 
         self = super().__new__(cls, client, *args, **kwargs)
@@ -120,7 +103,7 @@ class BetterExtension(Extension):
         return self
 
 
-class BetterInteractions(Extension):
+class Enhanced(Extension):
     """
     This is the core of this library, initialized when loading the extension.
 
@@ -128,12 +111,12 @@ class BetterInteractions(Extension):
 
     ```py
     # main.py
-    client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
+    client.load("interactions.ext.enhanced", ...)  # optional args/kwargs
     ```
 
     Parameters:
 
-    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
+    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
     * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
     * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
     * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
@@ -201,9 +184,7 @@ class BetterInteractions(Extension):
                             decorator_custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(
-                                decorator_custom_id, ctx
-                            )
+                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
                     elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("component_regex_", ""),
@@ -225,9 +206,7 @@ class BetterInteractions(Extension):
                             decorator_custom_id.replace("modal_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(
-                                decorator_custom_id, ctx
-                            )
+                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
                     elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("modal_regex_", ""),
@@ -244,24 +223,22 @@ def setup(
     debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
 ) -> None:
     """
-    This function initializes the core of the library, `BetterInteractions`.
+    This function initializes the core of the library, `Enhanced`.
 
     It applies hooks to the client for additional and modified features.
 
     ```py
     # main.py
-    client.load("interactions.ext.better_interactions", ...)  # optional args/kwargs
+    client.load("interactions.ext.enhanced", ...)  # optional args/kwargs
     ```
 
     Parameters:
 
-    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.better_interactions", ...)`.
+    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
     * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
     * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
     * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
     * `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
     """
-    log.info("Setting up BetterInteractions")
-    return BetterInteractions(
-        bot, debug_scope, add_subcommand, modify_callbacks, modify_command
-    )
+    log.info("Setting up Enhanced")
+    return Enhanced(bot, debug_scope, add_subcommand, modify_callbacks, modify_command)

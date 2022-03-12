@@ -23,11 +23,7 @@ class CustomFormatter(logging.Formatter):
         logging.INFO: Fore.GREEN + format_str + Fore.RESET,
         logging.WARNING: Fore.YELLOW + format_str + Fore.RESET,
         logging.ERROR: Fore.RED + format_str + Fore.RESET,
-        logging.CRITICAL: Style.BRIGHT
-        + Fore.RED
-        + format_str
-        + Fore.RESET
-        + Style.NORMAL,
+        logging.CRITICAL: Style.BRIGHT + Fore.RED + format_str + Fore.RESET + Style.NORMAL,
     }
 
     def __init__(self):

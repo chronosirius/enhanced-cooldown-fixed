@@ -4,7 +4,7 @@ Subcommands are technically options for commands, meaning to make subcommands, y
 
 This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
 
-Has features from [modified commands](./better_commands.md).
+Has features from [modified commands](./Enhanced-commands).
 
 ## Status
 
@@ -16,10 +16,10 @@ Here's some examples of subcommand usage:
 
 ```py
 # optional
-from interactions.ext.better_interactions import base
+from interactions.ext.enhanced import base
 ...
 # sets up bot.base, optional
-bot.load("interactions.ext.better_interactions")
+bot.load("interactions.ext.enhanced")
 ...
 # create a base command:
 the_base = bot.base("the_base", scope=874781880489222154)
@@ -103,7 +103,7 @@ This approach that I took is similar to the one in `discord-py-interactions<=3.0
 import interactions
 
 bot = interactions.Bot(...)
-bot.load("interactions.ext.better_interactions")  # optional
+bot.load("interactions.ext.enhanced")  # optional
 
 ...
 
@@ -116,13 +116,13 @@ bot.start()
 ``cog.py``:
 
 ```py
-from interactions.ext.better_interactions import (
+from interactions.ext.enhanced import (
     extension_base,
-    BetterExtension,
+    EnhancedExtension,
 )
 
 
-class Cog(BetterExtension):
+class Cog(EnhancedExtension):
     def __init__(self, bot):
         self.bot = bot
 

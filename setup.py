@@ -4,16 +4,16 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="better-interactions",
+    name="enhanced",
     version="3.0.0",
-    description="Better interactions for interactions.py",
+    description="Enhanced interactions for interactions.py",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Toricane/better-interactions",
+    url="https://github.com/interactions-py/enhanced",
     author="Toricane",
     author_email="prjwl028@gmail.com",
     license="MIT",
-    packages=["interactions.ext.better_interactions"],
+    packages=["interactions.ext.enhanced"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Development Status :: 4 - Beta",

@@ -22,36 +22,32 @@ log: Logger = get_logger("command")
 def command(
     self,
     *,
-    type: Optional[
-        Union[int, ApplicationCommandType]
-    ] = ApplicationCommandType.CHAT_INPUT,
+    type: Optional[Union[int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
     name: Optional[str] = MISSING,
     description: Optional[str] = MISSING,
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-    options: Optional[
-        Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]
-    ] = MISSING,
+    options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]] = MISSING,
     default_permission: Optional[bool] = MISSING,
     debug_scope: Optional[bool] = True,
 ) -> Callable[..., Any]:
     """
     A modified decorator for creating slash commands.
 
-    Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
+    Makes `name` and `description` optional, and adds ability to use `EnhancedOption`s.
 
     Full-blown example:
 
     ```py
     from interactions import OptionType, Channel
-    from interactions.ext.better_interactions import BetterOption
+    from interactions.ext.enhanced import EnhancedOption
     from typing_extensions import Annotated
 
     @bot.command()
     async def options(
         ctx,
-        option1: Annotated[str, BetterOption(description="...")],
-        option2: Annotated[OptionType.MENTIONABLE, BetterOption(description="...")],
-        option3: Annotated[Channel, BetterOption(description="...")],
+        option1: Annotated[str, EnhancedOption(description="...")],
+        option2: Annotated[OptionType.MENTIONABLE, EnhancedOption(description="...")],
+        option3: Annotated[Channel, EnhancedOption(description="...")],
     ):
         \"""Says something!\"""
         await ctx.send("something")
@@ -84,9 +80,7 @@ def command(
 
         params = signature(coro).parameters
         _options = (
-            parameters_to_options(params)
-            if options is MISSING and len(params) > 1
-            else options
+            parameters_to_options(params) if options is MISSING and len(params) > 1 else options
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
@@ -106,9 +100,9 @@ def extension_command(**kwargs):
     """
     A modified decorator for creating slash commands inside `Extension`s.
 
-    Makes `name` and `description` optional, and adds ability to use `BetterOption`s.
+    Makes `name` and `description` optional, and adds ability to use `EnhancedOption`s.
 
-    Same parameters as `interactions.ext.better_interactions.command`.
+    Same parameters as `interactions.ext.enhanced.command`.
 
     Parameters:
 
@@ -165,9 +159,7 @@ def autodefer(
 
     def inner(func: Callable[..., Any]) -> Callable[..., Any]:
         @wraps(func)
-        async def deferring_func(
-            ctx: Union[CommandContext, ComponentContext], *args, **kwargs
-        ):
+        async def deferring_func(ctx: Union[CommandContext, ComponentContext], *args, **kwargs):
             try:
                 loop = get_running_loop()
             except RuntimeError as e:
