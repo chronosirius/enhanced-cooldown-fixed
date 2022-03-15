@@ -108,6 +108,7 @@ Parameters:
 * `?description: str`: The description of the subcommand. Defaults to `"No description"`.
 * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the subcommand.
 * `?default_permission: bool`: The default permission of the subcommand.
+* `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
 
 Methods:
 
@@ -297,6 +298,7 @@ Parameters:
 * `?description: str`: The description of the base.
 * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
 * `?default_permission: bool`: The default permission of the base.
+* `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
 
 </ul>
 
