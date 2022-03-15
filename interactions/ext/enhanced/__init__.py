@@ -12,7 +12,7 @@ from ._logging import CustomFormatter, Data, get_logger
 from .callbacks import component, extension_component, extension_modal, modal
 from .command_models import EnhancedOption
 from .commands import autodefer, command, extension_command
-from .components import ActionRow, Button, SelectMenu, spread_to_rows
+from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
 from .cooldowns import cooldown
 from .extension import Enhanced, EnhancedExtension, base, setup, sync_subcommands, version
 from .subcommands import ext_subcommand_base, subcommand_base
@@ -43,6 +43,8 @@ __all__ = [
             "ActionRow",
             "Button",
             "SelectMenu",
+            "TextInput",
+            "Modal",
             "spread_to_rows",
     "extension",
         "sync_subcommands",
