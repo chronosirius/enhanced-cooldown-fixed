@@ -20,7 +20,7 @@ async def on_ready():
     print("Ready!")
 
 
-@client.command(debug_guild=False)
+@client.command(debug_scope=False)
 async def send_buttons(ctx: CommandContext):
     """Sends buttons!"""
     example_id: int = randint(0, 999_999_999)
