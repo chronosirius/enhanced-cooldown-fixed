@@ -15,7 +15,14 @@ from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
 from .cooldowns import cooldown
 from .extension import Enhanced, EnhancedExtension, base, setup, sync_subcommands, version
-from .subcommands import ext_subcommand_base, subcommand_base
+from .subcommands import (
+    ExternalSubcommandSetup,
+    Group,
+    Subcommand,
+    SubcommandSetup,
+    ext_subcommand_base,
+    subcommand_base,
+)
 
 # fmt: off
 __all__ = [
@@ -33,6 +40,10 @@ __all__ = [
         "subcommands",
             "subcommand_base",
             "ext_subcommand_base",
+            "SubcommandSetup",
+            "ExternalSubcommandSetup",
+            "Subcommand",
+            "Group",
     # "cmpt",
         "callbacks",
             "component",
