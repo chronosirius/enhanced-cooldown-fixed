@@ -129,9 +129,11 @@ def extension_command(**kwargs):
             else getdoc(coro) or "No description"
             if description is MISSING
             else description
-        ).split("\n")[0]
-        if len(kwargs["description"]) > 100:
-            raise ValueError("Description must be less than 100 characters.")
+        )
+        if isinstance(kwargs["description"], str):
+            kwargs["description"] = kwargs["description"].split("\n")[0]
+            if len(kwargs["description"]) > 100:
+                raise ValueError("Description must be less than 100 characters.")
         coro.__command_data__ = ((), kwargs)
         log.debug(f"extension_command: {coro.__command_data__=}")
         return coro
