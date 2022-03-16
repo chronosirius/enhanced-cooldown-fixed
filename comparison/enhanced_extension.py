@@ -1,23 +1,18 @@
 from random import randint
+
 from typing_extensions import Annotated
 
-from interactions import (
-    Client,
-    CommandContext,
-    Modal,
-    TextInput,
-    TextStyleType,
-)
 from enhanced.interactions.ext.enhanced.subcommands import ext_subcommand_base
+from interactions import Client, CommandContext, Modal, TextInput, TextStyleType
 from interactions.ext.enhanced import (
     EnhancedExtension,
+    EnhancedOption,
+    ExternalSubcommandSetup,
     Modal,
     TextInput,
-    EnhancedOption,
+    ext_subcommand_base,
     extension_command,
     extension_modal,
-    ext_subcommand_base,
-    ExternalSubcommandSetup,
 )
 
 
