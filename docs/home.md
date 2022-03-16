@@ -64,7 +64,7 @@ Click [here](./Enhanced-commands) to see more information and examples on enhanc
 
 ## Enhanced components
 
-Improved `Button`, `SelectMenu`, and `ActionRow` components, with error correction, `spread_to_rows`, and more.
+Improved `Button`, `SelectMenu`, `ActionRow`, `TextInput`, and `Modal` components, with error correction, `spread_to_rows` functionality, and more.
 
 Click [here](./Enhanced-components) to see more information and examples on enhanced components!
 
