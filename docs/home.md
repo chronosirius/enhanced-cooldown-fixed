@@ -1,4 +1,6 @@
-# Enhanced
+# enhanced
+
+![enhanced banner](https://github.com/interactions-py/enhanced/blob/main/src/enhanced_wide.png?raw=true)
 
 [![Discord](https://img.shields.io/discord/924871439776108544?color=blue&label=discord&style=for-the-badge)](https://discord.gg/Y78bpT5aNv) [![PyPI - Downloads](https://img.shields.io/pypi/dm/enhanced?color=blue&style=for-the-badge)](https://pypi.org/project/enhanced/)
 
