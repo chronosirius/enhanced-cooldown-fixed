@@ -26,6 +26,8 @@ pip install -U enhanced
 
 This is `enhanced`, a library for `interactions.py` which modifies interactions, and adds useful helper functions.
 
+It simplifies the process of creating commands, and provides an easy and organized way to make subcommands. Enhanced callbacks are also implemented, which allow for more advanced functionality. Enhanced components are also implemented, which allow for better looking code. A cooldown system is also implemented, which allows for commands to have a cooldown.
+
 ## Guide
 
 - [Home](https://github.com/interactions-py/enhanced/wiki)
