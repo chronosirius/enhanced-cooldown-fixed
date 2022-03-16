@@ -13,7 +13,7 @@ log: Logger = get_logger("extension")
 
 version = (
     Version(
-        version="3.0.0",
+        version="3.0.1",
         author=VersionAuthor(
             name="Toricane",
             email="prjwl028@gmail.com",
@@ -22,7 +22,7 @@ version = (
 )
 base = Base(
     name="enhanced",
-    version="3.0.0",
+    version=version,
     description="Enhanced interactions for interactions.py",
     link="https://github.com/interactions-py/enhanced",
     packages=["interactions.ext.enhanced"],
