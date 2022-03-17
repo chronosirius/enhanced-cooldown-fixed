@@ -73,9 +73,11 @@ def command(
             else getdoc(coro) or "No description"
             if description is MISSING
             else description
-        ).split("\n")[0]
-        if len(_description) > 100:
-            raise ValueError("Description must be less than 100 characters.")
+        )
+        if isinstance(_description, str):
+            _description = _description.split("\n")[0]
+            if len(_description) > 100:
+                raise ValueError("Description must be less than 100 characters.")
         _scope = (
             self.__debug_scope
             if scope is MISSING and hasattr(self, "__debug_scope") and debug_scope
