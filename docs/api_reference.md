@@ -272,7 +272,7 @@ Kwargs are optional.
 To use this function without loading the extension, pass in the client as the first argument.
 
 ```py
-base_name = client.base(
+base_name = client.subcommand_base(
     "base_name",
     description="Description of the base",
     scope=123456789,
@@ -475,6 +475,44 @@ Parameters:
 * `?description: str`: The description of the option. Defaults to the docstring or `"No description"`.
 * `?name: str`: The name of the option. Defaults to the argument name.
 * `?choices: list[Choice]`: The choices of the option.
+* `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
+* `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
+* `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*
+* `?autocomplete: bool`: If the option should be autocompleted.
+* `?focused: bool`: If the option should be focused.
+* `?value: str`: The value of the option.
+
+</ul>
+
+### *func* `option`
+
+<ul>
+
+An alternative way to provide options via a decorator.
+
+</ul>
+
+```py
+from interactions.ext.enhanced import option
+...
+bot.load("interactions.ext.enhanced")
+...
+@bot.command(...)
+@option(int, "name", "description", ...)
+@option(str, "name2", "description", ...)
+async def foo(ctx, name: int, name2: str):
+    ...
+```
+
+<ul>
+
+Parameters:
+
+* `type: type | int | OptionType`: The type of the option.
+* `name: str`: The name of the option.
+* `?description: str`: The description of the option. Defaults to `"No description"`.
+* `?choices: list[Choice]`: The choices of the option.
+* `?required: bool`: If the option is required.
 * `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
 * `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
 * `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*

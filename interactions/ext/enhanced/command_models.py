@@ -1,7 +1,16 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
 
-from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
+from interactions import (
+    MISSING,
+    Channel,
+    ChannelType,
+    Choice,
+    Option,
+    OptionType,
+    Role,
+    User,
+)
 
 from ._logging import get_logger
 
@@ -201,6 +210,36 @@ def option(
     focused: Optional[bool] = None,
     value: Optional[str] = None,
 ):
+    """
+    An alternative way to provide options via a decorator.
+
+    ```py
+    from interactions.ext.enhanced import option
+    ...
+    bot.load("interactions.ext.enhanced")
+    ...
+    @bot.command(...)
+    @option(int, "name", "description", ...)
+    @option(str, "name2", "description", ...)
+    async def foo(ctx, name: int, name2: str):
+        ...
+    ```
+
+    Parameters:
+
+    * `type: type | int | OptionType`: The type of the option.
+    * `name: str`: The name of the option.
+    * `?description: str`: The description of the option. Defaults to `"No description"`.
+    * `?choices: list[Choice]`: The choices of the option.
+    * `?required: bool`: If the option is required.
+    * `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
+    * `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
+    * `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*
+    * `?autocomplete: bool`: If the option should be autocompleted.
+    * `?focused: bool`: If the option should be focused.
+    * `?value: str`: The value of the option.
+    """
+
     def decorator(func: Callable[..., Any]):
         if isinstance(type, int):
             _type = type
