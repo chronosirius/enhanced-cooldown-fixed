@@ -213,6 +213,10 @@ def option(
     """
     An alternative way to provide options via a decorator.
 
+    Works with the `command` and `(External)SubcommandSetup.subcommand` decorators.
+
+    Incompatible with `EnhancedOption`!
+
     ```py
     from interactions.ext.enhanced import option
     ...

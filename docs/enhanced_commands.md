@@ -69,6 +69,19 @@ These are all different ways of providing options in the respective parameters.
 
 This will also work for `Extension`s! Use the `extension_command` decorator from this library.
 
+If you don't want to typehint your options and want a better way, then you can use the `option` decorator:
+
+```py
+from interactions.ext.enhanced import option
+
+@bot.command()
+@option(str, "option1", "desc")
+@option(int, "option2", "desc", required=False)
+async def option_decor(ctx: CommandContext, option1: str, option2: int = 3):
+    """option_decor"""
+    await ctx.send(f"{option1=}, {option2=}")
+```
+
 ### Debug scope
 
 Tired of specifying the scope of the command? Use the `debug_scope` keyword argument when loading the extension.
