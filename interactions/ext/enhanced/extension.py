@@ -1,4 +1,5 @@
 import types
+from hashlib import md5
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 from re import fullmatch
@@ -11,16 +12,34 @@ from ._logging import get_logger
 
 log: Logger = get_logger("extension")
 
+
+class VersionAuthorPatch(VersionAuthor):
+    def __init__(self, name, *, shared=False, active=True, email=None) -> None:
+        self.name = name
+        self._co_author = shared
+        self.active = active
+        self.email = email
+        self._hash = md5(self.__str__().encode("utf-8"))
+
+
+class VersionPatch(Version):
+    __slots__ = ("_authors",)
+
+
+class BasePatch(Base):
+    __slots__ = ("long_description",)
+
+
 version = (
-    Version(
+    VersionPatch(
         version="3.0.1",
-        author=VersionAuthor(
+        author=VersionAuthorPatch(
             name="Toricane",
             email="prjwl028@gmail.com",
         ),
     ),
 )
-base = Base(
+base = BasePatch(
     name="enhanced",
     version=version,
     description="Enhanced interactions for interactions.py",
