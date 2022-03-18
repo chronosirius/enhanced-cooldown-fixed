@@ -47,19 +47,38 @@ class NotEnhanced(Extension):
                     ),
                     Option(
                         type=OptionType.SUB_COMMAND,
-                        name="subcommand_options2",
-                        description="Subcommand with options 2",
+                        name="subcommand_options3",
+                        description="Subcommand with options 3",
                         options=[
                             Option(
                                 type=OptionType.STRING,
-                                name="string2",
-                                description="String 2",
+                                name="string3",
+                                description="String 3",
                                 required=True,
                             ),
                             Option(
                                 type=OptionType.INTEGER,
-                                name="integer2",
-                                description="Integer 2",
+                                name="integer3",
+                                description="Integer 3",
+                                required=False,
+                            ),
+                        ],
+                    ),
+                    Option(
+                        type=OptionType.SUB_COMMAND,
+                        name="subcommand_options4",
+                        description="Subcommand with options 4",
+                        options=[
+                            Option(
+                                type=OptionType.STRING,
+                                name="string4",
+                                description="String 4",
+                                required=True,
+                            ),
+                            Option(
+                                type=OptionType.INTEGER,
+                                name="integer4",
+                                description="Integer 4",
                                 required=False,
                             ),
                         ],
@@ -78,14 +97,18 @@ class NotEnhanced(Extension):
         ctx: CommandContext,
         sub_command_group: str = None,
         sub_command: str = None,
-        string2: str = None,
-        integer2: int = 5,
+        string3: str = None,
+        integer3: int = 5,
+        string4: str = None,
+        integer4: int = 5,
     ):
         if sub_command_group:
             if sub_command == "subcommand2":
                 await ctx.send("Subcommand 2")
-            elif sub_command == "subcommand_options2":
-                await ctx.send(f"Subcommand with options 2: {string2=}, {integer2=}.")
+            elif sub_command == "subcommand_options3":
+                await ctx.send(f"Subcommand with options 3: {string3=}, {integer3=}.")
+            elif sub_command == "subcommand_options4":
+                await ctx.send(f"Subcommand with options 4: {string4=}, {integer4=}.")
         elif sub_command == "subcommand_no_group2":
             await ctx.send("Subcommand without group 2")
 

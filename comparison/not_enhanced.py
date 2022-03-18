@@ -45,7 +45,9 @@ async def send_buttons(ctx: CommandContext):
 async def on_component(ctx: ComponentContext):
     custom_id: str = ctx.data.custom_id
     if custom_id.startswith("primary"):
-        await ctx.send(f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}")
+        await ctx.send(
+            f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}"
+        )
     elif custom_id.startswith("secondary"):
         await ctx.send(
             f"You clicked on a secondary button! ID is {custom_id.replace('secondary', '')}"
@@ -73,6 +75,29 @@ async def on_component(ctx: ComponentContext):
 )
 async def command_with_options(ctx: CommandContext, string: str, integer: int = 5):
     await ctx.send(f"Command with options: {string=}, {integer=}.")
+
+
+@client.command(
+    name="command_with_options2",
+    description="Command with options 2!",
+    options=[
+        Option(
+            type=OptionType.STRING,
+            name="string2",
+            description="String 2",
+            required=True,
+        ),
+        Option(
+            type=OptionType.INTEGER,
+            name="integer2",
+            description="Integer 2",
+            required=False,
+        ),
+    ],
+    scope=123456789,
+)
+async def command_with_options2(ctx: CommandContext, string2: str, integer2: int = 5):
+    await ctx.send(f"Command with options 2: {string2=}, {integer2=}.")
 
 
 @client.command(
@@ -108,6 +133,25 @@ async def command_with_options(ctx: CommandContext, string: str, integer: int = 
                         ),
                     ],
                 ),
+                Option(
+                    type=OptionType.SUB_COMMAND,
+                    name="subcommand_options2",
+                    description="Subcommand with options 2",
+                    options=[
+                        Option(
+                            type=OptionType.STRING,
+                            name="string2",
+                            description="String 2",
+                            required=True,
+                        ),
+                        Option(
+                            type=OptionType.INTEGER,
+                            name="integer2",
+                            description="Integer 2",
+                            required=False,
+                        ),
+                    ],
+                ),
             ],
         ),
         Option(
@@ -124,12 +168,16 @@ async def a_subcommand(
     sub_command: str = None,
     string: str = None,
     integer: int = 5,
+    string2: str = None,
+    integer2: int = 5,
 ):
     if sub_command_group:
         if sub_command == "subcommand":
             await ctx.send("Subcommand")
         elif sub_command == "subcommand_options":
             await ctx.send(f"Subcommand with options: {string=}, {integer=}.")
+        elif sub_command == "subcommand_options2":
+            await ctx.send(f"Subcommand with options 2: {string2=}, {integer2=}.")
     elif sub_command == "subcommand_no_group":
         await ctx.send("Subcommand without group")
 

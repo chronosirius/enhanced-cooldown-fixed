@@ -12,6 +12,7 @@ from interactions.ext.enhanced import (
     ext_subcommand_base,
     extension_command,
     extension_modal,
+    option,
 )
 
 
@@ -41,14 +42,23 @@ class VeryEnhanced(EnhancedExtension):
         await ctx.send("Subcommand 2")
 
     @base2.subcommand(group="subcommand_group2")
-    async def subcommand_options2(
+    async def subcommand_options3(
         self,
         ctx: CommandContext,
-        string: Annotated[str, EnhancedOption(description="String")],
-        integer: Annotated[int, EnhancedOption(description="Integer")] = 5,
+        string3: Annotated[str, EnhancedOption(description="String")],
+        integer3: Annotated[int, EnhancedOption(description="Integer")] = 5,
     ):
-        """Subcommand with options 2"""
-        await ctx.send(f"Subcommand with options 2: {string=}, {integer=}.")
+        """Subcommand with options 3"""
+        await ctx.send(f"Subcommand with options 3: {string3=}, {integer3=}.")
+
+    @base2.subcommand(group="subcommand_group2")
+    @option(str, "string4", "String 4")
+    @option(int, "integer4", "Integer 4", required=False)
+    async def subcommand_options4(
+        self, ctx: CommandContext, string4: str, integer4: int = 5
+    ):
+        """Subcommand with options 4"""
+        await ctx.send(f"Subcommand with options 4: {string4=}, {integer4=}.")
 
     @base2.subcommand()
     async def subcommand_no_group2(self, ctx: CommandContext):
