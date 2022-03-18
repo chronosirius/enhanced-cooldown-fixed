@@ -32,7 +32,7 @@ class BasePatch(Base):
 
 version = (
     VersionPatch(
-        version="3.0.1",
+        version="3.1.0",
         author=VersionAuthorPatch(
             name="Toricane",
             email="prjwl028@gmail.com",
