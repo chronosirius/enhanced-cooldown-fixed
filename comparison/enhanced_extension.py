@@ -54,9 +54,7 @@ class VeryEnhanced(EnhancedExtension):
     @base2.subcommand(group="subcommand_group2")
     @option(str, "string4", "String 4")
     @option(int, "integer4", "Integer 4", required=False)
-    async def subcommand_options4(
-        self, ctx: CommandContext, string4: str, integer4: int = 5
-    ):
+    async def subcommand_options4(self, ctx: CommandContext, string4: str, integer4: int = 5):
         """Subcommand with options 4"""
         await ctx.send(f"Subcommand with options 4: {string4=}, {integer4=}.")
 

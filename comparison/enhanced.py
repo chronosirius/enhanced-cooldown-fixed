@@ -2,14 +2,7 @@ from random import randint
 
 from typing_extensions import Annotated
 
-from interactions import (
-    ActionRow,
-    Button,
-    ButtonStyle,
-    Client,
-    CommandContext,
-    ComponentContext,
-)
+from interactions import ActionRow, Button, ButtonStyle, Client, CommandContext, ComponentContext
 from interactions.ext.enhanced import EnhancedOption, SubcommandSetup, option
 
 client = Client("...")
@@ -47,17 +40,13 @@ async def send_buttons(ctx: CommandContext):
 @client.component("primary", startswith=True)
 async def primary_callback(ctx: ComponentContext):
     custom_id: str = ctx.data.custom_id
-    await ctx.send(
-        f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}"
-    )
+    await ctx.send(f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}")
 
 
 @client.component("secondary", startswith=True)
 async def secondary_callback(ctx: ComponentContext):
     custom_id: str = ctx.data.custom_id
-    await ctx.send(
-        f"You clicked on a secondary button! ID is {custom_id.replace('secondary', '')}"
-    )
+    await ctx.send(f"You clicked on a secondary button! ID is {custom_id.replace('secondary', '')}")
 
 
 @client.command()

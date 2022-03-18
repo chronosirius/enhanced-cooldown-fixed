@@ -45,9 +45,7 @@ async def send_buttons(ctx: CommandContext):
 async def on_component(ctx: ComponentContext):
     custom_id: str = ctx.data.custom_id
     if custom_id.startswith("primary"):
-        await ctx.send(
-            f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}"
-        )
+        await ctx.send(f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}")
     elif custom_id.startswith("secondary"):
         await ctx.send(
             f"You clicked on a secondary button! ID is {custom_id.replace('secondary', '')}"
