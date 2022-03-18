@@ -4,6 +4,8 @@ from inspect import getdoc, signature
 from logging import Logger
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
+from typing_extensions import _AnnotatedAlias
+
 from interactions import (
     MISSING,
     ApplicationCommandType,
@@ -14,7 +16,7 @@ from interactions import (
     get_logger,
 )
 
-from .command_models import parameters_to_options
+from .command_models import EnhancedOption, parameters_to_options
 
 log: Logger = get_logger("command")
 
@@ -84,7 +86,16 @@ def command(
 
         params = signature(coro).parameters
         _options = (
-            parameters_to_options(params) if options is MISSING and len(params) > 1 else options
+            coro.__decor_options
+            if hasattr(coro, "__decor_options")
+            else parameters_to_options(params)
+            if options is MISSING
+            and len(params) > 1
+            and any(
+                isinstance(param.annotation, (EnhancedOption, _AnnotatedAlias))
+                for _, param in params.items()
+            )
+            else options
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 

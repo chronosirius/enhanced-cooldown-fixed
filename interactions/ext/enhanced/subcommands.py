@@ -2,6 +2,7 @@ from inspect import getdoc, signature
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
 from interactions.decor import command
+from typing_extensions import _AnnotatedAlias
 
 from interactions import (
     MISSING,
@@ -134,8 +135,8 @@ class SubcommandSetup:
         self.base: str = base
         self.description: str = description
         self.scope: Union[int, Guild, List[int], List[Guild]] = (
-            client.__debug_scope
-            if scope is MISSING and hasattr(self, "__debug_scope") and debug_scope
+            getattr(client, "__debug_scope")
+            if scope is MISSING and hasattr(client, "__debug_scope") and debug_scope
             else scope
         )
         self.default_permission: bool = default_permission
@@ -183,12 +184,14 @@ class SubcommandSetup:
                 raise ValueError("Description must be less than 100 characters.")
 
             params = signature(coro).parameters
-            if options is MISSING and any(
-                isinstance(param.annotation, EnhancedOption) for _, param in params.items()
-            ):
-                _options = parameters_to_options(params)
-            else:
-                _options = options
+            print(hasattr(coro, "__decor_options"), "lol")
+            _options = (
+                getattr(coro, "__decor_options")
+                if hasattr(coro, "__decor_options")
+                else parameters_to_options(params)
+                if options is MISSING and len(params) > 1
+                else options
+            )
 
             if not params:
                 raise InteractionException(
@@ -250,6 +253,8 @@ class SubcommandSetup:
                     self.client._loop.run_until_complete(self.client._synchronize(command))
                     for command in commands
                 ]
+
+        print(f"{self.scope=} {self.base=}")
 
         if self.scope is not MISSING:
             if isinstance(self.scope, list):
@@ -350,12 +355,18 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 raise ValueError("Description must be less than 100 characters.")
 
             params = signature(coro).parameters
-            if options is MISSING and any(
-                isinstance(param.annotation, EnhancedOption) for _, param in params.items()
-            ):
-                _options = parameters_to_options(params)
-            else:
-                _options = options
+            _options = (
+                coro.__decor_options
+                if hasattr(coro, "__decor_options")
+                else parameters_to_options(params)
+                if options is MISSING
+                and len(params) > 1
+                and any(
+                    isinstance(param.annotation, (EnhancedOption, _AnnotatedAlias))
+                    for _, param in params.items()
+                )
+                else options
+            )
 
             if not params:
                 raise InteractionException(
@@ -431,8 +442,8 @@ def subcommand_base(
     base: str,
     *,
     description: Optional[str] = "No description",
-    scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
-    default_permission: Optional[bool] = None,
+    scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
+    default_permission: Optional[bool] = MISSING,
     debug_scope: Optional[bool] = True,
 ) -> SubcommandSetup:
     """
@@ -477,8 +488,8 @@ def ext_subcommand_base(
     base: str,
     *,
     description: Optional[str] = "No description",
-    scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
-    default_permission: Optional[bool] = None,
+    scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
+    default_permission: Optional[bool] = MISSING,
 ) -> ExternalSubcommandSetup:
     """
     Use this function to initialize a base for future subcommands inside extensions.
