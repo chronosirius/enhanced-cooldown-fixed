@@ -1,5 +1,5 @@
 from inspect import _empty
-from typing import TYPE_CHECKING, List, Optional, Union, get_args
+from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
 
 from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
 
@@ -181,8 +181,66 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
 
     if any(opt is MISSING for opt in _options):
         raise TypeError(
-            "You must typehint with `EnhancedOption` or specify `options=[]` in the decorator!"
+            "You must typehint with `EnhancedOption` or not specify `options=...` in the decorator!"
         )
     log.debug(f"  _options: {_options}\n")
 
     return _options
+
+
+def option(
+    type: Union[_type, int, OptionType],
+    name: str,
+    description: Optional[str] = "No description",
+    choices: Optional[List[Choice]] = None,
+    required: Optional[bool] = True,
+    channel_types: Optional[List[ChannelType]] = None,
+    min_value: Optional[int] = None,
+    max_value: Optional[int] = None,
+    autocomplete: Optional[bool] = None,
+    focused: Optional[bool] = None,
+    value: Optional[str] = None,
+):
+    def decorator(func: Callable[..., Any]):
+        if isinstance(type, int):
+            _type = type
+        elif type in (str, int, float):
+            if type is str:
+                _type = OptionType.STRING
+            elif type is int:
+                _type = OptionType.INTEGER
+            elif type is float:
+                _type = OptionType.NUMBER
+            elif type is bool:
+                _type = OptionType.BOOLEAN
+        elif isinstance(type, OptionType):
+            _type = type
+        elif type is User:
+            _type = OptionType.USER
+        elif type is Channel:
+            _type = OptionType.CHANNEL
+        elif type is Role:
+            _type = OptionType.ROLE
+        else:
+            raise TypeError(f"Invalid type: {type}")
+
+        option: Option = Option(
+            type=_type,
+            name=name,
+            description=description,
+            choices=choices,
+            required=required,
+            channel_types=channel_types,
+            min_value=min_value,
+            max_value=max_value,
+            autocomplete=autocomplete,
+            focused=focused,
+            value=value,
+        )
+        if hasattr(func, "__decor_options"):
+            func.__decor_options.insert(0, option)
+        else:
+            func.__decor_options = [option]
+        return func
+
+    return decorator
