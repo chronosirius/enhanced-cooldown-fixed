@@ -5,7 +5,14 @@ from logging import Logger
 from re import fullmatch
 from typing import List, Optional, Union
 
-from interactions import MISSING, Client, CommandContext, ComponentContext, Extension, Guild
+from interactions import (
+    MISSING,
+    Client,
+    CommandContext,
+    ComponentContext,
+    Extension,
+    Guild,
+)
 from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
@@ -73,7 +80,10 @@ def sync_subcommands(self):
 
         if client._automate_sync:
             if client._loop.is_running():
-                [client._loop.create_task(client._synchronize(command)) for command in commands]
+                [
+                    client._loop.create_task(client._synchronize(command))
+                    for command in commands
+                ]
             else:
                 [
                     client._loop.run_until_complete(client._synchronize(command))
@@ -81,9 +91,12 @@ def sync_subcommands(self):
                 ]
         for subcommand in bases.values():
             scope = subcommand.scope
-            if scope is not None:
+            if scope is not MISSING:
                 if isinstance(scope, list):
-                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
+                    [
+                        client._scopes.add(_ if isinstance(_, int) else _.id)
+                        for _ in scope
+                    ]
                 else:
                     client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
@@ -112,7 +125,11 @@ class EnhancedExtension(Extension):
                 scope = func.__command_data__[1].get("scope", MISSING)
                 debug_scope = func.__command_data__[1].get("debug_scope", True)
                 del func.__command_data__[1]["debug_scope"]
-                if scope is MISSING and debug_scope and hasattr(client, "__debug_scope"):
+                if (
+                    scope is MISSING
+                    and debug_scope
+                    and hasattr(client, "__debug_scope")
+                ):
                     func.__command_data__[1]["scope"] = client.__debug_scope
 
         self = super().__new__(cls, client, *args, **kwargs)
@@ -203,7 +220,9 @@ class Enhanced(Extension):
                             decorator_custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
                     elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("component_regex_", ""),
@@ -225,7 +244,9 @@ class Enhanced(Extension):
                             decorator_custom_id.replace("modal_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
                     elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("modal_regex_", ""),
