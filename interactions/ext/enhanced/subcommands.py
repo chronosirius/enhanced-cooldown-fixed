@@ -107,6 +107,24 @@ class Group:
 
 
 class GroupSetup:
+    """
+    A class that allows a shortcut to creating a group subcommand in the original `SubcommandSetup`.
+
+    ```py
+    base_var: SubcommandSetup = client.subcommand_base("base_name", ...)
+    group_var: GroupSetup = base_var.group("group_name")
+
+    group_var.subcommand(...)
+    async def group_subcommand(ctx, ...):
+        ...
+    ```
+
+    Parameters:
+
+    * `group: str`: The name of the subcommand group.
+    * `subcommand_setup: SubcommandSetup`: The `SubcommandSetup` to add the group subcommand to.
+    """
+
     def __init__(self, group: str, subcommand_setup: "SubcommandSetup"):
         log.debug(f"GroupSetup.__init__: {group=}, {subcommand_setup=}")
         self.group: str = group
@@ -118,6 +136,25 @@ class GroupSetup:
         description: Optional[str] = MISSING,
         options: Optional[List[Option]] = MISSING,
     ) -> Callable[..., Any]:
+        """
+        Creates a subcommand with the specified group and parameters.
+
+        ```py
+        base_var: SubcommandSetup = client.subcommand_base("base_name", ...)
+        group_var: GroupSetup = base_var.group("group_name")
+
+        group_var.subcommand(...)
+        async def group_subcommand(ctx, ...):
+            ...
+        ```
+
+        Parameters:
+
+        * `?name: str`: The name of the subcommand.
+        * `?description: str`: The description of the subcommand.
+        * `?options: List[Option]`: The options of the subcommand.
+        """
+
         def decorator(coro):
             self.subcommand_setup.subcommand(
                 group=self.group,
@@ -132,7 +169,7 @@ class GroupSetup:
 
 class SubcommandSetup:
     """
-    A class you get when using `base_var = client.base("base_name", ...)`
+    A class you get when using `base_var = client.subcommand_base("base_name", ...)`
 
     Use this class to create subcommands by using the `@base_name.subcommand(...)` decorator.
 
@@ -170,7 +207,24 @@ class SubcommandSetup:
         self.subcommands: Dict[str, Subcommand] = {}
         self.commands: List[ApplicationCommand] = MISSING
 
-    def group(self, group: str):
+    def group(self, group: str) -> GroupSetup:
+        """
+        Function to get a `GroupSetup` object, a shortcut to creating group subcommands.
+        This is also in `ExternalSubcommandSetup`.
+
+        ```py
+        base_var: SubcommandSetup = client.subcommand_base("base_name", ...)
+        group_var: GroupSetup = base_var.group("group_name")
+        ```
+
+        Parameters:
+
+        * `group: str`: The name of the group.
+
+        Returns:
+
+        `GroupSetup`
+        """
         return GroupSetup(group=group, subcommand_setup=self)
 
     def subcommand(
@@ -317,10 +371,42 @@ class SubcommandSetup:
         return self.client.event(inner, name=f"command_{self.base}")
 
     def autocomplete(self, option: str) -> Callable[..., Any]:
-        def decorator(coro: Coroutine) -> Any:
+        """
+        Decorator for building autocomplete for options in the current base.
+
+        **IMPORTANT**: You must `base_var.finish()` before using this decorator.
+
+        Example:
+
+        ```py
+        base = client.subcommand_base("base_name", ...)
+
+        @base.subcommand()
+        @option("auto", autocomplete=True)
+        async def subcommand(ctx, auto: str):
+            ...
+
+        ...
+        base.finish()
+
+        @base.autocomplete("auto")
+        async def auto_complete(ctx, user_input: str = ""):
+            await ctx.populate([
+                interactions.Choice(...),
+                interactions.Choice(...),
+                ...
+            ])
+        ```
+
+        Parameters:
+
+        * `option: str`: The option to build autocomplete for.
+        """
+
+        def decorator(coro: Coroutine) -> Callable[..., Any]:
             if self.commands is MISSING:
                 raise RuntimeError(
-                    "You must `finish()` the setup of the subcommands before providing autocomplete."
+                    "You must `base_var.finish()` the setup of the subcommands before providing autocomplete."
                 )
             command: str = self.base
             _command_obj: ApplicationCommand = self.client._http.cache.interactions.get(
@@ -547,7 +633,7 @@ def subcommand_base(
     To use this function without loading the extension, pass in the client as the first argument.
 
     ```py
-    base_name = client.base(
+    base_name = client.subcommand_base(
         "base_name",
         description="Description of the base",
         scope=123456789,
