@@ -6,8 +6,8 @@ from interactions import Client, CommandContext, TextStyleType
 from interactions.ext.enhanced import (
     EnhancedExtension,
     EnhancedOption,
-    GroupSetup,
     ExternalSubcommandSetup,
+    GroupSetup,
     Modal,
     TextInput,
     ext_subcommand_base,
@@ -56,9 +56,7 @@ class VeryEnhanced(EnhancedExtension):
     @subcommand_group2.subcommand()
     @option(str, "string4", "String 4")
     @option(int, "integer4", "Integer 4", required=False)
-    async def subcommand_options4(
-        self, ctx: CommandContext, string4: str, integer4: int = 5
-    ):
+    async def subcommand_options4(self, ctx: CommandContext, string4: str, integer4: int = 5):
         """Subcommand with options 4"""
         await ctx.send(f"Subcommand with options 4: {string4=}, {integer4=}.")
 
