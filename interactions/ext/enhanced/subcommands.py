@@ -14,6 +14,7 @@ from interactions import (
     InteractionException,
     Option,
     OptionType,
+    Snowflake,
 )
 
 from ._logging import get_logger
@@ -167,6 +168,7 @@ class SubcommandSetup:
 
         self.groups: Dict[str, Group] = {}
         self.subcommands: Dict[str, Subcommand] = {}
+        self.commands: List[ApplicationCommand] = MISSING
 
     def group(self, group: str):
         return GroupSetup(group=group, subcommand_setup=self)
@@ -213,7 +215,6 @@ class SubcommandSetup:
                 raise ValueError("Description must be less than 100 characters.")
 
             params = signature(coro).parameters
-            print(hasattr(coro, "__decor_options"), "lol")
             _options = (
                 getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
@@ -266,7 +267,7 @@ class SubcommandSetup:
             else []
         )
         options = (group_options + subcommand_options) or None
-        commands: List[ApplicationCommand] = command(
+        self.commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
             description=self.description,
@@ -274,23 +275,20 @@ class SubcommandSetup:
             options=options,
             default_permission=self.default_permission,
         )
-        print(f"{commands=}")
 
         if self.client._automate_sync:
             if self.client._loop.is_running():
                 [
                     self.client._loop.create_task(self.client._synchronize(command))
-                    for command in commands
+                    for command in self.commands
                 ]
             else:
                 [
                     self.client._loop.run_until_complete(
                         self.client._synchronize(command)
                     )
-                    for command in commands
+                    for command in self.commands
                 ]
-
-        print(f"{self.scope=} {self.base=}")
 
         if self.scope is not MISSING:
             if isinstance(self.scope, list):
@@ -317,6 +315,48 @@ class SubcommandSetup:
             return await subcommand.coro(ctx, *args, **kwargs)
 
         return self.client.event(inner, name=f"command_{self.base}")
+
+    def autocomplete(self, option: str) -> Callable[..., Any]:
+        def decorator(coro: Coroutine) -> Any:
+            if self.commands is MISSING:
+                raise RuntimeError(
+                    "You must `finish()` the setup of the subcommands before providing autocomplete."
+                )
+            command: str = self.base
+            _command_obj: ApplicationCommand = self.client._http.cache.interactions.get(
+                command
+            )
+            if not _command_obj or not _command_obj.id:
+                if getattr(_command_obj, "guild_id", None) or self._automate_sync:
+                    _application_commands: List[
+                        ApplicationCommand
+                    ] = self.client._loop.run_until_complete(
+                        self.client._http.get_application_commands(
+                            application_id=self.me.id,
+                            guild_id=None
+                            if not hasattr(_command_obj, "guild_id")
+                            else _command_obj.guild_id,
+                        )
+                    )
+                    _command_obj: ApplicationCommand = self.client._find_command(
+                        _application_commands, command
+                    )
+                else:
+                    for _scope in self._scopes:
+                        _application_commands: List[
+                            ApplicationCommand
+                        ] = self.client._loop.run_until_complete(
+                            self.client._http.get_application_commands(
+                                application_id=self.me.id, guild_id=_scope
+                            )
+                        )
+                        _command_obj: ApplicationCommand = self.client._find_command(
+                            _application_commands, command
+                        )
+            _command: Union[Snowflake, int] = int(_command_obj.id)
+            return self.client.event(coro, name=f"autocomplete_{_command}_{option}")
+
+        return decorator
 
 
 class ExternalSubcommandSetup(SubcommandSetup):
