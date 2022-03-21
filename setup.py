@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="enhanced",
-    version="3.1.0",
+    version="3.2.0",
     description="Enhanced interactions for interactions.py",
     long_description=long_description,
     long_description_content_type="text/markdown",
