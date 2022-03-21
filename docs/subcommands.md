@@ -16,30 +16,31 @@ Here's some examples of subcommand usage:
 
 ```py
 # optional
-from interactions.ext.enhanced import base
+from interactions.ext.enhanced import subcommand_base
 ...
 # sets up bot.base, optional
 bot.load("interactions.ext.enhanced")
 ...
 # create a base command:
-the_base = bot.base("the_base", scope=874781880489222154)
+the_base = bot.subcommand_base("the_base", scope=874781880489222154)
 # or without loading:
-the_base = base(bot, "the_base", scope=874781880489222154)
+the_base = subcommand_base(bot, "the_base", scope=874781880489222154)
+# create some groups:
+the_group = the_base.group("the_group")
+the_group2 = the_base.group("the_group2")
 
 # create a subcommand with an optional group and required name:
-@the_base.subcommand(
-    group="the_group",
+@the_group.subcommand(
     name="the_name",
     description="A simple subcommand",
 )
-async def the_group(
+async def the_group1(
     ctx: interactions.CommandContext,
 ):
     await ctx.send("1")
 
 # another subcommand in the same group:
-@the_base.subcommand(
-    group="the_group",
+@the_group.subcommand(
     name="the_name2",
     description="A simple subcommand",
 )
@@ -49,8 +50,7 @@ async def the_group2(
     await ctx.send("2")
 
 # another subcommand in the same group with some options:
-@the_base.subcommand(
-    group="the_group",
+@the_group.subcommand(
     name="the_name3",
     description="A simple subcommand",
     options=[
@@ -69,7 +69,7 @@ async def the_group3(
     await ctx.send(f"3 {the_string}")
 
 # a subcommand in a different group:
-@the_base.subcommand(
+@the_group2.subcommand(
     group="the_group2",
     name="the_name4",
     description="A simple subcommand4",
@@ -127,12 +127,13 @@ class Cog(EnhancedExtension):
         self.bot = bot
 
     the_base = ext_subcommand_base("the_base", scope=874781880489222154)
+    group1 = the_base.group("group1")
 
     @the_base.subcommand(name="name1", description="subcommand")
     async def b(self, ctx):
         await ctx.send("You used /the_base name1")
 
-    @the_base.subcommand(group="group1", name="name2", description="group subcommand")
+    @group1.subcommand(name="name2", description="group subcommand")
     async def c(self, ctx):
         await ctx.send("You used /the_base group1 name2")
 
