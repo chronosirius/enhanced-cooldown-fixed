@@ -105,6 +105,30 @@ class Group:
         )
 
 
+class GroupSetup:
+    def __init__(self, group: str, subcommand_setup: "SubcommandSetup"):
+        log.debug(f"GroupSetup.__init__: {group=}, {subcommand_setup=}")
+        self.group: str = group
+        self.subcommand_setup: "SubcommandSetup" = subcommand_setup
+
+    def subcommand(
+        self,
+        name: Optional[str] = MISSING,
+        description: Optional[str] = MISSING,
+        options: Optional[List[Option]] = MISSING,
+    ) -> Callable[..., Any]:
+        def decorator(coro):
+            self.subcommand_setup.subcommand(
+                group=self.group,
+                name=name,
+                description=description,
+                options=options,
+            )(coro)
+            return coro
+
+        return decorator
+
+
 class SubcommandSetup:
     """
     A class you get when using `base_var = client.base("base_name", ...)`
@@ -144,6 +168,9 @@ class SubcommandSetup:
         self.groups: Dict[str, Group] = {}
         self.subcommands: Dict[str, Subcommand] = {}
 
+    def group(self, group: str):
+        return GroupSetup(group=group, subcommand_setup=self)
+
     def subcommand(
         self,
         *,
@@ -178,7 +205,9 @@ class SubcommandSetup:
         def decorator(coro: Coroutine) -> Coroutine:
             _name = coro.__name__ if name is MISSING else name
             _description = (
-                (getdoc(coro) or "No description") if description is MISSING else description
+                (getdoc(coro) or "No description")
+                if description is MISSING
+                else description
             ).split("\n")[0]
             if len(_description) > 100:
                 raise ValueError("Description must be less than 100 characters.")
@@ -200,11 +229,13 @@ class SubcommandSetup:
                 )
 
             if group is MISSING:
-                self.subcommands[_name] = Subcommand(_name, _description, coro, _options)
+                self.subcommands[_name] = Subcommand(
+                    _name, _description, coro, _options
+                )
             elif group not in self.groups:
                 self.groups[group] = Group(
                     group,
-                    description,
+                    _description,
                     subcommand=Subcommand(_name, _description, coro, _options),
                 )
             else:
@@ -226,7 +257,9 @@ class SubcommandSetup:
         ```
         """
         log.debug(f"SubcommandSetup.finish: {self.base=}")
-        group_options = [group._options for group in self.groups.values()] if self.groups else []
+        group_options = (
+            [group._options for group in self.groups.values()] if self.groups else []
+        )
         subcommand_options = (
             [subcommand._options for subcommand in self.subcommands.values()]
             if self.subcommands
@@ -241,6 +274,7 @@ class SubcommandSetup:
             options=options,
             default_permission=self.default_permission,
         )
+        print(f"{commands=}")
 
         if self.client._automate_sync:
             if self.client._loop.is_running():
@@ -250,7 +284,9 @@ class SubcommandSetup:
                 ]
             else:
                 [
-                    self.client._loop.run_until_complete(self.client._synchronize(command))
+                    self.client._loop.run_until_complete(
+                        self.client._synchronize(command)
+                    )
                     for command in commands
                 ]
 
@@ -258,13 +294,18 @@ class SubcommandSetup:
 
         if self.scope is not MISSING:
             if isinstance(self.scope, list):
-                [self.client._scopes.add(_ if isinstance(_, int) else _.id) for _ in self.scope]
+                [
+                    self.client._scopes.add(_ if isinstance(_, int) else _.id)
+                    for _ in self.scope
+                ]
             else:
                 self.client._scopes.add(
                     self.scope if isinstance(self.scope, int) else self.scope.id
                 )
 
-        async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
+        async def inner(
+            ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+        ) -> None:
             if sub_command_group:
                 group = self.groups[sub_command_group]
                 subcommand = next(
@@ -340,7 +381,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
         * `?description: str`: The description of the subcommand.
         * `?options: list[Option]`: The options of the subcommand.
         """
-        log.debug(f"ExternalSubcommandSetup.subcommand: {self.base=}, {group=}, {name=}")
+        log.debug(
+            f"ExternalSubcommandSetup.subcommand: {self.base=}, {group=}, {name=}"
+        )
 
         def decorator(coro: Coroutine) -> Coroutine:
             coro.__subcommand__ = True
@@ -349,7 +392,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
 
             _name = coro.__name__ if name is MISSING else name
             _description = (
-                (getdoc(coro) or "No description") if description is MISSING else description
+                (getdoc(coro) or "No description")
+                if description is MISSING
+                else description
             ).split("\n")[0]
             if len(_description) > 100:
                 raise ValueError("Description must be less than 100 characters.")
@@ -375,7 +420,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 )
 
             if group is MISSING:
-                self.subcommands[_name] = Subcommand(_name, _description, coro, _options)
+                self.subcommands[_name] = Subcommand(
+                    _name, _description, coro, _options
+                )
             elif group not in self.groups:
                 self.groups[group] = Group(
                     group,
@@ -402,7 +449,9 @@ class ExternalSubcommandSetup(SubcommandSetup):
         ```
         """
         log.debug(f"ExternalSubcommandSetup.finish: {self.base=}")
-        group_options = [group._options for group in self.groups.values()] if self.groups else []
+        group_options = (
+            [group._options for group in self.groups.values()] if self.groups else []
+        )
         subcommand_options = (
             [subcommand._options for subcommand in self.subcommands.values()]
             if self.subcommands
@@ -419,10 +468,14 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
         self.raw_commands = commands
 
-    async def inner(self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
+    async def inner(
+        self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs
+    ) -> None:
         if sub_command_group:
             group = self.groups[sub_command_group]
-            subcommand = next((sub for sub in group.subcommands if sub.name == sub_command), None)
+            subcommand = next(
+                (sub for sub in group.subcommands if sub.name == sub_command), None
+            )
         else:
             subcommand = self.subcommands[sub_command]
 
@@ -481,7 +534,9 @@ def subcommand_base(
     * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
     log.debug(f"base: {base=}")
-    return SubcommandSetup(self, base, description, scope, default_permission, debug_scope)
+    return SubcommandSetup(
+        self, base, description, scope, default_permission, debug_scope
+    )
 
 
 def ext_subcommand_base(
