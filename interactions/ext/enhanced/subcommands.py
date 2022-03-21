@@ -210,6 +210,7 @@ class SubcommandSetup:
     def group(self, group: str) -> GroupSetup:
         """
         Function to get a `GroupSetup` object, a shortcut to creating group subcommands.
+
         This is also in `ExternalSubcommandSetup`.
 
         ```py

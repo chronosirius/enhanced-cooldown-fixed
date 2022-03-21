@@ -93,6 +93,73 @@ Properties:
 
 </ul>
 
+### *class* `GroupSetup`
+
+<ul>
+
+A class that allows a shortcut to creating a group subcommand in the original `SubcommandSetup`.
+
+</ul>
+
+```py
+base_var: SubcommandSetup = client.subcommand_base("base_name", ...)
+group_var: GroupSetup = base_var.group("group_name")
+
+group_var.subcommand(...)
+async def group_subcommand(ctx, ...):
+    ...
+```
+
+<ul>
+
+Parameters:
+
+* `group: str`: The name of the subcommand group.
+* `subcommand_setup: SubcommandSetup`: The `SubcommandSetup` to add the group subcommand to.
+
+Methods:
+
+<ul>
+
+#### *func* `subcommand` (group)
+
+<ul>
+
+Creates a subcommand with the specified group and parameters.
+
+</ul>
+
+```py
+base_var: SubcommandSetup = client.subcommand_base("base_name", ...)
+group_var: GroupSetup = base_var.group("group_name")
+
+group_var.subcommand(...)
+async def group_subcommand(ctx, ...):
+    ...
+```
+
+<ul>
+
+<ul>
+
+<ul>
+
+Parameters:
+
+* `?name: str`: The name of the subcommand.
+* `?description: str`: The description of the subcommand.
+* `?options: list[Option]`: The options of the subcommand.
+
+</ul>
+
+</ul>
+
+</ul>
+
+</ul>
+
+</ul>
+
 ### *class* `SubcommandSetup`
 
 <ul>
@@ -156,6 +223,45 @@ Parameters:
 
 <ul>
 
+#### *func* `group`
+
+<ul>
+
+Function to get a `GroupSetup` object, a shortcut to creating group subcommands.
+
+This is also in `ExternalSubcommandSetup`.
+
+</ul>
+
+```py
+base_var: SubcommandSetup = client.subcommand_base("base_name", ...)
+group_var: GroupSetup = base_var.group("group_name")
+```
+
+<ul>
+
+<ul>
+
+<ul>
+
+Parameters:
+
+* `group: str`: The name of the group.
+
+Returns:
+
+`GroupSetup`
+
+</ul>
+
+</ul>
+
+</ul>
+
+<ul>
+
+<ul>
+
 #### *func* `finish`
 
 <ul>
@@ -171,6 +277,58 @@ base_var.finish()
 </ul>
 
 </ul>
+
+</ul>
+
+</ul>
+
+</ul>
+
+<ul>
+
+<ul>
+
+#### *func* `autocomplete`
+
+<ul>
+
+Decorator for building autocomplete for options in the current base.
+
+**IMPORTANT**: You must `base_var.finish()` before using this decorator.
+
+Example:
+
+</ul>
+
+```py
+base = client.subcommand_base("base_name", ...)
+
+@base.subcommand()
+@option("auto", autocomplete=True)
+async def subcommand(ctx, auto: str):
+    ...
+
+...
+base.finish()
+
+@base.autocomplete("auto")
+async def auto_complete(ctx, user_input: str = ""):
+    await ctx.populate([
+        interactions.Choice(...),
+        interactions.Choice(...),
+        ...
+    ])
+```
+
+<ul>
+
+<ul>
+
+<ul>
+
+Parameters:
+
+* `option: str`: The option to build autocomplete for.
 
 </ul>
 
