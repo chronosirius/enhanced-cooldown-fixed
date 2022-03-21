@@ -509,7 +509,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
 
             params = signature(coro).parameters
             _options = (
-                coro.__decor_options
+                getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
                 else parameters_to_options(params)
                 if options is MISSING
