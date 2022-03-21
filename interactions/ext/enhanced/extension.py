@@ -52,40 +52,37 @@ base = BasePatch(
 )
 
 
-def sync_subcommands(self):
+def sync_subcommands(self, client):
     """Syncs the subcommands in the extension."""
-    client = self.client
-    if any(
+    if not any(
         hasattr(func, "__subcommand__")
         for _, func in getmembers(self, predicate=iscoroutinefunction)
     ):
-        bases = {
-            func.__base__: func.__data__
-            for _, func in getmembers(self, predicate=iscoroutinefunction)
-            if hasattr(func, "__subcommand__")
-        }
-        commands = []
+        return
+    bases = {
+        func.__base__: func.__data__
+        for _, func in getmembers(self, predicate=iscoroutinefunction)
+        if hasattr(func, "__subcommand__")
+    }
+    commands = []
 
-        for base, subcommand in bases.items():
-            subcommand.set_self(self)
-            client.event(subcommand.inner, name=f"command_{base}")
-            commands.extend(subcommand.raw_commands)
+    for base, subcommand in bases.items():
+        subcommand.set_self(self)
+        client.event(subcommand.inner, name=f"command_{base}")
+        commands.extend(subcommand.raw_commands)
 
-        if client._automate_sync:
-            if client._loop.is_running():
-                [client._loop.create_task(client._synchronize(command)) for command in commands]
+    if client._automate_sync:
+        if client._loop.is_running():
+            [client._loop.create_task(client._synchronize(command)) for command in commands]
+        else:
+            [client._loop.run_until_complete(client._synchronize(command)) for command in commands]
+    for subcommand in bases.values():
+        scope = subcommand.scope
+        if scope is not MISSING:
+            if isinstance(scope, list):
+                [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
             else:
-                [
-                    client._loop.run_until_complete(client._synchronize(command))
-                    for command in commands
-                ]
-        for subcommand in bases.values():
-            scope = subcommand.scope
-            if scope is not MISSING:
-                if isinstance(scope, list):
-                    [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
-                else:
-                    client._scopes.add(scope if isinstance(scope, int) else scope.id)
+                client._scopes.add(scope if isinstance(scope, int) else scope.id)
 
 
 class EnhancedExtension(Extension):
@@ -115,10 +112,11 @@ class EnhancedExtension(Extension):
                 if scope is MISSING and debug_scope and hasattr(client, "__debug_scope"):
                     func.__command_data__[1]["scope"] = client.__debug_scope
 
-        self = super().__new__(cls, client, *args, **kwargs)
         log.debug("Syncing subcommands...")
-        sync_subcommands(self)
+        sync_subcommands(cls, client)
         log.debug("Synced subcommands")
+
+        self = super().__new__(cls, client, *args, **kwargs)
         return self
 
 
