@@ -572,6 +572,50 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
         self.raw_commands = self.commands
 
+    def autocomplete(self, option: str) -> Callable[..., Any]:
+        """
+        Decorator for building autocomplete for options in the current base.
+
+        **IMPORTANT**: You must `base_var.finish()` before using this decorator.
+
+        Example:
+
+        ```py
+        base = client.subcommand_base("base_name", ...)
+
+        @base.subcommand()
+        @option("auto", autocomplete=True)
+        async def subcommand(ctx, auto: str):
+            ...
+
+        ...
+        base.finish()
+
+        @base.autocomplete("auto")
+        async def auto_complete(ctx, user_input: str = ""):
+            await ctx.populate([
+                interactions.Choice(...),
+                interactions.Choice(...),
+                ...
+            ])
+        ```
+
+        Parameters:
+
+        * `option: str`: The option to build autocomplete for.
+        """
+
+        def decorator(coro: Coroutine) -> Callable[..., Any]:
+            if self.commands is MISSING:
+                raise RuntimeError(
+                    "You must `base_var.finish()` the setup of the subcommands before providing autocomplete."
+                )
+            command: str = self.base
+            coro.__autocomplete_data__ = ((), {"command": command, "name": option})
+            return coro
+
+        return decorator
+
     async def inner(self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
         if sub_command_group:
             group = self.groups[sub_command_group]
