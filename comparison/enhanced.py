@@ -2,8 +2,20 @@ from random import randint
 
 from typing_extensions import Annotated
 
-from interactions import ActionRow, Button, ButtonStyle, Client, CommandContext, ComponentContext
-from interactions.ext.enhanced import EnhancedOption, SubcommandSetup, option
+from interactions import (
+    ActionRow,
+    Button,
+    ButtonStyle,
+    Client,
+    CommandContext,
+    ComponentContext,
+)
+from interactions.ext.enhanced import (
+    EnhancedOption,
+    GroupSetup,
+    SubcommandSetup,
+    option,
+)
 
 client = Client("...")
 client.load("interactions.ext.enhanced", debug_scope=123456789)
@@ -40,13 +52,17 @@ async def send_buttons(ctx: CommandContext):
 @client.component("primary", startswith=True)
 async def primary_callback(ctx: ComponentContext):
     custom_id: str = ctx.data.custom_id
-    await ctx.send(f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}")
+    await ctx.send(
+        f"You clicked on a primary button! ID is {custom_id.replace('primary', '')}"
+    )
 
 
 @client.component("secondary", startswith=True)
 async def secondary_callback(ctx: ComponentContext):
     custom_id: str = ctx.data.custom_id
-    await ctx.send(f"You clicked on a secondary button! ID is {custom_id.replace('secondary', '')}")
+    await ctx.send(
+        f"You clicked on a secondary button! ID is {custom_id.replace('secondary', '')}"
+    )
 
 
 @client.command()
@@ -68,15 +84,16 @@ async def command_with_options2(ctx: CommandContext, string2: str, integer2: int
 
 
 base: SubcommandSetup = client.subcommand_base("base", description="Base")
+subcommand_group: GroupSetup = base.group("subcommand_group")
 
 
-@base.subcommand(group="subcommand_group")
+@subcommand_group.subcommand()
 async def subcommand(ctx: CommandContext):
     """Subcommand"""
     await ctx.send("Subcommand")
 
 
-@base.subcommand(group="subcommand_group")
+@subcommand_group.subcommand()
 async def subcommand_options(
     ctx: CommandContext,
     string: Annotated[str, EnhancedOption(description="String")],
@@ -86,7 +103,7 @@ async def subcommand_options(
     await ctx.send(f"Subcommand with options: {string=}, {integer=}.")
 
 
-@base.subcommand(group="subcommand_group")
+@subcommand_group.subcommand()
 @option(str, "string2", "String 2")
 @option(int, "integer2", "Integer 2", required=False)
 async def subcommand_options2(ctx: CommandContext, string2: str, integer2: int = 5):
