@@ -562,7 +562,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
             else []
         )
         options = (group_options + subcommand_options) or MISSING
-        commands: List[ApplicationCommand] = command(
+        self.commands: List[ApplicationCommand] = command(
             type=ApplicationCommandType.CHAT_INPUT,
             name=self.base,
             description=self.description,
@@ -570,7 +570,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
             options=options,
             default_permission=self.default_permission,
         )
-        self.raw_commands = commands
+        self.raw_commands = self.commands
 
     async def inner(self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
         if sub_command_group:
