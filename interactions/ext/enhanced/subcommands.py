@@ -405,11 +405,12 @@ class SubcommandSetup:
                     ] = self.client._loop.run_until_complete(
                         self.client._http.get_application_commands(
                             application_id=self.me.id,
-                            guild_id=None
-                            if not hasattr(_command_obj, "guild_id")
-                            else _command_obj.guild_id,
+                            guild_id=_command_obj.guild_id
+                            if hasattr(_command_obj, "guild_id")
+                            else None,
                         )
                     )
+
                     _command_obj: ApplicationCommand = self.client._find_command(
                         _application_commands, command
                     )
@@ -462,7 +463,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
         self.raw_commands = None
         self.full_command = None
-        self._commands: Dict[str, Callable] = {}
         self.__self = None
 
     def subcommand(

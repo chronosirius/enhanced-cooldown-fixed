@@ -121,6 +121,7 @@ class EnhancedExtension(Extension):
         log.debug("Synced subcommands")
 
         self = super().__new__(cls, client, *args, **kwargs)
+        self._commands = {}
         return self
 
 
