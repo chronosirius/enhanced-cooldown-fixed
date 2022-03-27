@@ -67,13 +67,8 @@ def sync_subcommands(self, client):
     commands = []
 
     for base, subcommand in bases.items():
-        subcommand.set_self(self)
-        cmd_name = f"command_{base}"
-        client.event(subcommand.inner, name=cmd_name)
+        client.event(subcommand.inner, name=f"command_{base}")
         commands.extend(subcommand.raw_commands)
-        commands = self._commands.get(cmd_name, [])
-        commands.append(subcommand.inner)
-        self._commands[cmd_name] = commands
 
     if client._automate_sync:
         if client._loop.is_running():
@@ -87,6 +82,7 @@ def sync_subcommands(self, client):
                 [client._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
             else:
                 client._scopes.add(scope if isinstance(scope, int) else scope.id)
+    return bases
 
 
 class EnhancedExtension(Extension):
@@ -117,11 +113,15 @@ class EnhancedExtension(Extension):
                     func.__command_data__[1]["scope"] = client.__debug_scope
 
         log.debug("Syncing subcommands...")
-        sync_subcommands(cls, client)
+        bases = sync_subcommands(cls, client)
         log.debug("Synced subcommands")
 
         self = super().__new__(cls, client, *args, **kwargs)
-        self._commands = {}
+        for base, subcommand in bases.items():
+            subcommand.set_self(self)
+            commands = self._commands.get(f"command_{base}", [])
+            commands.append(subcommand.inner)
+            self._commands[f"command_{base}"] = commands
         return self
 
 
