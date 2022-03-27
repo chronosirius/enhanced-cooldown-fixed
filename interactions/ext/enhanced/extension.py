@@ -68,8 +68,12 @@ def sync_subcommands(self, client):
 
     for base, subcommand in bases.items():
         subcommand.set_self(self)
-        client.event(subcommand.inner, name=f"command_{base}")
+        cmd_name = f"command_{base}"
+        client.event(subcommand.inner, name=cmd_name)
         commands.extend(subcommand.raw_commands)
+        commands = self._commands.get(cmd_name, [])
+        commands.append(subcommand.inner)
+        self._commands[cmd_name] = commands
 
     if client._automate_sync:
         if client._loop.is_running():
