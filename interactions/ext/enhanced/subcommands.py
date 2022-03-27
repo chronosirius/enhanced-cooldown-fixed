@@ -462,6 +462,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         )
         self.raw_commands = None
         self.full_command = None
+        self._commands: Dict[str, Callable] = {}
         self.__self = None
 
     def subcommand(
@@ -571,6 +572,11 @@ class ExternalSubcommandSetup(SubcommandSetup):
             default_permission=self.default_permission,
         )
         self.raw_commands = self.commands
+
+        cmd_name = f"command_{self.base}"
+        commands = self._commands.get(cmd_name, [])
+        commands.append(self.inner)
+        self._commands[cmd_name] = commands
 
     def autocomplete(self, option: str) -> Callable[..., Any]:
         """
