@@ -399,7 +399,7 @@ class SubcommandSetup:
             command: str = self.base
             _command_obj: ApplicationCommand = self.client._http.cache.interactions.get(command)
             if not _command_obj or not _command_obj.id:
-                if getattr(_command_obj, "guild_id", None) or self._automate_sync:
+                if getattr(_command_obj, "guild_id", None) or self.client._automate_sync:
                     _application_commands: List[
                         ApplicationCommand
                     ] = self.client._loop.run_until_complete(
@@ -415,12 +415,12 @@ class SubcommandSetup:
                         _application_commands, command
                     )
                 else:
-                    for _scope in self._scopes:
+                    for _scope in self.client._scopes:
                         _application_commands: List[
                             ApplicationCommand
                         ] = self.client._loop.run_until_complete(
                             self.client._http.get_application_commands(
-                                application_id=self.me.id, guild_id=_scope
+                                application_id=self.client.me.id, guild_id=_scope
                             )
                         )
                         _command_obj: ApplicationCommand = self.client._find_command(
