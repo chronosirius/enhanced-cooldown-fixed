@@ -32,9 +32,9 @@ It simplifies the process of creating commands, and provides an easy and organiz
 
 - [Home](https://github.com/interactions-py/enhanced/wiki)
 - [Subcommands](https://github.com/interactions-py/enhanced/wiki/Subcommands)
-- [Enhanced commands](https://github.com/interactions-py/enhanced/wiki/Better-commands)
-- [Enhanced components](https://github.com/interactions-py/enhanced/wiki/Better-components)
-- [Enhanced callbacks](https://github.com/interactions-py/enhanced/wiki/Better-callbacks)
+- [Enhanced commands](https://github.com/interactions-py/enhanced/wiki/Enhanced-commands)
+- [Enhanced components](https://github.com/interactions-py/enhanced/wiki/Enhanced-components)
+- [Enhanced callbacks](https://github.com/interactions-py/enhanced/wiki/Enhanced-callbacks)
 - [Cooldown](https://github.com/interactions-py/enhanced/wiki/Cooldown)
 
 ## Documentation
