@@ -1,7 +1,17 @@
 from inspect import _empty
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
 
-from interactions import MISSING, Channel, ChannelType, Choice, Option, OptionType, Role, User
+from interactions import (
+    MISSING,
+    Channel,
+    ChannelType,
+    Choice,
+    Member,
+    Option,
+    OptionType,
+    Role,
+    User,
+)
 
 from ._logging import get_logger
 
@@ -40,7 +50,7 @@ def type_to_int(param):
             return OptionType.BOOLEAN
     elif isinstance(type, OptionType):
         return type
-    elif type is User:
+    elif type is User or type is Member:
         return OptionType.USER
     elif type is Channel:
         return OptionType.CHANNEL
@@ -110,7 +120,7 @@ class EnhancedOption:
         log.debug("EnhancedOption.__init__")
         if isinstance(type, (int, _type(None))):
             self.type = type
-        elif type in (str, int, float):
+        elif type in (str, int, float, bool):
             if type is str:
                 self.type = OptionType.STRING
             elif type is int:
@@ -121,7 +131,7 @@ class EnhancedOption:
                 self.type = OptionType.BOOLEAN
         elif isinstance(type, OptionType):
             self.type = type
-        elif type is User:
+        elif type is User or type is Member:
             self.type = OptionType.USER
         elif type is Channel:
             self.type = OptionType.CHANNEL
@@ -145,37 +155,35 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
     """Converts `EnhancedOption`s to `Option`s."""
     log.debug("parameters_to_options:")
     _options = [
-        (
-            Option(
-                type=param.annotation.type,
-                name=__name if not param.annotation.name else param.annotation.name,
-                description=param.annotation.description,
-                required=param.default is _empty,
-                choices=param.annotation.choices,
-                channel_types=param.annotation.channel_types,
-                min_value=param.annotation.min_value,
-                max_value=param.annotation.max_value,
-                autocomplete=param.annotation.autocomplete,
-                focused=param.annotation.focused,
-                value=param.annotation.value,
-            )
-            if isinstance(param.annotation, EnhancedOption)
-            else Option(
-                type=type_to_int(param),
-                name=__name if not get_option(param).name else get_option(param).name,
-                description=get_option(param).description,
-                required=param.default is _empty,
-                choices=get_option(param).choices,
-                channel_types=get_option(param).channel_types,
-                min_value=get_option(param).min_value,
-                max_value=get_option(param).max_value,
-                autocomplete=get_option(param).autocomplete,
-                focused=get_option(param).focused,
-                value=get_option(param).value,
-            )
-            if isinstance(param.annotation, _AnnotatedAlias)
-            else MISSING
+        Option(
+            type=param.annotation.type,
+            name=param.annotation.name or __name,
+            description=param.annotation.description,
+            required=param.default is _empty,
+            choices=param.annotation.choices,
+            channel_types=param.annotation.channel_types,
+            min_value=param.annotation.min_value,
+            max_value=param.annotation.max_value,
+            autocomplete=param.annotation.autocomplete,
+            focused=param.annotation.focused,
+            value=param.annotation.value,
         )
+        if isinstance(param.annotation, EnhancedOption)
+        else Option(
+            type=type_to_int(param),
+            name=get_option(param).name or __name,
+            description=get_option(param).description,
+            required=param.default is _empty,
+            choices=get_option(param).choices,
+            channel_types=get_option(param).channel_types,
+            min_value=get_option(param).min_value,
+            max_value=get_option(param).max_value,
+            autocomplete=get_option(param).autocomplete,
+            focused=get_option(param).focused,
+            value=get_option(param).value,
+        )
+        if isinstance(param.annotation, _AnnotatedAlias)
+        else MISSING
         for __name, param in params.items()
     ][1:]
 
@@ -238,7 +246,7 @@ def option(
     def decorator(func: Callable[..., Any]):
         if isinstance(type, int):
             _type = type
-        elif type in (str, int, float):
+        elif type in (str, int, float, bool):
             if type is str:
                 _type = OptionType.STRING
             elif type is int:
@@ -249,7 +257,7 @@ def option(
                 _type = OptionType.BOOLEAN
         elif isinstance(type, OptionType):
             _type = type
-        elif type is User:
+        elif type is User or type is Member:
             _type = OptionType.USER
         elif type is Channel:
             _type = OptionType.CHANNEL
