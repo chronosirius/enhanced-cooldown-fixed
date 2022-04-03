@@ -132,6 +132,8 @@ class GroupSetup:
 
     def subcommand(
         self,
+        _coro: Optional[Coroutine] = MISSING,
+        *,
         name: Optional[str] = MISSING,
         description: Optional[str] = MISSING,
         options: Optional[List[Option]] = MISSING,
@@ -164,6 +166,8 @@ class GroupSetup:
             )(coro)
             return coro
 
+        if _coro is not MISSING:
+            return decorator(_coro)
         return decorator
 
 
@@ -230,6 +234,7 @@ class SubcommandSetup:
 
     def subcommand(
         self,
+        _coro: Optional[Coroutine] = MISSING,
         *,
         group: Optional[str] = MISSING,
         name: Optional[str] = MISSING,
@@ -296,6 +301,8 @@ class SubcommandSetup:
                 )
             return coro
 
+        if _coro is not MISSING:
+            return decorator(_coro)
         return decorator
 
     def finish(self) -> Callable[..., Any]:
@@ -467,6 +474,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
 
     def subcommand(
         self,
+        _coro: Optional[Coroutine] = MISSING,
         *,
         group: Optional[str] = MISSING,
         name: Optional[str] = MISSING,
@@ -543,6 +551,8 @@ class ExternalSubcommandSetup(SubcommandSetup):
 
             return coro
 
+        if _coro is not MISSING:
+            return decorator(_coro)
         return decorator
 
     def finish(self) -> Callable[..., Any]:
