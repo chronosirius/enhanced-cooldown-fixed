@@ -23,6 +23,7 @@ log: Logger = get_logger("command")
 
 def command(
     self,
+    _coro: Optional[Coroutine] = MISSING,
     *,
     type: Optional[Union[int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
     name: Optional[str] = MISSING,
@@ -110,6 +111,8 @@ def command(
             default_permission=default_permission,
         )(coro)
 
+    if _coro is not MISSING:
+        return decorator(_coro)
     return decorator
 
 
