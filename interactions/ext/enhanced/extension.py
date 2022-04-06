@@ -1,5 +1,4 @@
 import types
-from hashlib import md5
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 from re import fullmatch
@@ -14,40 +13,23 @@ from .subcommands import ExternalSubcommandSetup
 log: Logger = get_logger("extension")
 
 
-class VersionAuthorPatch(VersionAuthor):
-    def __init__(self, name, *, shared=False, active=True, email=None) -> None:
-        self.name = name
-        self._co_author = shared
-        self.active = active
-        self.email = email
-        self._hash = md5(self.__str__().encode("utf-8"))
-
-
-class VersionPatch(Version):
-    __slots__ = ("_authors",)
-
-
-class BasePatch(Base):
-    __slots__ = ("long_description",)
-
-
 version = (
-    VersionPatch(
-        version="3.2.1",
-        author=VersionAuthorPatch(
+    Version(
+        version="3.3.0-rc.1",
+        author=VersionAuthor(
             name="Toricane",
             email="prjwl028@gmail.com",
         ),
     ),
 )
-base = BasePatch(
+base = Base(
     name="enhanced",
     version=version,
     description="Enhanced interactions for interactions.py",
     link="https://github.com/interactions-py/enhanced",
     packages=["interactions.ext.enhanced"],
     requirements=[
-        "discord-py-interactions>=4.1.0",
+        "discord-py-interactions>=4.1.1rc.1",
         "typing_extensions",
     ],
 )

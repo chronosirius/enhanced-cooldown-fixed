@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="enhanced",
-    version="3.2.1",
+    version="3.3.0-rc.1",
     description="Enhanced interactions for interactions.py",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -21,7 +21,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "discord-py-interactions>=4.1.0",
+        "discord-py-interactions>=4.1.1rc.1",
         "typing_extensions",
     ],
 )
