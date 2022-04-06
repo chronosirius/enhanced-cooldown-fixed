@@ -1,11 +1,15 @@
 from inspect import _empty
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, List, Optional, Union, get_args
+
+from interactions.api.http.route import Route
 
 from interactions import (
     MISSING,
     Channel,
     ChannelType,
     Choice,
+    Client,
+    HTTPClient,
     Member,
     Option,
     OptionType,
@@ -286,3 +290,63 @@ def option(
         return func
 
     return decorator
+
+
+async def get_role(self: HTTPClient, guild_id: int, role_id: int) -> Role:
+    """
+    Gets a role from a guild.
+
+    Parameters:
+
+    * `guild_id: int`: The guild ID.
+    * `role_id: int`: The role ID.
+
+    Returns:
+
+    `Role`: The role we're trying to get.
+    """
+    request = await self._req.request(Route("GET", "/guilds/{guild_id}/roles", guild_id=guild_id))
+
+    for role in request:
+        if role.get("id") == str(role_id):
+            return role
+
+
+async def get(
+    self: Client, __obj: object, *args, http_method: Optional[str] = None, **kwargs
+) -> object:
+    r"""
+    A helper method for retrieving data from the Discord API in its object representation.
+
+    Parameters:
+
+    * `(?)self: Client`: The client instance. Do not input if using the `Client.get` method.
+    * `__obj: object`: The object to get.
+    * `*args: list`: The parameters to send with the request.
+    * `?http_method: str`: The HTTP method to use. Defaults to `None`.
+    * `**kwargs: dict`: The parameters to send with the request.
+
+    Returns:
+
+    `object`: The object we're trying to get.
+    """
+    if __obj is not List:
+        class_name: str = __obj.__name__
+        try:
+            _http_method: Coroutine = getattr(
+                self._http, http_method or f"get_{class_name.lower()}"
+            )
+        except AttributeError:
+            raise ValueError(f"Client.get() does not support the model {class_name}.")
+        try:
+            res: Union[dict, List[dict]] = await _http_method(*args, **kwargs)
+        except TypeError:
+            raise ValueError(f"Client.get() could not find a {class_name} with the given IDs.")
+        if isinstance(res, dict):
+            return __obj(**res, _client=self._http)
+        elif isinstance(res, list):
+            return [__obj(**r, _client=self._http) for r in res]
+        else:
+            return res
+    else:
+        ...  # TODO: Implement List[object]

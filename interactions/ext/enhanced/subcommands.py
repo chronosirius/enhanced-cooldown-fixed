@@ -471,6 +471,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
         self.raw_commands = None
         self.full_command = None
         self.__self = None
+        self._autocomplete_options: Dict[str, Callable] = {}
 
     def subcommand(
         self,
@@ -621,11 +622,21 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 raise RuntimeError(
                     "You must `base_var.finish()` the setup of the subcommands before providing autocomplete."
                 )
-            command: str = self.base
-            coro.__autocomplete_data__ = ((), {"command": command, "name": option})
+            self._autocomplete_options[option] = coro
             return coro
 
         return decorator
+
+    def _super_autocomplete(self, client: Client):
+        self.client = client
+        if not self._autocomplete_options:
+            return
+        for option, coro in self._autocomplete_options.items():
+
+            async def new_coro(*args, **kwargs):
+                return await coro(self.__self, *args, **kwargs)
+
+            super().autocomplete(option)(new_coro)
 
     async def inner(self, ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
         if sub_command_group:
