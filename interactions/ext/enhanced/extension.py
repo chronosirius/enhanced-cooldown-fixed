@@ -46,6 +46,10 @@ def sync_subcommands(self: Extension, client: Client):
         for _, func in getmembers(self, predicate=iscoroutinefunction)
         if hasattr(func, "__subcommand__")
     }
+
+    if not bases:
+        return
+
     commands = []
 
     for base, subcommand in bases.items():
@@ -107,11 +111,12 @@ class EnhancedExtension(Extension):
         log.debug("Synced subcommands")
 
         self = super().__new__(cls, client, *args, **kwargs)
-        for base, subcommand in bases.items():
-            subcommand.set_self(self)
-            commands = self._commands.get(f"command_{base}", [])
-            commands.append(subcommand.inner)
-            self._commands[f"command_{base}"] = commands
+        if bases:
+            for base, subcommand in bases.items():
+                subcommand.set_self(self)
+                commands = self._commands.get(f"command_{base}", [])
+                commands.append(subcommand.inner)
+                self._commands[f"command_{base}"] = commands
         return self
 
 
