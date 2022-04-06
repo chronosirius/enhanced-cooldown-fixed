@@ -116,7 +116,7 @@ def command(
     return decorator
 
 
-def extension_command(**kwargs):
+def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
     """
     A modified decorator for creating slash commands inside `Extension`s.
 
@@ -154,6 +154,8 @@ def extension_command(**kwargs):
         log.debug(f"extension_command: {coro.__command_data__=}")
         return coro
 
+    if _coro is not MISSING:
+        return decorator(_coro)
     return decorator
 
 
