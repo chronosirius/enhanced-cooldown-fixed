@@ -13,15 +13,14 @@ from .subcommands import ExternalSubcommandSetup
 log: Logger = get_logger("extension")
 
 
-version = (
-    Version(
-        version="3.3.0-rc.1",
-        author=VersionAuthor(
-            name="Toricane",
-            email="prjwl028@gmail.com",
-        ),
+version: Version = Version(
+    version="3.3.0",  # could not release candidate
+    author=VersionAuthor(
+        name="Toricane",
+        email="prjwl028@gmail.com",
     ),
 )
+
 base = Base(
     name="enhanced",
     version=version,
