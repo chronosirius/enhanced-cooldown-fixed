@@ -1,7 +1,7 @@
 from inspect import getdoc, signature
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
-from interactions.decor import command
+from interactions.client.decor import command
 from typing_extensions import _AnnotatedAlias
 
 from interactions import (
