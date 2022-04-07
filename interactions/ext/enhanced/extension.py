@@ -164,9 +164,10 @@ class Enhanced(Extension):
             setattr(bot, "__debug_scope", debug_scope)
 
         if add_get:
-            from .command_models import get, get_role
+            from ._get import get, get_emoji, get_role
 
             log.debug("Adding bot.get (add_get)")
+            bot._http.get_emoji = types.MethodType(get_emoji, bot._http)
             bot._http.get_role = types.MethodType(get_role, bot._http)
             bot.get = types.MethodType(get, bot)
 

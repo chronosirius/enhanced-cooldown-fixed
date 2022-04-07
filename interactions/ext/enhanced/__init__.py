@@ -8,9 +8,10 @@ from . import (
     extension,
     subcommands,
 )
+from ._get import get
 from ._logging import CustomFormatter, Data, get_logger
 from .callbacks import component, extension_component, extension_modal, modal
-from .command_models import EnhancedOption, get, option
+from .command_models import EnhancedOption, option
 from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
 from .cooldowns import cooldown
@@ -34,6 +35,7 @@ __all__ = [
         "command_models",
             "EnhancedOption",  # noqa E131
             "option",
+        "_get",
             "get",
         "commands",
             "command",
