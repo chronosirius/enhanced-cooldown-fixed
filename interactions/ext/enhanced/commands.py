@@ -1,3 +1,16 @@
+"""
+commands
+
+Content:
+
+* command: enhanced command decorator
+* extension_command: enhanced extension command decorator
+* autodefer: autodefer decorator
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/commands.py
+
+(c) 2022 interactions-py.
+"""
 from asyncio import Task, get_running_loop, sleep
 from functools import wraps
 from inspect import getdoc, signature
@@ -13,9 +26,9 @@ from interactions import (
     ComponentContext,
     Guild,
     Option,
-    get_logger,
 )
 
+from ._logging import get_logger
 from .command_models import EnhancedOption, parameters_to_options
 
 log: Logger = get_logger("command")
@@ -68,7 +81,6 @@ def command(
     """
 
     def decorator(coro: Coroutine) -> Callable[..., Any]:
-        # TODO: fix this code once it breaks
         _name = coro.__name__ if name is MISSING else name
         _description = (
             MISSING

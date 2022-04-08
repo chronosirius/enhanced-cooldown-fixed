@@ -1,10 +1,30 @@
+"""
+extension
+
+Content:
+
+* EnhancedExtension: extension class.
+* base: base class for extension.
+* version: version of the extension.
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/extension.py
+
+(c) 2022 interactions-py.
+"""
 import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
 from re import fullmatch
 from typing import List, Optional, Union
 
-from interactions import MISSING, Client, CommandContext, ComponentContext, Extension, Guild
+from interactions import (
+    MISSING,
+    Client,
+    CommandContext,
+    ComponentContext,
+    Extension,
+    Guild,
+)
 from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
@@ -34,7 +54,7 @@ base = Base(
 )
 
 
-def sync_subcommands(self: Extension, client: Client):
+def sync_subcommands(self: Extension, client: Client) -> Optional[dict]:
     """Syncs the subcommands in the extension."""
     if not any(
         hasattr(func, "__subcommand__")
@@ -60,9 +80,15 @@ def sync_subcommands(self: Extension, client: Client):
 
     if client._automate_sync:
         if client._loop.is_running():
-            [client._loop.create_task(client._synchronize(command)) for command in commands]
+            [
+                client._loop.create_task(client._synchronize(command))
+                for command in commands
+            ]
         else:
-            [client._loop.run_until_complete(client._synchronize(command)) for command in commands]
+            [
+                client._loop.run_until_complete(client._synchronize(command))
+                for command in commands
+            ]
     for subcommand in bases.values():
         scope = subcommand.scope
         if scope is not MISSING:
@@ -103,7 +129,11 @@ class EnhancedExtension(Extension):
                 scope = func.__command_data__[1].get("scope", MISSING)
                 debug_scope = func.__command_data__[1].get("debug_scope", True)
                 del func.__command_data__[1]["debug_scope"]
-                if scope is MISSING and debug_scope and hasattr(client, "__debug_scope"):
+                if (
+                    scope is MISSING
+                    and debug_scope
+                    and hasattr(client, "__debug_scope")
+                ):
                     func.__command_data__[1]["scope"] = client.__debug_scope
 
         log.debug("Syncing subcommands...")
@@ -164,7 +194,7 @@ class Enhanced(Extension):
             setattr(bot, "__debug_scope", debug_scope)
 
         if add_get:
-            from ._get import get, get_emoji, get_role
+            from .get_helpers import get, get_emoji, get_role
 
             log.debug("Adding bot.get (add_get)")
             bot._http.get_emoji = types.MethodType(get_emoji, bot._http)
@@ -215,7 +245,9 @@ class Enhanced(Extension):
                             decorator_custom_id.replace("component_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
                     elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("component_regex_", ""),
@@ -237,7 +269,9 @@ class Enhanced(Extension):
                             decorator_custom_id.replace("modal_startswith_", "")
                         ):
                             log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                            return websocket._dispatch.dispatch(
+                                decorator_custom_id, ctx
+                            )
                     elif hasattr(func, "regex") and fullmatch(
                         func.regex,
                         ctx.data.custom_id.replace("modal_regex_", ""),
@@ -255,7 +289,7 @@ def setup(
     add_subcommand: bool = True,
     modify_callbacks: bool = True,
     modify_command: bool = True,
-) -> None:
+) -> Enhanced:
     """
     This function initializes the core of the library, `Enhanced`.
 

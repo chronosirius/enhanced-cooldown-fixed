@@ -1,3 +1,20 @@
+"""
+components
+
+Content:
+
+* ActionRow: enhanced action row
+* Button: enhanced button
+* SelectOption: enhanced select option
+* SelectMenu: enhanced select menu
+* TextInput: enhanced text input
+* Modal: enhanced modal
+* spread_to_rows: spread components to rows
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/components.py
+
+(c) 2022 interactions-py.
+"""
 from typing import List, Optional, Union
 
 from interactions import ActionRow as AR

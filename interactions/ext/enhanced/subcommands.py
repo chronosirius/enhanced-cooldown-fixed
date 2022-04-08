@@ -1,3 +1,15 @@
+"""
+subcommands
+
+Content:
+
+* subcommand_base: base for subcommands
+* ext_subcommand_base: base for subcommands in extensions
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/subcommands.py
+
+(c) 2022 interactions-py.
+"""
 from inspect import getdoc, signature
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 

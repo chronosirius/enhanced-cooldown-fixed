@@ -1,3 +1,28 @@
+"""
+enhanced
+
+Enhanced interactions for interactions.py.
+
+Everything within and including the below modules
+is importable directly from enhanced.
+
+Modules:
+
+* callbacks: component or modal callbacks.
+* commands: slash commands.
+* command_models: slash command option models.
+* components: components.
+* cooldowns: command cooldowns.
+* extension: extension.
+* get_helpers: get helpers.
+* subcommands: subcommands.
+
+GitHub: https://github.com/interactions-py/enhanced/
+
+PyPI: https://pypi.org/project/enhanced/
+
+(c) 2022 interactions-py.
+"""
 from . import (
     _logging,
     callbacks,
@@ -6,9 +31,9 @@ from . import (
     components,
     cooldowns,
     extension,
+    get_helpers,
     subcommands,
 )
-from ._get import get
 from ._logging import CustomFormatter, Data, get_logger
 from .callbacks import component, extension_component, extension_modal, modal
 from .command_models import EnhancedOption, option
@@ -16,6 +41,7 @@ from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
 from .cooldowns import cooldown
 from .extension import Enhanced, EnhancedExtension, base, setup, sync_subcommands, version
+from .get_helpers import get
 from .subcommands import (
     ExternalSubcommandSetup,
     Group,
@@ -35,7 +61,7 @@ __all__ = [
         "command_models",
             "EnhancedOption",  # noqa E131
             "option",
-        "_get",
+        "get_helpers",
             "get",
         "commands",
             "command",

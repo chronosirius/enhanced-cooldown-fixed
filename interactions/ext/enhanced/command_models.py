@@ -1,3 +1,15 @@
+"""
+command_models
+
+Content:
+
+* EnhancedOption: typehintable option
+* option: decoratable option
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/command_models.py
+
+(c) 2022 interactions-py.
+"""
 from inspect import _empty
 from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
 

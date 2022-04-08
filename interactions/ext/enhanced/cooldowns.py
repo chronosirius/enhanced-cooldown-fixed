@@ -1,5 +1,13 @@
 """
-Credit to @dontbanmeplz for the original code regarding cooldowns, and merging into better-interactions.
+cooldowns
+
+Content:
+
+* cooldown: cooldown decorator
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/cooldowns.py
+
+(c) 2022 interactions-py.
 """
 from datetime import datetime, timedelta
 from functools import wraps

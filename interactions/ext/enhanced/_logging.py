@@ -1,3 +1,16 @@
+"""
+_logging
+
+Content:
+
+* Data: constants
+* CustomFormatter: custom formatter for logging
+* get_logger: gets a logger for the library
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/_logging.py
+
+(c) 2022 interactions-py.
+"""
 import logging
 from typing import ClassVar, List, Optional, Union
 
@@ -5,10 +18,7 @@ from colorama import Fore, Style, init
 
 
 class Data:
-    """A class representing constants for the library.
-    :ivar LOG_LEVEL ClassVar[int]: The default level of logging as an integer
-    :ivar LOGGERS List[str]: A list of all loggers registered from this library
-    """
+    """A class representing constants for the library."""
 
     LOG_LEVEL: ClassVar[int] = logging.ERROR
     LOGGERS: List[str] = []

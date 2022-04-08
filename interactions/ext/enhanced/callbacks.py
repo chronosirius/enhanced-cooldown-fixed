@@ -1,3 +1,17 @@
+"""
+callbacks
+
+Content:
+
+* component: component callback
+* modal: modal callback
+* extension_component: extension component callback
+* extension_modal: extension modal callback
+
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/callbacks.py
+
+(c) 2022 interactions-py.
+"""
 from functools import wraps
 from re import compile
 from typing import Any, Callable, Coroutine, Optional, Union
