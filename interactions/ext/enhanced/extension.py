@@ -189,6 +189,12 @@ class Enhanced(Extension):
                 raise TypeError(f"{bot.__class__.__name__} is not interactions.Client!")
         log.debug("The bot is an instance of Client")
 
+        from .file_sending import create_interaction_response
+
+        bot._http.create_interaction_response = types.MethodType(
+            create_interaction_response, bot._http
+        )
+
         if debug_scope is not None:
             log.debug("Setting debug_scope (debug_scope)")
             setattr(bot, "__debug_scope", debug_scope)
