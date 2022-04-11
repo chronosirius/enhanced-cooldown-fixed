@@ -34,9 +34,7 @@ async def get_role(self: HTTPClient, guild_id: int, role_id: int) -> dict:
 
     `dict`
     """
-    request = await self._req.request(
-        Route("GET", "/guilds/{guild_id}/roles", guild_id=guild_id)
-    )
+    request = await self._req.request(Route("GET", "/guilds/{guild_id}/roles", guild_id=guild_id))
 
     for role in request:
         if role.get("id"):
@@ -61,9 +59,7 @@ async def get_emoji(self: HTTPClient, guild_id: int, emoji_id: int) -> dict:
     return await self.get_guild_emoji(guild_id, emoji_id)
 
 
-async def _get_http(
-    self: Client, class_name: str, http_method: Optional[str] = None
-) -> Coroutine:
+async def _get_http(self: Client, class_name: str, http_method: Optional[str] = None) -> Coroutine:
     """Gets the HTTPClient method to use in `get()`."""
     try:
         return getattr(self._http, http_method or f"get_{class_name.lower()}")
@@ -96,9 +92,7 @@ async def get(
         try:
             res: Union[dict, List[dict]] = await _http_method(*args, **kwargs)
         except TypeError:
-            raise ValueError(
-                f"Client.get() could not find a {class_name} with the given IDs."
-            )
+            raise ValueError(f"Client.get() could not find a {class_name} with the given IDs.")
         if isinstance(res, dict):
             return __obj(**res, _client=self._http)
         elif isinstance(res, list):
@@ -108,16 +102,11 @@ async def get(
     else:
         __obj: object = get_args(__obj)[0]
         class_name: str = __obj.__name__
-        log.debug(
-            f"Getting {len(args or kwargs)} {class_name}s with {args} and {kwargs}"
-        )
+        log.debug(f"Getting {len(args or kwargs)} {class_name}s with {args} and {kwargs}")
         _http_method: Coroutine = await _get_http(self, class_name, http_method)
         arguments: List[List[int]] = list(
             args
-            or [
-                (list(kwarg) if isinstance(kwarg, tuple) else kwarg)
-                for kwarg in kwargs.values()
-            ]
+            or [(list(kwarg) if isinstance(kwarg, tuple) else kwarg) for kwarg in kwargs.values()]
         )
 
         for arg in arguments:
@@ -131,16 +120,12 @@ async def get(
                 arguments[0] *= len(arg)
                 break
 
-        arguments: List[List[int]] = (
-            arguments[0] if len(arguments) == 1 else list(zip(*arguments))
-        )
+        arguments: List[List[int]] = arguments[0] if len(arguments) == 1 else list(zip(*arguments))
 
         async def _main() -> List[dict]:
             return await gather(
                 *[
-                    _http_method(*arg)
-                    if isinstance(arg, (list, tuple))
-                    else _http_method(arg)
+                    _http_method(*arg) if isinstance(arg, (list, tuple)) else _http_method(arg)
                     for arg in arguments
                 ]
             )

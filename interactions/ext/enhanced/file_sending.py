@@ -1,37 +1,28 @@
 """
-command_models
+file_sending
 
-Content:
-
-* EnhancedOption: typehintable option
-* option: decoratable option
-
-GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/command_models.py
+GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/enhanced/file_sending.py
 
 (c) 2022 interactions-py.
 """
-from msilib.schema import Component
-from aiohttp import MultipartWriter
 from typing import List, Optional, Union
-from types import MethodType
-from sys import modules
 
-import interactions
+from aiohttp import MultipartWriter
+from interactions.api.http.route import Route
+from interactions.client.context import CommandContext, ComponentContext, _Context
+from interactions.client.models.component import _build_components
+
 from interactions import (
     MISSING,
-    File,
-    Embed,
-    MessageInteraction,
     ActionRow,
     Button,
-    SelectMenu,
-    Message,
+    Embed,
+    File,
     InteractionCallbackType,
+    Message,
+    MessageInteraction,
+    SelectMenu,
 )
-from interactions.api.http.route import Route
-from interactions.client.context import _Context, CommandContext, ComponentContext
-from interactions.client.models.component import _build_components
-from loguru import logger
 
 from ._logging import get_logger
 
@@ -44,6 +35,7 @@ async def create_interaction_response(
 ) -> None:
     """
     Posts initial response to an interaction, but you need to add the token.
+
     :param token: Token.
     :param application_id: Application ID snowflake
     :param data: The data to send.
@@ -60,11 +52,14 @@ async def create_interaction_response(
             part = file_data.append(
                 file._fp,
             )
-            part.set_content_disposition("form-data", name=f"files[{str(id)}]", filename=file._filename)
-
+            part.set_content_disposition(
+                "form-data", name=f"files[{str(id)}]", filename=file._filename
+            )
 
     return await self._req.request(
-        Route("POST", f"/interactions/{application_id}/{token}/callback"), json=data, data=file_data
+        Route("POST", f"/interactions/{application_id}/{token}/callback"),
+        json=data,
+        data=file_data,
     )
 
 
@@ -88,25 +83,6 @@ async def base_send(
     ] = MISSING,
     ephemeral: Optional[bool] = False,
 ) -> Message:
-    """
-    This allows the invocation state described in the "context"
-    to send an interaction response.
-
-    :param content?: The contents of the message as a string or string-converted value.
-    :type content: Optional[str]
-    :param tts?: Whether the message utilizes the text-to-speech Discord programme or not.
-    :type tts: Optional[bool]
-    :param embeds?: An embed, or list of embeds for the message.
-    :type embeds: Optional[Union[Embed, List[Embed]]]
-    :param allowed_mentions?: The message interactions/mention limits that the message can refer to.
-    :type allowed_mentions: Optional[MessageInteraction]
-    :param components?: A component, or list of components for the message.
-    :type components: Optional[Union[ActionRow, Button, SelectMenu, List[Union[ActionRow, Button, SelectMenu]]]]
-    :param ephemeral?: Whether the response is hidden or not.
-    :type ephemeral: Optional[bool]
-    :return: The sent message as an object.
-    :rtype: Message
-    """
     if (
         content is MISSING
         and self.message
@@ -127,11 +103,7 @@ async def base_send(
     _embeds: list = (
         []
         if not embeds or embeds is MISSING
-        else (
-            [embed._json for embed in embeds]
-            if isinstance(embeds, list)
-            else [embeds._json]
-        )
+        else ([embed._json for embed in embeds] if isinstance(embeds, list) else [embeds._json])
     )
     _allowed_mentions: dict = {} if allowed_mentions is MISSING else allowed_mentions
     if components is not MISSING and components:
@@ -270,10 +242,6 @@ async def component_send(self, content: Optional[str] = MISSING, **kwargs) -> Me
         return msg
     return payload
 
-
-# _Context.send = MethodType(base_send, _Context)
-# CommandContext.send = MethodType(command_send, CommandContext)
-# ComponentContext.send = MethodType(component_send, ComponentContext)
 
 _Context.send = base_send
 CommandContext.send = command_send
