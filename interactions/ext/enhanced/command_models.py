@@ -15,9 +15,11 @@ from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
 
 from interactions import (
     MISSING,
+    Attachment,
     Channel,
     ChannelType,
     Choice,
+    File,
     Member,
     Option,
     OptionType,
@@ -149,6 +151,8 @@ class EnhancedOption:
             self.type = OptionType.CHANNEL
         elif type is Role:
             self.type = OptionType.ROLE
+        elif type is File or type is Attachment:
+            self.type = OptionType.ATTACHMENT
         else:
             raise TypeError(f"Invalid type: {type}")
 
@@ -275,6 +279,8 @@ def option(
             _type = OptionType.CHANNEL
         elif type is Role:
             _type = OptionType.ROLE
+        elif type is File or type is Attachment:
+            _type = OptionType.ATTACHMENT
         else:
             raise TypeError(f"Invalid type: {type}")
 
