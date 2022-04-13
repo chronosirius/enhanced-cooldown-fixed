@@ -103,7 +103,11 @@ async def base_send(
     _embeds: list = (
         []
         if not embeds or embeds is MISSING
-        else ([embed._json for embed in embeds] if isinstance(embeds, list) else [embeds._json])
+        else (
+            [embed._json for embed in embeds]
+            if isinstance(embeds, list)
+            else [embeds._json]
+        )
     )
     _allowed_mentions: dict = {} if allowed_mentions is MISSING else allowed_mentions
     if components is not MISSING and components:
@@ -153,7 +157,7 @@ async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Mess
     if not self.deferred:
         self.callback = InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE
 
-    _payload: dict = {"type": 1, "data": payload._json}
+    _payload: dict = {"type": self.callback.value, "data": payload._json}
 
     msg = None
     if self.responded or self.deferred:
