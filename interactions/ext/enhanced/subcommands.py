@@ -423,7 +423,7 @@ class SubcommandSetup:
                         ApplicationCommand
                     ] = self.client._loop.run_until_complete(
                         self.client._http.get_application_commands(
-                            application_id=self.me.id,
+                            application_id=self.client.me.id,
                             guild_id=_command_obj.guild_id
                             if hasattr(_command_obj, "guild_id")
                             else None,
