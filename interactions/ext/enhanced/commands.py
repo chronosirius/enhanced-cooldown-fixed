@@ -30,6 +30,7 @@ from interactions import (
 
 from ._logging import get_logger
 from .command_models import EnhancedOption, parameters_to_options
+from .new_subcommands import Manager
 
 log: Logger = get_logger("command")
 
@@ -113,6 +114,15 @@ def command(
             else options
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
+
+        try:
+            coro.manager = Manager(name, description, options, scope, default_permission)
+            coro.subcommand = coro.manager.subcommand
+            coro.group = coro.manager.group
+        except AttributeError:
+            coro.__func__.manager = Manager(name, description, options, scope, default_permission)
+            coro.__func__.subcommand = coro.__func__.manager.subcommand
+            coro.__func__.group = coro.__func__.manager.group
 
         return self.old_command(
             type=type,
