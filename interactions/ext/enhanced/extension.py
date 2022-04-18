@@ -133,6 +133,24 @@ class EnhancedExtension(Extension):
         return self
 
 
+def start(self: Client) -> None:
+    """Starts the client session."""
+    print("AAAAAAAAA", self._command_data)
+    if self._automate_sync:
+        if self._loop.is_running():
+            [self._loop.create_task(self._synchronize(command)) for command in self._command_data]
+        else:
+            [
+                self._loop.run_until_complete(self._synchronize(command))
+                for command in self._command_data
+            ]
+    for name, coro in self._command_coros.items():
+        print("EEEEEE    ", name, coro)
+        self.event(coro, name=f"command_{name}")
+    ...
+    self._loop.run_until_complete(self._ready())
+
+
 class Enhanced(Extension):
     """
     This is the core of this library, initialized when loading the extension.
@@ -146,7 +164,7 @@ class Enhanced(Extension):
 
     Parameters:
 
-    * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
+    * `(?)bot: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
     * `?ignore_warning: bool`: Whether to ignore the warning. Defaults to `False`.
     * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
     * `?add_get: bool`: Whether to add the `get()` helper function. Defaults to `True`.
@@ -177,6 +195,8 @@ class Enhanced(Extension):
         bot._http.create_interaction_response = types.MethodType(
             create_interaction_response, bot._http
         )
+
+        bot.start = types.MethodType(start, bot)
 
         if debug_scope is not None:
             log.debug("Setting debug_scope (debug_scope)")

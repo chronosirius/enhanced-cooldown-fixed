@@ -17,11 +17,13 @@ from inspect import getdoc, signature
 from logging import Logger
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
+from interactions.client.decor import command as old_command
 from typing_extensions import _AnnotatedAlias
 
 from interactions import (
     MISSING,
     ApplicationCommandType,
+    Client,
     CommandContext,
     ComponentContext,
     Guild,
@@ -36,7 +38,7 @@ log: Logger = get_logger("command")
 
 
 def command(
-    self,
+    self: Client,
     _coro: Optional[Coroutine] = MISSING,
     *,
     type: Optional[Union[int, ApplicationCommandType]] = ApplicationCommandType.CHAT_INPUT,
@@ -116,22 +118,50 @@ def command(
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
         try:
-            coro.manager = Manager(name, description, options, scope, default_permission)
+            coro.manager = Manager(coro, _name, _description, _scope, default_permission, self)
             coro.subcommand = coro.manager.subcommand
             coro.group = coro.manager.group
         except AttributeError:
-            coro.__func__.manager = Manager(name, description, options, scope, default_permission)
+            coro.__func__.manager = Manager(
+                coro, _name, _description, _scope, default_permission, self
+            )
             coro.__func__.subcommand = coro.__func__.manager.subcommand
             coro.__func__.group = coro.__func__.manager.group
 
-        return self.old_command(
+        cmd_data = old_command(
             type=type,
             name=_name,
             description=_description,
             scope=_scope,
             options=_options,
             default_permission=default_permission,
-        )(coro)
+        )
+
+        if scope is not MISSING:
+            if isinstance(scope, List):
+                [self._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
+            else:
+                self._scopes.add(scope if isinstance(scope, int) else scope.id)
+
+        if not hasattr(self, "_command_data") or not self._command_data:
+            self._command_data = cmd_data
+        else:
+            self._command_data.extend(cmd_data)
+
+        if not hasattr(self, "_command_coros") or not self._command_coros:
+            self._command_coros = {_name: coro}
+        else:
+            self._command_coros[_name] = coro
+
+        # return self.old_command(
+        #     type=type,
+        #     name=_name,
+        #     description=_description,
+        #     scope=_scope,
+        #     options=_options,
+        #     default_permission=default_permission,
+        # )(coro)
+        return coro
 
     if _coro is not MISSING:
         return decorator(_coro)
