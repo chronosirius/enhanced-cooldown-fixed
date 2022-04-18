@@ -246,6 +246,3 @@ class Manager:
         else:
             subcommand_coro = self.coroutines[sub_command]
             return await subcommand_coro(ctx, base_res, *args, **kwargs)
-
-
-{"subcommand": Coroutine, "group": Coroutine, "group subcommand2": Coroutine}
