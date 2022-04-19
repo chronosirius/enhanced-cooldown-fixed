@@ -142,7 +142,6 @@ class GroupManager:
 
             for i, group in enumerate(self.m.data):
                 if group["type"] == OptionType.SUB_COMMAND_GROUP and group["name"] == self.group:
-                    print("E", self.m.data[i])
                     if group.get("options"):
                         self.m.data[i]["options"].append(
                             Option(

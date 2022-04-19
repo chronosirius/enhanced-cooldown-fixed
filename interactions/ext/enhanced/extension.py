@@ -135,19 +135,20 @@ class EnhancedExtension(Extension):
 
 def start(self: Client) -> None:
     """Starts the client session."""
-    print("AAAAAAAAA", self._command_data)
-    if self._automate_sync:
-        if self._loop.is_running():
-            [self._loop.create_task(self._synchronize(command)) for command in self._command_data]
-        else:
-            [
-                self._loop.run_until_complete(self._synchronize(command))
-                for command in self._command_data
-            ]
-    for name, coro in self._command_coros.items():
-        print("EEEEEE    ", name, coro)
-        self.event(coro, name=f"command_{name}")
-    ...
+    if hasattr(self, "_command_data") and self._command_data:
+        if self._automate_sync:
+            if self._loop.is_running():
+                [
+                    self._loop.create_task(self._synchronize(command))
+                    for command in self._command_data
+                ]
+            else:
+                [
+                    self._loop.run_until_complete(self._synchronize(command))
+                    for command in self._command_data
+                ]
+        for name, coro in self._command_coros.items():
+            self.event(coro, name=f"command_{name}")
     self._loop.run_until_complete(self._ready())
 
 
