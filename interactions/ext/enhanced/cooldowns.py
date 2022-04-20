@@ -76,7 +76,7 @@ def cooldown(
             raise TypeError(
                 "Invalid type provided for `error`! Must be a `Callable`, specifically a `Coroutine`!"
             )
-        if type not in {"user", User, "guild", Guild, "channel", Channel}:
+        if type not in {"user", User, "member", Member, "guild", Guild, "channel", Channel}:
             raise TypeError("Invalid type provided for `type`!")
 
         @wraps(coro)
