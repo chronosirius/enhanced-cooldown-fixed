@@ -24,7 +24,7 @@ def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext
     type = type.lower() if isinstance(type, str) else type
 
     if type == "user" or type is User or type == "member" or type is Member:
-        return str(ctx.author.user.id)
+        return str(ctx.user.id)
     if type == "channel" or type is Channel:
         return str(ctx.channel_id)
     if type == "guild" or type is Guild:
@@ -50,7 +50,7 @@ def cooldown(
         ...
 
     @client.command(...)
-    @cooldown(seconds=..., ..., error=cooldown_error, type=...)
+    @cooldown(..., error=cooldown_error, type=..., seconds=..., ...)
     async def cooldown_command(ctx, ...):
         ...
     ```
