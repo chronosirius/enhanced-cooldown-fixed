@@ -11,10 +11,11 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 """
 from datetime import datetime, timedelta
 from functools import wraps
-from inspect import iscoroutinefunction
+from inspect import iscoroutinefunction, signature
 from typing import Callable, Coroutine, Optional, Type, Union
 
-from interactions import Channel, CommandContext, Guild, Member, User
+from interactions import Channel, CommandContext, Extension, Guild, Member, User
+from interactions.client.context import _Context
 
 NoneType: Type[None] = type(None)
 
@@ -80,26 +81,35 @@ def cooldown(
             raise TypeError("Invalid type provided for `type`!")
 
         @wraps(coro)
-        async def wrapper(ctx: CommandContext, *args, **kwargs):
+        async def wrapper(ctx: Union[CommandContext, Extension], *args, **kwargs):
+            _ctx: CommandContext = ctx if isinstance(ctx, _Context) else args[0]
             last_called: dict = coro.__last_called
             now = datetime.now()
-            id = get_id(type, ctx)
+            id = get_id(type, _ctx)
             unique_last_called = last_called.get(id)
 
             if unique_last_called and (now - unique_last_called < delta):
                 if not error:
-                    return await ctx.send(
+                    return await _ctx.send(
                         f"This command is on cooldown for {delta - (now - unique_last_called)}!"
                     )
                 return (
-                    await error(ctx, delta - (now - unique_last_called))
-                    if iscoroutinefunction(error)
-                    else error(ctx, delta - (now - unique_last_called))
+                    (
+                        await error(_ctx, delta - (now - unique_last_called))
+                        if iscoroutinefunction(error)
+                        else error(_ctx, delta - (now - unique_last_called))
+                    )
+                    if len(signature(error).parameters) == 2
+                    else (
+                        await error(ctx, _ctx, delta - (now - unique_last_called))
+                        if iscoroutinefunction(error)
+                        else error(ctx, _ctx, delta - (now - unique_last_called))
+                    )
                 )
 
             last_called[id] = now
             coro.__last_called = last_called
-            return await coro(ctx, *args, **kwargs)
+            return await coro(_ctx, *args, **kwargs)
 
         return wrapper
 
