@@ -14,8 +14,9 @@ from functools import wraps
 from inspect import iscoroutinefunction, signature
 from typing import Callable, Coroutine, Optional, Type, Union
 
-from interactions import Channel, CommandContext, Extension, Guild, Member, User
 from interactions.client.context import _Context
+
+from interactions import Channel, CommandContext, Extension, Guild, Member, User
 
 NoneType: Type[None] = type(None)
 
