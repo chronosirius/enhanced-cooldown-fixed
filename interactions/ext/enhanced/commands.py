@@ -117,25 +117,29 @@ def command(
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
-        try:
+        if not hasattr(coro, "manager"):
             coro.manager = Manager(coro, _name, _description, _scope, default_permission, self)
             coro.subcommand = coro.manager.subcommand
             coro.group = coro.manager.group
-        except AttributeError:
-            coro.__func__.manager = Manager(
-                coro, _name, _description, _scope, default_permission, self
-            )
-            coro.__func__.subcommand = coro.__func__.manager.subcommand
-            coro.__func__.group = coro.__func__.manager.group
 
-        cmd_data = old_command(
-            type=type,
-            name=_name,
-            description=_description,
-            scope=_scope,
-            options=_options,
-            default_permission=default_permission,
-        )
+            cmd_data = old_command(
+                type=type,
+                name=_name,
+                description=_description,
+                scope=_scope,
+                options=_options,
+                default_permission=default_permission,
+            )
+
+            if not hasattr(self, "_command_data") or not self._command_data:
+                self._command_data = cmd_data
+            else:
+                self._command_data.extend(cmd_data)
+
+            if not hasattr(self, "_command_coros") or not self._command_coros:
+                self._command_coros = {_name: coro}
+            else:
+                self._command_coros[_name] = coro
 
         if scope is not MISSING:
             if isinstance(scope, List):
@@ -143,24 +147,6 @@ def command(
             else:
                 self._scopes.add(scope if isinstance(scope, int) else scope.id)
 
-        if not hasattr(self, "_command_data") or not self._command_data:
-            self._command_data = cmd_data
-        else:
-            self._command_data.extend(cmd_data)
-
-        if not hasattr(self, "_command_coros") or not self._command_coros:
-            self._command_coros = {_name: coro}
-        else:
-            self._command_coros[_name] = coro
-
-        # return self.old_command(
-        #     type=type,
-        #     name=_name,
-        #     description=_description,
-        #     scope=_scope,
-        #     options=_options,
-        #     default_permission=default_permission,
-        # )(coro)
         return coro
 
     if _coro is not MISSING:
@@ -198,6 +184,16 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
             kwargs["description"] = kwargs["description"].split("\n")[0]
             if len(kwargs["description"]) > 100:
                 raise ValueError("Description must be less than 100 characters.")
+        coro.manager = Manager(
+            coro,
+            kwargs["name"],
+            kwargs["description"],
+            kwargs.get("scope"),
+            kwargs.get("default_permission"),
+            debug_scope=kwargs.get("debug_scope", True),
+        )
+        coro.subcommand = coro.manager.subcommand
+        coro.group = coro.manager.group
         coro.__command_data__ = ((), kwargs)
         log.debug(f"extension_command: {coro.__command_data__=}")
         return coro

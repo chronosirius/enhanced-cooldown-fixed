@@ -92,6 +92,39 @@ def sync_subcommands(self: Extension, client: Client) -> Optional[dict]:
     return bases
 
 
+def sync_new_subcommands(cls: Extension, client: Client):
+    subcmds = []
+    new_bases: set = set()
+    for _, func in getmembers(cls, predicate=iscoroutinefunction):
+        if hasattr(func, "manager") and func.manager.full_data:
+            subcmds.append(func.manager)
+            if (
+                hasattr(client, "__debug_scope")
+                and getattr(client, "__debug_scope")
+                and func.manager.debug_scope
+            ):
+                func.manager.scope = getattr(client, "__debug_scope")
+            if func.manager.base not in new_bases:
+                if client._automate_sync:
+                    if client._loop.is_running() and isinstance(func.manager.full_data, list):
+                        for data in func.manager.full_data:
+                            client._loop.create_task(client._synchronize(data))
+                    elif (
+                        client._loop.is_running()
+                        and not isinstance(func.manager.full_data, list)
+                        or not client._loop.is_running()
+                        and not isinstance(func.manager.full_data, list)
+                    ):
+                        client._loop.create_task(client._synchronize(func.manager.full_data))
+                    else:
+                        for data in func.manager.full_data:
+                            client._loop.run_until_complete(client._synchronize(data))
+                client.event(func.manager.subcommand_caller, name=f"command_{func.manager.base}")
+                new_bases.add(func.manager.base)
+            del func.__command_data__
+    return subcmds
+
+
 class EnhancedExtension(Extension):
     """
     Enables modified external commands, subcommands, callbacks, and more.
@@ -111,25 +144,25 @@ class EnhancedExtension(Extension):
     """
 
     def __new__(cls, client: Client, *args, **kwargs):
-        for func in getmembers(cls, predicate=iscoroutinefunction):
-            if hasattr(func, "__command_data__"):
-                scope = func.__command_data__[1].get("scope", MISSING)
-                debug_scope = func.__command_data__[1].get("debug_scope", True)
-                del func.__command_data__[1]["debug_scope"]
-                if scope is MISSING and debug_scope and hasattr(client, "__debug_scope"):
-                    func.__command_data__[1]["scope"] = client.__debug_scope
+        subcmds = sync_new_subcommands(cls, client)
 
         log.debug("Syncing subcommands...")
         bases = sync_subcommands(cls, client)
         log.debug("Synced subcommands")
 
         self = super().__new__(cls, client, *args, **kwargs)
+
         if bases:
             for base, subcommand in bases.items():
                 subcommand.set_self(self)
                 commands = self._commands.get(f"command_{base}", [])
                 commands.append(subcommand.inner)
                 self._commands[f"command_{base}"] = commands
+
+        if subcmds:
+            for sub in subcmds:
+                sub.set_self(self)
+
         return self
 
 
@@ -138,15 +171,11 @@ def start(self: Client) -> None:
     if hasattr(self, "_command_data") and self._command_data:
         if self._automate_sync:
             if self._loop.is_running():
-                [
+                for command in self._command_data:
                     self._loop.create_task(self._synchronize(command))
-                    for command in self._command_data
-                ]
             else:
-                [
+                for command in self._command_data:
                     self._loop.run_until_complete(self._synchronize(command))
-                    for command in self._command_data
-                ]
         for name, coro in self._command_coros.items():
             self.event(coro, name=f"command_{name}")
     self._loop.run_until_complete(self._ready())
@@ -223,13 +252,13 @@ class Enhanced(Extension):
             log.debug("Modifying component callbacks (modify_callbacks)")
             bot.component = types.MethodType(component, bot)
 
-            bot.event(self._on_component, "on_component")
+            bot.event(self._on_component, name="on_component")
             log.debug("Registered on_component")
 
             log.debug("Modifying modal callbacks (modify_callbacks)")
             bot.modal = types.MethodType(modal, bot)
 
-            bot.event(self._on_modal, "on_modal")
+            bot.event(self._on_modal, name="on_modal")
             log.debug("Registered on_modal")
 
         if modify_command:
