@@ -3,7 +3,16 @@ from typing import Any, Callable, Coroutine, Dict, List, Optional, Type, Union
 
 from interactions.client.decor import command
 
-from interactions import MISSING, Client, Extension, Guild, InteractionException, Option, OptionType
+from interactions import (
+    MISSING,
+    Client,
+    CommandContext,
+    Extension,
+    Guild,
+    InteractionException,
+    Option,
+    OptionType,
+)
 
 from ._logging import get_logger
 from .command_models import parameters_to_options
@@ -12,13 +21,36 @@ log = get_logger("subcommand")
 
 
 class StopCommand:
-    """A class that when returned from a command, the command chain is stopped."""
+    """
+    A class that when returned from a command, the command chain is stopped.
+
+    Usage:
+    ```py
+    @bot.command()
+    async def foo(ctx):
+        ... # do something
+        return StopCommand  # does not execute `bar`
+        # or `return StopCommand()`
+
+    @foo.subcommand()
+    async def bar(ctx): ...
+    """
 
     def __init__(self, *args, **kwargs):
         pass
 
 
 class BaseResult:
+    """
+    The result from a base command.
+
+    To get the result from this object, access the `result` attribute or call it.
+
+    Attributes:
+
+    * `result`: The result from the base command.
+    """
+
     def __init__(self, result: Any) -> None:
         self.result = result
 
@@ -37,6 +69,19 @@ class BaseResult:
 
 
 class GroupResult:
+    """
+    The result from a group command.
+
+    To get the result from this object, access the `result` attribute or call it.
+
+    To get the parent result, access the `parent` attribute.
+
+    Attributes:
+
+    * `result`: The result from the group command.
+    * `parent: BaseResult`: The `BaseResult` object from the base command.
+    """
+
     def __init__(self, result: Any, parent: BaseResult) -> None:
         self.result = result
         self.parent = parent
@@ -51,6 +96,8 @@ class GroupResult:
 
 
 class SubcommandManager:
+    """Manages the subcommand creation from a command."""
+
     def __init__(self, manager: "Manager") -> None:
         self.m = manager
 
@@ -62,6 +109,24 @@ class SubcommandManager:
         description: Optional[str] = MISSING,
         options: Optional[List[Option]] = MISSING,
     ) -> Callable[..., Any]:
+        """
+        Creates a subcommand.
+
+        ```py
+        @bot.command()
+        async def base(ctx): ...
+
+        @base.subcommand()
+        async def subcommand(ctx): ...
+        ```
+
+        Parameters:
+
+        * `?name: str`: The name of the subcommand. Defaults to the name of the function.
+        * `?description: str`: The description of the subcommand. Defaults to the docstring of the function.
+        * `?options: List[Option]`: The options of the subcommand.
+        """
+
         def decorator(coro: Coroutine) -> Coroutine:
             _name = coro.__name__ if name is MISSING else name
             _description = (
@@ -107,6 +172,8 @@ class SubcommandManager:
 
 
 class GroupManager:
+    """Manages the group creation in a command."""
+
     def __init__(self, manager: "Manager") -> None:
         self.m = manager
         self.group: Optional[str] = None
@@ -117,6 +184,22 @@ class GroupManager:
         *,
         group: Optional[str] = MISSING,
     ) -> Callable[..., Any]:
+        """
+        Creates a group.
+
+        ```py
+        @bot.command()
+        async def base(ctx): ...
+
+        @base.group()
+        async def group(ctx): ...
+        ```
+
+        Parameters:
+
+        * `?group: str`: The name of the group. Defaults to the name of the function.
+        """
+
         def decorator(coro: Coroutine) -> Coroutine:
             _group = coro.__name__ if group is MISSING else group
             self.m.data.append(
@@ -151,6 +234,27 @@ class GroupManager:
         description: Optional[str] = MISSING,
         options: Optional[List[Option]] = MISSING,
     ) -> Callable[..., Any]:
+        """
+        Creates a subcommand in the group.
+
+        ```py
+        @bot.command()
+        async def base(ctx): ...
+
+        @base.group()
+        async def group(ctx): ...
+
+        @group.subcommand()
+        async def subcommand(ctx): ...
+        ```
+
+        Parameters:
+
+        * `?name: str`: The name of the subcommand. Defaults to the name of the function.
+        * `?description: str`: The description of the subcommand. Defaults to the docstring of the function.
+        * `?options: List[Option]`: The options of the subcommand.
+        """
+
         def decorator(coro: Coroutine) -> Coroutine:
             _name = coro.__name__ if name is MISSING else name
             _description = (
@@ -217,6 +321,8 @@ class GroupManager:
 
 
 class Manager:
+    """The internal manager of the subcommands and groups."""
+
     def __init__(
         self,
         coro: Coroutine,
@@ -247,7 +353,8 @@ class Manager:
         self.group = GroupManager(self)
 
     @property
-    def full_data(self):
+    def full_data(self) -> Union[dict, List[dict]]:
+        """Returns the command in JSON format."""
         return command(
             name=self.base,
             description=self.description,
@@ -256,7 +363,8 @@ class Manager:
             default_permission=self.default_permission,
         )
 
-    def sync_client_commands(self):
+    def sync_client_commands(self) -> None:
+        """Synchronizes the commands with the client."""
         if not self.client:
             return
 
@@ -274,17 +382,19 @@ class Manager:
         else:
             self.client._command_coros[self.base] = self.subcommand_caller
 
-    def set_self(self, _self: Extension):
+    def set_self(self, _self: Extension) -> None:
+        """Sets the `self` of the `Extension`."""
         self._self = _self
 
     async def subcommand_caller(
         self,
-        ctx,
+        ctx: CommandContext,
         *args,
         sub_command_group: Optional[str] = None,
         sub_command: Optional[str] = None,
         **kwargs,
-    ):
+    ) -> Optional[Any]:
+        """Calls all of the coroutines of the subcommand."""
         base_coro = self.base_coroutine
         if self._self:
             base_res = BaseResult(await base_coro(self._self, ctx, *args, **kwargs))
