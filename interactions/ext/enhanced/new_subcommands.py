@@ -34,6 +34,7 @@ class StopCommand:
 
     @foo.subcommand()
     async def bar(ctx): ...
+    ```
     """
 
     def __init__(self, *args, **kwargs):
