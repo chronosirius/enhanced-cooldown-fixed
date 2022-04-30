@@ -11,6 +11,13 @@ from .command_models import parameters_to_options
 log = get_logger("subcommand")
 
 
+class StopCommand:
+    """A class that when returned from a command, the command chain is stopped."""
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+
 class BaseResult:
     def __init__(self, result: Any) -> None:
         self.result = result
@@ -281,6 +288,8 @@ class Manager:
         base_coro = self.base_coroutine
         if self._self:
             base_res = BaseResult(await base_coro(self._self, ctx, *args, **kwargs))
+            if base_res() is StopCommand or isinstance(base_res(), StopCommand):
+                return
             if self.data:
                 if sub_command_group:
                     group_coro = self.coroutines[sub_command_group]
@@ -288,17 +297,23 @@ class Manager:
                     group_res = GroupResult(
                         await group_coro(self._self, ctx, base_res, *args, **kwargs), base_res
                     )
+                    if group_res() is StopCommand or isinstance(group_res(), StopCommand):
+                        return
                     return await subcommand_coro(self._self, ctx, group_res, *args, **kwargs)
                 else:
                     subcommand_coro = self.coroutines[sub_command]
                     return await subcommand_coro(self._self, ctx, base_res, *args, **kwargs)
             return base_res
         base_res = BaseResult(await base_coro(ctx, *args, **kwargs))
+        if base_res() is StopCommand or isinstance(base_res(), StopCommand):
+            return
         if self.data:
             if sub_command_group:
                 group_coro = self.coroutines[sub_command_group]
                 subcommand_coro = self.coroutines[f"{sub_command_group} {sub_command}"]
                 group_res = GroupResult(await group_coro(ctx, base_res, *args, **kwargs), base_res)
+                if group_res() is StopCommand or isinstance(group_res(), StopCommand):
+                    return
                 return await subcommand_coro(ctx, group_res, *args, **kwargs)
             else:
                 subcommand_coro = self.coroutines[sub_command]
