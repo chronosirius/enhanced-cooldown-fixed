@@ -287,27 +287,31 @@ class GroupManager:
                     message="You must call `group` before calling `subcommand`.",
                 )
 
-            for i, group in enumerate(self.m.data):
-                if group["type"] == OptionType.SUB_COMMAND_GROUP and group["name"] == self.group:
-                    if group.get("options"):
-                        self.m.data[i]["options"].append(
-                            Option(
-                                type=OptionType.SUB_COMMAND,
-                                name=_name,
-                                description=_description,
-                                options=_options,
-                            )._json
-                        )
-                    else:
-                        self.m.data[i]["options"] = [
-                            Option(
-                                type=OptionType.SUB_COMMAND,
-                                name=_name,
-                                description=_description,
-                                options=_options,
-                            )._json
-                        ]
-                    break
+            group = next(
+                group
+                for group in self.m.data
+                if group["type"] == OptionType.SUB_COMMAND_GROUP and group["name"] == self.group
+            )
+            group_index = self.m.data.index(group)
+
+            if group.get("options"):
+                self.m.data[group_index]["options"].append(
+                    Option(
+                        type=OptionType.SUB_COMMAND,
+                        name=_name,
+                        description=_description,
+                        options=_options,
+                    )._json
+                )
+            else:
+                self.m.data[group_index]["options"] = [
+                    Option(
+                        type=OptionType.SUB_COMMAND,
+                        name=_name,
+                        description=_description,
+                        options=_options,
+                    )._json
+                ]
 
             self.m.coroutines[f"{self.group} {_name}"] = coro
 
