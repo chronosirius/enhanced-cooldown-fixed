@@ -37,9 +37,6 @@ class StopCommand:
     ```
     """
 
-    def __init__(self, *args, **kwargs):
-        pass
-
 
 class BaseResult:
     """
@@ -52,6 +49,8 @@ class BaseResult:
     * `result`: The result from the base command.
     """
 
+    __slots__ = ("result",)
+
     def __init__(self, result: Any) -> None:
         self.result = result
 
@@ -60,7 +59,7 @@ class BaseResult:
             raise AttributeError("There is no parent for the base command result!")
         return super().__getattr__(name)
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+    def __call__(self) -> Any:
         return self.result
 
     def __repr__(self) -> str:
@@ -83,11 +82,13 @@ class GroupResult:
     * `parent: BaseResult`: The `BaseResult` object from the base command.
     """
 
+    __slots__ = ("result", "parent")
+
     def __init__(self, result: Any, parent: BaseResult) -> None:
         self.result = result
         self.parent = parent
 
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+    def __call__(self) -> Any:
         return self.result
 
     def __repr__(self) -> str:
@@ -98,6 +99,8 @@ class GroupResult:
 
 class SubcommandManager:
     """Manages the subcommand creation from a command."""
+
+    __slots__ = ("m",)
 
     def __init__(self, manager: "Manager") -> None:
         self.m = manager
@@ -175,6 +178,8 @@ class SubcommandManager:
 class GroupManager:
     """Manages the group creation in a command."""
 
+    __slots__ = ("m", "group")
+
     def __init__(self, manager: "Manager") -> None:
         self.m = manager
         self.group: Optional[str] = None
@@ -202,23 +207,18 @@ class GroupManager:
         """
 
         def decorator(coro: Coroutine) -> Coroutine:
-            _group = coro.__name__ if group is MISSING else group
+            self.group = coro.__name__ if group is MISSING else group
             self.m.data.append(
                 Option(
                     type=OptionType.SUB_COMMAND_GROUP,
-                    name=_group,
+                    name=self.group,
                     description=(getdoc(coro) or "No description").split("\n")[0],
                 )._json
             )
-            self.m.groups.append(_group)
-            self.m.coroutines[_group] = coro
-            self.group = _group
+            self.m.groups.append(self.group)
+            self.m.coroutines[self.group] = coro
 
-            try:
-                coro.subcommand = self.subcommand
-            except AttributeError:
-                coro.__func__.subcommand = self.subcommand
-
+            coro.subcommand = self.subcommand
             self.m.sync_client_commands()
 
             return coro
@@ -327,6 +327,22 @@ class GroupManager:
 
 class Manager:
     """The internal manager of the subcommands and groups."""
+
+    __slots__ = (
+        "base",
+        "description",
+        "scope",
+        "default_permission",
+        "debug_scope",
+        "client",
+        "_self",
+        "groups",
+        "data",
+        "base_coroutine",
+        "coroutines",
+        "subcommand",
+        "group",
+    )
 
     def __init__(
         self,
