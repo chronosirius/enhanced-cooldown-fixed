@@ -395,6 +395,7 @@ class Manager:
             for i, cmd in enumerate(self.client._command_data):
                 if cmd["name"] == self.base:
                     self.client._command_data[i] = self.full_data
+                    break
         else:
             self.client._command_data.append(self.full_data)
 
