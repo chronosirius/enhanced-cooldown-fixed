@@ -63,6 +63,46 @@ async def create_interaction_response(
     )
 
 
+async def edit_interaction_response(
+    self,
+    data: dict,
+    files: List[File],
+    token: str,
+    application_id: str,
+    message_id: str = "@original",
+) -> dict:
+    """
+    Edits an existing interaction message, but token needs to be manually called.
+
+    :param data: A dictionary containing the new response.
+    :param token: the token of the interaction
+    :param application_id: Application ID snowflake.
+    :param message_id: Message ID snowflake. Defaults to `@original` which represents the initial response msg.
+    :return: Updated message data.
+    """
+    # ^ again, I don't know if python will let me
+    file_data = None
+    if files:
+        file_data = MultipartWriter("form-data")
+        part = file_data.append_json(data)
+        part.set_content_disposition("form-data", name="payload_json")
+        data = None
+
+        for id, file in enumerate(files):
+            part = file_data.append(
+                file._fp,
+            )
+            part.set_content_disposition(
+                "form-data", name=f"files[{str(id)}]", filename=file._filename
+            )
+
+    return await self._req.request(
+        Route("PATCH", f"/webhooks/{application_id}/{token}/messages/{message_id}"),
+        json=data,
+        data=file_data,
+    )
+
+
 async def base_send(
     self,
     content: Optional[str] = MISSING,
@@ -149,6 +189,7 @@ async def base_send(
 
 async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Message:
     payload, files = await base_send(self, content, **kwargs)
+    print("EEEE", payload._json)
 
     if not self.deferred:
         self.callback = InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE
@@ -158,11 +199,14 @@ async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Mess
     msg = None
     if self.responded or self.deferred:
         if self.deferred:
-            res = await self.client.edit_interaction_response(
+            res = await edit_interaction_response(
+                self.client,
                 data=payload._json,
+                files=files,
                 token=self.token,
                 application_id=str(self.application_id),
             )
+            self.deferred = False
             self.responded = True
         else:
             res = await self.client._post_followup(
@@ -170,24 +214,19 @@ async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Mess
                 token=self.token,
                 application_id=str(self.application_id),
             )
+        print(res)
         self.message = msg = Message(**res, _client=self.client)
     else:
-        await create_interaction_response(
+        res = await create_interaction_response(
             self.client,
             token=self.token,
             application_id=int(self.id),
             data=_payload,
             files=files,
         )
-        __newdata = await self.client.edit_interaction_response(
-            data={},
-            token=self.token,
-            application_id=str(self.application_id),
-        )
-        if not __newdata.get("code"):
+        if not res.get("code"):
             # if sending message fails somehow
-            msg = Message(**__newdata, _client=self.client)
-            self.message = msg
+            self.message = msg = Message(**res, _client=self.client)
         self.responded = True
     if msg is not None:
         return msg
@@ -207,11 +246,14 @@ async def component_send(self, content: Optional[str] = MISSING, **kwargs) -> Me
         or self.callback == InteractionCallbackType.DEFERRED_UPDATE_MESSAGE
     ):
         if self.deferred:
-            res = await self.client.edit_interaction_response(
+            res = await edit_interaction_response(
+                self.client,
                 data=payload._json,
+                files=files,
                 token=self.token,
                 application_id=str(self.application_id),
             )
+            self.deferred = False
             self.responded = True
         else:
             res = await self.client._post_followup(
@@ -228,7 +270,8 @@ async def component_send(self, content: Optional[str] = MISSING, **kwargs) -> Me
             data=_payload,
             files=files,
         )
-        __newdata = await self.client.edit_interaction_response(
+        __newdata = await edit_interaction_response(
+            self.client,
             data={},
             token=self.token,
             application_id=str(self.application_id),
