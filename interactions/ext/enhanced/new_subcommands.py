@@ -1,4 +1,5 @@
 from inspect import getdoc, signature
+from pprint import pprint
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Type, Union
 
 from interactions.client.decor import command
@@ -329,10 +330,10 @@ class Manager:
     """The internal manager of the subcommands and groups."""
 
     __slots__ = (
+        "type",
         "base",
         "description",
         "scope",
-        "default_permission",
         "debug_scope",
         "client",
         "_self",
@@ -347,20 +348,20 @@ class Manager:
     def __init__(
         self,
         coro: Coroutine,
+        type: int,
         base: str,
         description: Optional[Union[str, Type[MISSING]]],
         scope: Union[int, Guild, List[int], List[Guild]],
-        default_permission: bool,
         debug_scope: bool,
         client: Optional[Client] = None,
         _self: Optional[Extension] = None,
     ) -> None:
+        self.type = type
         self.base = base
         self.description = (
             "No description" if description is MISSING or description is None else description
         )
         self.scope = scope
-        self.default_permission = default_permission
         self.debug_scope = debug_scope
         self.client = client
         self._self = _self
@@ -376,33 +377,76 @@ class Manager:
     @property
     def full_data(self) -> Union[dict, List[dict]]:
         """Returns the command in JSON format."""
-        return command(
+        data: List[Dict[str, List[dict]]] = command(
+            type=self.type,
             name=self.base,
-            description=self.description,
+            description=self.description if self.type == 1 else None,
             options=self.data,
             scope=self.scope,
-            default_permission=self.default_permission,
         )
+        for i, cmd in enumerate(data.copy()):
+            for j, opt in enumerate(cmd.get("options", [])):
+                for key, value in opt.copy().items():
+                    if value is None or value is MISSING:
+                        del data[i]["options"][j][key]
+        return data
 
     def sync_client_commands(self) -> None:
         """Synchronizes the commands with the client."""
+        print("EEE", self.client)
         if not self.client:
             return
 
-        if not self.client._command_data:
-            self.client._command_data = [self.full_data]
-        elif any(cmd["name"] == self.base for cmd in self.client._command_data):
-            for i, cmd in enumerate(self.client._command_data):
-                if cmd["name"] == self.base:
-                    self.client._command_data[i] = self.full_data
-                    break
-        else:
-            self.client._command_data.append(self.full_data)
+        async def subcommand_caller(
+            ctx: CommandContext,
+            *args,
+            sub_command_group: Optional[str] = None,
+            sub_command: Optional[str] = None,
+            **kwargs,
+        ) -> Optional[Any]:
+            """Calls all of the coroutines of the subcommand."""
+            base_coro = self.base_coroutine
+            if self._self:
+                base_res = BaseResult(await base_coro(self._self, ctx, *args, **kwargs))
+                if base_res() is StopCommand or isinstance(base_res(), StopCommand):
+                    return
+                if self.data:
+                    if sub_command_group:
+                        group_coro = self.coroutines[sub_command_group]
+                        subcommand_coro = self.coroutines[f"{sub_command_group} {sub_command}"]
+                        group_res = GroupResult(
+                            await group_coro(self._self, ctx, base_res, *args, **kwargs), base_res
+                        )
+                        if group_res() is StopCommand or isinstance(group_res(), StopCommand):
+                            return
+                        return await subcommand_coro(self._self, ctx, group_res, *args, **kwargs)
+                    elif sub_command:
+                        subcommand_coro = self.coroutines[sub_command]
+                        return await subcommand_coro(self._self, ctx, base_res, *args, **kwargs)
+                return base_res
+            base_res = BaseResult(await base_coro(ctx, *args, **kwargs))
+            if base_res() is StopCommand or isinstance(base_res(), StopCommand):
+                return
+            if self.data:
+                if sub_command_group:
+                    group_coro = self.coroutines[sub_command_group]
+                    subcommand_coro = self.coroutines[f"{sub_command_group} {sub_command}"]
+                    group_res = GroupResult(
+                        await group_coro(ctx, base_res, *args, **kwargs), base_res
+                    )
+                    if group_res() is StopCommand or isinstance(group_res(), StopCommand):
+                        return
+                    return await subcommand_coro(ctx, group_res, *args, **kwargs)
+                elif sub_command:
+                    subcommand_coro = self.coroutines[sub_command]
+                    return await subcommand_coro(ctx, base_res, *args, **kwargs)
+            return base_res
 
-        if not hasattr(self.client, "_command_coros") or not self.client._command_coros:
-            self.client._command_coros = {self.base: self.subcommand_caller}
-        else:
-            self.client._command_coros[self.base] = self.subcommand_caller
+        subcommand_caller._command_data = self.full_data
+        print(self.client._websocket._dispatch.events)
+        self.client._websocket._dispatch.events[f"command_{self.base}"] = [subcommand_caller]
+        print("E", self.client._websocket._dispatch.events)
+        pprint(self.client._websocket._dispatch.events[f"command_{self.base}"][0]._command_data)
 
     def set_self(self, _self: Extension) -> None:
         """Sets the `self` of the `Extension`."""
@@ -432,7 +476,7 @@ class Manager:
                     if group_res() is StopCommand or isinstance(group_res(), StopCommand):
                         return
                     return await subcommand_coro(self._self, ctx, group_res, *args, **kwargs)
-                else:
+                elif sub_command:
                     subcommand_coro = self.coroutines[sub_command]
                     return await subcommand_coro(self._self, ctx, base_res, *args, **kwargs)
             return base_res
@@ -447,7 +491,7 @@ class Manager:
                 if group_res() is StopCommand or isinstance(group_res(), StopCommand):
                     return
                 return await subcommand_coro(ctx, group_res, *args, **kwargs)
-            else:
+            elif sub_command:
                 subcommand_coro = self.coroutines[sub_command]
                 return await subcommand_coro(ctx, base_res, *args, **kwargs)
         return base_res

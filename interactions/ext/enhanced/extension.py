@@ -63,19 +63,21 @@ def sync_subcommands(self: Extension, client: Client) -> Optional[dict]:
     if not bases:
         return
 
-    commands = []
+    # commands = []
 
     for base, subcommand in bases.items():
         base: str
         subcommand: ExternalSubcommandSetup
+        subcommand.inner._command_data = subcommand.raw_commands
+        client._Client__command_coroutines.append(subcommand.inner)
         client.event(subcommand.inner, name=f"command_{base}")
-        commands.extend(subcommand.raw_commands)
+        # commands.extend(subcommand.raw_commands)
 
-    if client._automate_sync:
-        if client._loop.is_running():
-            [client._loop.create_task(client._synchronize(command)) for command in commands]
-        else:
-            [client._loop.run_until_complete(client._synchronize(command)) for command in commands]
+    # if client._automate_sync:
+    #     if client._loop.is_running():
+    #         [client._loop.create_task(client._synchronize(command)) for command in commands]
+    #     else:
+    #         [client._loop.run_until_complete(client._synchronize(command)) for command in commands]
     for subcommand in bases.values():
         scope = subcommand.scope
         if scope is not MISSING:
@@ -105,22 +107,27 @@ def sync_new_subcommands(cls: Extension, client: Client):
             ):
                 func.manager.scope = getattr(client, "__debug_scope")
             if func.manager.base not in new_bases:
-                if client._automate_sync:
-                    if client._loop.is_running() and isinstance(func.manager.full_data, list):
-                        for data in func.manager.full_data:
-                            client._loop.create_task(client._synchronize(data))
-                    elif (
-                        client._loop.is_running()
-                        and not isinstance(func.manager.full_data, list)
-                        or not client._loop.is_running()
-                        and not isinstance(func.manager.full_data, list)
-                    ):
-                        client._loop.create_task(client._synchronize(func.manager.full_data))
-                    else:
-                        for data in func.manager.full_data:
-                            client._loop.run_until_complete(client._synchronize(data))
+                func.manager.subcommand_caller = func.manager.full_data
+                client._Client__command_coroutines.append(func.manager.subcommand_caller)
                 client.event(func.manager.subcommand_caller, name=f"command_{func.manager.base}")
-                new_bases.add(func.manager.base)
+                # OLD:
+                # if client._automate_sync:
+                #     if client._loop.is_running() and isinstance(func.manager.full_data, list):
+                #         for data in func.manager.full_data:
+                #             client._loop.create_task(client._synchronize(data))
+                #     elif (
+                #         client._loop.is_running()
+                #         and not isinstance(func.manager.full_data, list)
+                #         or not client._loop.is_running()
+                #         and not isinstance(func.manager.full_data, list)
+                #     ):
+                #         client._loop.create_task(client._synchronize(func.manager.full_data))
+                #     else:
+                #         for data in func.manager.full_data:
+                #             client._loop.run_until_complete(client._synchronize(data))
+                # client.event(func.manager.subcommand_caller, name=f"command_{func.manager.base}")
+                # new_bases.add(func.manager.base)
+                # END OLD
             del func.__command_data__
     return subcmds
 
@@ -154,6 +161,8 @@ class EnhancedExtension(Extension):
 
         if bases:
             for base, subcommand in bases.items():
+                base: str
+                subcommand: ExternalSubcommandSetup
                 subcommand.set_self(self)
                 commands = self._commands.get(f"command_{base}", [])
                 commands.append(subcommand.inner)
@@ -226,7 +235,7 @@ class Enhanced(Extension):
             create_interaction_response, bot._http
         )
 
-        bot.start = types.MethodType(start, bot)
+        # bot.start = types.MethodType(start, bot)
 
         if debug_scope is not None:
             log.debug("Setting debug_scope (debug_scope)")

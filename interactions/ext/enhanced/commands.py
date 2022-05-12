@@ -17,7 +17,7 @@ from inspect import getdoc, signature
 from logging import Logger
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Union
 
-from interactions.client.decor import command as old_command
+# from interactions.client.decor import command as old_command
 from typing_extensions import _AnnotatedAlias
 
 from interactions import (
@@ -46,7 +46,6 @@ def command(
     description: Optional[str] = MISSING,
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
     options: Optional[Union[Dict[str, Any], List[Dict[str, Any]], Option, List[Option]]] = MISSING,
-    default_permission: Optional[bool] = MISSING,
     debug_scope: Optional[bool] = True,
 ) -> Callable[..., Any]:
     """
@@ -79,7 +78,6 @@ def command(
     * `?description: str`: The description of the command. Defaults to function docstring or `"No description"`.
     * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the command.
     * `?options: list[Option]`: The options of the command.
-    * `?default_permission: bool`: The default permission of the command.
     * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
 
@@ -118,35 +116,22 @@ def command(
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
         if not hasattr(coro, "manager"):
-            coro.manager = Manager(coro, _name, _description, _scope, default_permission, self)
+            coro.manager = Manager(
+                coro, type, _name, _description, _scope, self.__debug_scope, self
+            )
             coro.subcommand = coro.manager.subcommand
             coro.group = coro.manager.group
+            coro._original = True
 
-            cmd_data = old_command(
+            self.old_command(
                 type=type,
                 name=_name,
                 description=_description,
                 scope=_scope,
                 options=_options,
-                default_permission=default_permission,
-            )
+            )(coro)
 
-            if not hasattr(self, "_command_data") or not self._command_data:
-                self._command_data = cmd_data
-            else:
-                self._command_data.extend(cmd_data)
-
-            if not hasattr(self, "_command_coros") or not self._command_coros:
-                self._command_coros = {_name: coro}
-            else:
-                self._command_coros[_name] = coro
-
-        if scope is not MISSING:
-            if isinstance(scope, List):
-                [self._scopes.add(_ if isinstance(_, int) else _.id) for _ in scope]
-            else:
-                self._scopes.add(scope if isinstance(scope, int) else scope.id)
-
+        # return self.event(coro, name=f"command_{coro.__name__ if name is MISSING else name}")
         return coro
 
     if _coro is not MISSING:
@@ -169,7 +154,6 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
     * `?description: str`: The description of the command. Defaults to function docstring or `"No description"`.
     * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the command.
     * `?options: list[Option]`: The options of the command.
-    * `?default_permission: bool`: The default permission of the command.
     * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
 
@@ -189,7 +173,6 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
             kwargs["name"],
             kwargs["description"],
             kwargs.get("scope"),
-            kwargs.get("default_permission"),
             debug_scope=kwargs.get("debug_scope", True),
         )
         coro.subcommand = coro.manager.subcommand

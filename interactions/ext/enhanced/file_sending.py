@@ -224,7 +224,7 @@ async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Mess
             data=_payload,
             files=files,
         )
-        if not res.get("code"):
+        if res and not res.get("code"):
             # if sending message fails somehow
             self.message = msg = Message(**res, _client=self.client)
         self.responded = True
@@ -276,7 +276,7 @@ async def component_send(self, content: Optional[str] = MISSING, **kwargs) -> Me
             token=self.token,
             application_id=str(self.application_id),
         )
-        if not __newdata.get("code"):
+        if __newdata and not __newdata.get("code"):
             # if sending message fails somehow
             msg = Message(**__newdata, _client=self.client)
             self.message = msg

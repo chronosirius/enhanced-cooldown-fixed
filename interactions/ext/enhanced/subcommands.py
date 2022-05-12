@@ -26,7 +26,6 @@ from interactions import (
     InteractionException,
     Option,
     OptionType,
-    Snowflake,
 )
 
 from ._logging import get_logger
@@ -195,7 +194,6 @@ class SubcommandSetup:
     * `base: str`: The base name of the subcommand.
     * `?description: str`: The description of the subcommand. Defaults to `"No description"`.
     * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the subcommand.
-    * `?default_permission: bool`: The default permission of the subcommand.
     * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
 
@@ -205,7 +203,6 @@ class SubcommandSetup:
         base: str,
         description: Optional[str] = "No description",
         scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-        default_permission: Optional[bool] = MISSING,
         debug_scope: Optional[bool] = True,
     ):
         log.debug(f"SubcommandSetup.__init__: {base=}")
@@ -217,7 +214,6 @@ class SubcommandSetup:
             if scope is MISSING and hasattr(client, "__debug_scope") and debug_scope
             else scope
         )
-        self.default_permission: bool = default_permission
 
         self.groups: Dict[str, Group] = {}
         self.subcommands: Dict[str, Subcommand] = {}
@@ -341,28 +337,7 @@ class SubcommandSetup:
             description=self.description,
             scope=self.scope,
             options=options,
-            default_permission=self.default_permission,
         )
-
-        if self.client._automate_sync:
-            if self.client._loop.is_running():
-                [
-                    self.client._loop.create_task(self.client._synchronize(command))
-                    for command in self.commands
-                ]
-            else:
-                [
-                    self.client._loop.run_until_complete(self.client._synchronize(command))
-                    for command in self.commands
-                ]
-
-        if self.scope is not MISSING:
-            if isinstance(self.scope, list):
-                [self.client._scopes.add(_ if isinstance(_, int) else _.id) for _ in self.scope]
-            else:
-                self.client._scopes.add(
-                    self.scope if isinstance(self.scope, int) else self.scope.id
-                )
 
         async def inner(ctx, *args, sub_command_group=None, sub_command=None, **kwargs) -> None:
             if sub_command_group:
@@ -374,6 +349,31 @@ class SubcommandSetup:
                 subcommand = self.subcommands[sub_command]
 
             return await subcommand.coro(ctx, *args, **kwargs)
+
+        inner._command_data = self.commands
+        self.client._Client__command_coroutines.append(inner)
+
+        # OLD:
+        # if self.client._automate_sync:
+        #     if self.client._loop.is_running():
+        #         [
+        #             self.client._loop.create_task(self.client._synchronize(command))
+        #             for command in self.commands
+        #         ]
+        #     else:
+        #         [
+        #             self.client._loop.run_until_complete(self.client._synchronize(command))
+        #             for command in self.commands
+        #         ]
+        # END OLD
+
+        if self.scope is not MISSING:
+            if isinstance(self.scope, list):
+                [self.client._scopes.add(_ if isinstance(_, int) else _.id) for _ in self.scope]
+            else:
+                self.client._scopes.add(
+                    self.scope if isinstance(self.scope, int) else self.scope.id
+                )
 
         return self.client.event(inner, name=f"command_{self.base}")
 
@@ -416,37 +416,41 @@ class SubcommandSetup:
                     "You must `base_var.finish()` the setup of the subcommands before providing autocomplete."
                 )
             command: str = self.base
-            _command_obj: ApplicationCommand = self.client._http.cache.interactions.get(command)
-            if not _command_obj or not _command_obj.id:
-                if getattr(_command_obj, "guild_id", None) or self.client._automate_sync:
-                    _application_commands: List[
-                        ApplicationCommand
-                    ] = self.client._loop.run_until_complete(
-                        self.client._http.get_application_commands(
-                            application_id=self.client.me.id,
-                            guild_id=_command_obj.guild_id
-                            if hasattr(_command_obj, "guild_id")
-                            else None,
-                        )
-                    )
+            self.client._Client__name_autocomplete[command] = {"coro": coro, "name": option}
+            return coro
+            # OLD:
+            # _command_obj: ApplicationCommand = self.client._http.cache.interactions.get(command)
+            # if not _command_obj or not _command_obj.id:
+            #     if getattr(_command_obj, "guild_id", None) or self.client._automate_sync:
+            #         _application_commands: List[
+            #             ApplicationCommand
+            #         ] = self.client._loop.run_until_complete(
+            #             self.client._http.get_application_commands(
+            #                 application_id=self.client.me.id,
+            #                 guild_id=_command_obj.guild_id
+            #                 if hasattr(_command_obj, "guild_id")
+            #                 else None,
+            #             )
+            #         )
 
-                    _command_obj: ApplicationCommand = self.client._find_command(
-                        _application_commands, command
-                    )
-                else:
-                    for _scope in self.client._scopes:
-                        _application_commands: List[
-                            ApplicationCommand
-                        ] = self.client._loop.run_until_complete(
-                            self.client._http.get_application_commands(
-                                application_id=self.client.me.id, guild_id=_scope
-                            )
-                        )
-                        _command_obj: ApplicationCommand = self.client._find_command(
-                            _application_commands, command
-                        )
-            _command: Union[Snowflake, int] = int(_command_obj.id)
-            return self.client.event(coro, name=f"autocomplete_{_command}_{option}")
+            #         _command_obj: ApplicationCommand = self.client._find_command(
+            #             _application_commands, command
+            #         )
+            #     else:
+            #         for _scope in self.client._scopes:
+            #             _application_commands: List[
+            #                 ApplicationCommand
+            #             ] = self.client._loop.run_until_complete(
+            #                 self.client._http.get_application_commands(
+            #                     application_id=self.client.me.id, guild_id=_scope
+            #                 )
+            #             )
+            #             _command_obj: ApplicationCommand = self.client._find_command(
+            #                 _application_commands, command
+            #             )
+            # _command: Union[Snowflake, int] = int(_command_obj.id)
+            # return self.client.event(coro, name=f"autocomplete_{_command}_{option}")
+            # END OLD
 
         return decorator
 
@@ -462,7 +466,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
     * `base: str`: The base name of the subcommand.
     * `?description: str`: The description of the subcommand.
     * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the subcommand.
-    * `?default_permission: bool`: The default permission of the subcommand.
     """
 
     def __init__(
@@ -470,7 +473,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
         base: str,
         description: Optional[str] = "No description",
         scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-        default_permission: Optional[bool] = MISSING,
     ):
         log.debug(f"ExternalSubcommandSetup.__init__: {base=}")
         super().__init__(
@@ -478,7 +480,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
             base=base,
             description=description,
             scope=scope,
-            default_permission=default_permission,
         )
         self.raw_commands = None
         self.full_command = None
@@ -592,7 +593,6 @@ class ExternalSubcommandSetup(SubcommandSetup):
             description=self.description,
             scope=self.scope,
             options=options,
-            default_permission=self.default_permission,
         )
         self.raw_commands = self.commands
 
@@ -674,7 +674,6 @@ def subcommand_base(
     *,
     description: Optional[str] = "No description",
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-    default_permission: Optional[bool] = MISSING,
     debug_scope: Optional[bool] = True,
 ) -> SubcommandSetup:
     """
@@ -689,7 +688,6 @@ def subcommand_base(
         "base_name",
         description="Description of the base",
         scope=123456789,
-        default_permission=True
     )
     # or
     from interactions.ext.enhanced import subcommand_base
@@ -698,7 +696,6 @@ def subcommand_base(
         "base_name",
         description="Description of the base",
         scope=123456789,
-        default_permission=True
     )
     ```
 
@@ -708,11 +705,10 @@ def subcommand_base(
     * `base: str`: The base name of the base.
     * `?description: str`: The description of the base.
     * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
-    * `?default_permission: bool`: The default permission of the base.
     * `?debug_scope: bool`: Whether to use debug_scope for this command. Defaults to `True`.
     """
     log.debug(f"base: {base=}")
-    return SubcommandSetup(self, base, description, scope, default_permission, debug_scope)
+    return SubcommandSetup(self, base, description, scope, debug_scope)
 
 
 def ext_subcommand_base(
@@ -720,7 +716,6 @@ def ext_subcommand_base(
     *,
     description: Optional[str] = "No description",
     scope: Optional[Union[int, Guild, List[int], List[Guild]]] = MISSING,
-    default_permission: Optional[bool] = MISSING,
 ) -> ExternalSubcommandSetup:
     """
     Use this function to initialize a base for future subcommands inside extensions.
@@ -732,7 +727,6 @@ def ext_subcommand_base(
         "base_name",
         description="Description of the base",
         scope=123456789,
-        default_permission=True
     )
     ```
 
@@ -741,7 +735,6 @@ def ext_subcommand_base(
     * `base: str`: The base name of the base.
     * `?description: str`: The description of the base.
     * `?scope: int | Guild | list[int] | list[Guild]`: The scope of the base.
-    * `?default_permission: bool`: The default permission of the base.
     """
     log.debug(f"extension_base: {base=}")
-    return ExternalSubcommandSetup(base, description, scope, default_permission)
+    return ExternalSubcommandSetup(base, description, scope)
