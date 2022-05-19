@@ -189,7 +189,6 @@ async def base_send(
 
 async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Message:
     payload, files = await base_send(self, content, **kwargs)
-    print("EEEE", payload._json)
 
     if not self.deferred:
         self.callback = InteractionCallbackType.CHANNEL_MESSAGE_WITH_SOURCE
@@ -214,7 +213,6 @@ async def command_send(self, content: Optional[str] = MISSING, **kwargs) -> Mess
                 token=self.token,
                 application_id=str(self.application_id),
             )
-        print(res)
         self.message = msg = Message(**res, _client=self.client)
     else:
         res = await create_interaction_response(

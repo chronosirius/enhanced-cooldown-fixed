@@ -14,7 +14,6 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
-from pprint import pprint
 from re import fullmatch
 from typing import List, Optional, Union
 
@@ -28,7 +27,7 @@ log: Logger = get_logger("extension")
 
 
 version: Version = Version(
-    version="3.3.0",  # could not release candidate
+    version="3.3.0",
     author=VersionAuthor(
         name="Toricane",
         email="prjwl028@gmail.com",
@@ -64,21 +63,12 @@ def sync_subcommands(self: Extension, client: Client) -> Optional[dict]:
     if not bases:
         return
 
-    # commands = []
-
     for base, subcommand in bases.items():
         base: str
         subcommand: ExternalSubcommandSetup
         subcommand.inner.__func__._command_data = subcommand.raw_commands
         client._Client__command_coroutines.append(subcommand.inner)
         client.event(subcommand.inner, name=f"command_{base}")
-        # commands.extend(subcommand.raw_commands)
-
-    # if client._automate_sync:
-    #     if client._loop.is_running():
-    #         [client._loop.create_task(client._synchronize(command)) for command in commands]
-    #     else:
-    #         [client._loop.run_until_complete(client._synchronize(command)) for command in commands]
     for subcommand in bases.values():
         scope = subcommand.scope
         if scope is not MISSING:
@@ -106,33 +96,12 @@ def sync_new_subcommands(cls: Extension, client: Client):
                 and func.manager.debug_scope
             ):
                 func.manager.scope = getattr(client, "__debug_scope")
-            print("        BASE")
-            print(f"{func.manager.base}")
-            if func.manager.base == "cog_global_test":
-                pprint(func.manager.full_data)
-            print("        BASE")
             subcmds.append(func.manager)
             cmds.add(func.manager)
             del func.__command_data__
     for manager in cmds:
         manager.client = client
         manager.sync_client_commands()
-        # manager.subcommand_caller.__func__._command_data = manager.full_data
-        # client._Client__command_coroutines.append(manager.subcommand_caller)
-        # client.event(manager.subcommand_caller, name=f"command_{manager.base}")
-    pprint(cmds)
-    print("     COROS")
-    print("     COROS")
-    pprint(
-        [
-            coro._command_data[0]["name"]
-            if isinstance(coro._command_data, list)
-            else coro._command_data["name"]
-            for coro in client._Client__command_coroutines
-        ]
-    )
-    print("     COROS")
-    print("     COROS")
     return subcmds
 
 
