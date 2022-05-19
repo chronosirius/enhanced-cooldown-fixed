@@ -27,7 +27,7 @@ log: Logger = get_logger("extension")
 
 
 version: Version = Version(
-    version="3.3.0",
+    version="4.0.0",
     author=VersionAuthor(
         name="Toricane",
         email="prjwl028@gmail.com",
@@ -41,7 +41,7 @@ base = Base(
     link="https://github.com/interactions-py/enhanced",
     packages=["interactions.ext.enhanced"],
     requirements=[
-        "discord-py-interactions>=4.1.1rc.1",
+        "discord-py-interactions>=4.2.0",
         "typing_extensions",
     ],
 )
