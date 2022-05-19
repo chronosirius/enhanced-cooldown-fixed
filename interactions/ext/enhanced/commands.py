@@ -170,6 +170,7 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
                 raise ValueError("Description must be less than 100 characters.")
         coro.manager = Manager(
             coro,
+            kwargs.get("type", ApplicationCommandType.CHAT_INPUT),
             kwargs["name"],
             kwargs["description"],
             kwargs.get("scope"),

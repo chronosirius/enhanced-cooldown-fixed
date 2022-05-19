@@ -14,6 +14,7 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 import types
 from inspect import getmembers, iscoroutinefunction
 from logging import Logger
+from pprint import pprint
 from re import fullmatch
 from typing import List, Optional, Union
 
@@ -68,7 +69,7 @@ def sync_subcommands(self: Extension, client: Client) -> Optional[dict]:
     for base, subcommand in bases.items():
         base: str
         subcommand: ExternalSubcommandSetup
-        subcommand.inner._command_data = subcommand.raw_commands
+        subcommand.inner.__func__._command_data = subcommand.raw_commands
         client._Client__command_coroutines.append(subcommand.inner)
         client.event(subcommand.inner, name=f"command_{base}")
         # commands.extend(subcommand.raw_commands)
@@ -99,7 +100,6 @@ def sync_new_subcommands(cls: Extension, client: Client):
     new_bases: set = set()
     for _, func in getmembers(cls, predicate=iscoroutinefunction):
         if hasattr(func, "manager") and func.manager.full_data:
-            subcmds.append(func.manager)
             if (
                 hasattr(client, "__debug_scope")
                 and getattr(client, "__debug_scope")
@@ -107,28 +107,20 @@ def sync_new_subcommands(cls: Extension, client: Client):
             ):
                 func.manager.scope = getattr(client, "__debug_scope")
             if func.manager.base not in new_bases:
-                func.manager.subcommand_caller = func.manager.full_data
+                print("        BASE")
+                print(f"{func.manager.base}")
+                print("        BASE")
+                subcmds.append(func.manager)
+                func.manager.subcommand_caller.__func__._command_data = func.manager.full_data
                 client._Client__command_coroutines.append(func.manager.subcommand_caller)
                 client.event(func.manager.subcommand_caller, name=f"command_{func.manager.base}")
-                # OLD:
-                # if client._automate_sync:
-                #     if client._loop.is_running() and isinstance(func.manager.full_data, list):
-                #         for data in func.manager.full_data:
-                #             client._loop.create_task(client._synchronize(data))
-                #     elif (
-                #         client._loop.is_running()
-                #         and not isinstance(func.manager.full_data, list)
-                #         or not client._loop.is_running()
-                #         and not isinstance(func.manager.full_data, list)
-                #     ):
-                #         client._loop.create_task(client._synchronize(func.manager.full_data))
-                #     else:
-                #         for data in func.manager.full_data:
-                #             client._loop.run_until_complete(client._synchronize(data))
-                # client.event(func.manager.subcommand_caller, name=f"command_{func.manager.base}")
-                # new_bases.add(func.manager.base)
-                # END OLD
+                new_bases.add(func.manager.base)
             del func.__command_data__
+    print("COROS")
+    print("COROS")
+    pprint(client._Client__command_coroutines)
+    print("COROS")
+    print("COROS")
     return subcmds
 
 
@@ -175,19 +167,19 @@ class EnhancedExtension(Extension):
         return self
 
 
-def start(self: Client) -> None:
-    """Starts the client session."""
-    if hasattr(self, "_command_data") and self._command_data:
-        if self._automate_sync:
-            if self._loop.is_running():
-                for command in self._command_data:
-                    self._loop.create_task(self._synchronize(command))
-            else:
-                for command in self._command_data:
-                    self._loop.run_until_complete(self._synchronize(command))
-        for name, coro in self._command_coros.items():
-            self.event(coro, name=f"command_{name}")
-    self._loop.run_until_complete(self._ready())
+# def start(self: Client) -> None:
+#     """Starts the client session."""
+#     if hasattr(self, "_command_data") and self._command_data:
+#         if self._automate_sync:
+#             if self._loop.is_running():
+#                 for command in self._command_data:
+#                     self._loop.create_task(self._synchronize(command))
+#             else:
+#                 for command in self._command_data:
+#                     self._loop.run_until_complete(self._synchronize(command))
+#         for name, coro in self._command_coros.items():
+#             self.event(coro, name=f"command_{name}")
+#     self._loop.run_until_complete(self._ready())
 
 
 class Enhanced(Extension):

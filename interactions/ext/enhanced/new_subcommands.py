@@ -393,7 +393,7 @@ class Manager:
 
     def sync_client_commands(self) -> None:
         """Synchronizes the commands with the client."""
-        print("EEE", self.client)
+        # print("EEE", self.client)
         if not self.client:
             return
 
@@ -443,10 +443,18 @@ class Manager:
             return base_res
 
         subcommand_caller._command_data = self.full_data
-        print(self.client._websocket._dispatch.events)
+        # print(self.client._websocket._dispatch.events)
         self.client._websocket._dispatch.events[f"command_{self.base}"] = [subcommand_caller]
-        print("E", self.client._websocket._dispatch.events)
-        pprint(self.client._websocket._dispatch.events[f"command_{self.base}"][0]._command_data)
+        for i, coro in enumerate(self.client._Client__command_coroutines):
+            if isinstance(coro._command_data, list):
+                if coro._command_data[0]["name"] == self.base:
+                    del self.client._Client__command_coroutines[i]
+            else:
+                if coro._command_data["name"] == self.base:
+                    del self.client._Client__command_coroutines[i]
+        self.client._Client__command_coroutines.append(subcommand_caller)
+        # print("E", self.client._websocket._dispatch.events)
+        # pprint(self.client._websocket._dispatch.events[f"command_{self.base}"][0]._command_data)
 
     def set_self(self, _self: Extension) -> None:
         """Sets the `self` of the `Extension`."""
