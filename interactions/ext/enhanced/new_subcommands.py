@@ -1,5 +1,4 @@
 from inspect import getdoc, signature
-from pprint import pprint
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Type, Union
 
 from interactions.client.decor import command
@@ -442,7 +441,10 @@ class Manager:
                     return await subcommand_coro(ctx, base_res, *args, **kwargs)
             return base_res
 
-        subcommand_caller._command_data = self.full_data
+        if self.scope in {None, MISSING} and not self.debug_scope:
+            subcommand_caller._command_data = self.full_data[0]
+        else:
+            subcommand_caller._command_data = self.full_data
         # print(self.client._websocket._dispatch.events)
         self.client._websocket._dispatch.events[f"command_{self.base}"] = [subcommand_caller]
         for i, coro in enumerate(self.client._Client__command_coroutines):
@@ -503,3 +505,6 @@ class Manager:
                 subcommand_coro = self.coroutines[sub_command]
                 return await subcommand_coro(ctx, base_res, *args, **kwargs)
         return base_res
+
+    def __repr__(self) -> str:
+        return f"<Manager base={self.base}>"

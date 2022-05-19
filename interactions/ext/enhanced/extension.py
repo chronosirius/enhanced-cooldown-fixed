@@ -97,7 +97,7 @@ def sync_subcommands(self: Extension, client: Client) -> Optional[dict]:
 
 def sync_new_subcommands(cls: Extension, client: Client):
     subcmds = []
-    new_bases: set = set()
+    cmds: set = set()
     for _, func in getmembers(cls, predicate=iscoroutinefunction):
         if hasattr(func, "manager") and func.manager.full_data:
             if (
@@ -106,21 +106,33 @@ def sync_new_subcommands(cls: Extension, client: Client):
                 and func.manager.debug_scope
             ):
                 func.manager.scope = getattr(client, "__debug_scope")
-            if func.manager.base not in new_bases:
-                print("        BASE")
-                print(f"{func.manager.base}")
-                print("        BASE")
-                subcmds.append(func.manager)
-                func.manager.subcommand_caller.__func__._command_data = func.manager.full_data
-                client._Client__command_coroutines.append(func.manager.subcommand_caller)
-                client.event(func.manager.subcommand_caller, name=f"command_{func.manager.base}")
-                new_bases.add(func.manager.base)
+            print("        BASE")
+            print(f"{func.manager.base}")
+            if func.manager.base == "cog_global_test":
+                pprint(func.manager.full_data)
+            print("        BASE")
+            subcmds.append(func.manager)
+            cmds.add(func.manager)
             del func.__command_data__
-    print("COROS")
-    print("COROS")
-    pprint(client._Client__command_coroutines)
-    print("COROS")
-    print("COROS")
+    for manager in cmds:
+        manager.client = client
+        manager.sync_client_commands()
+        # manager.subcommand_caller.__func__._command_data = manager.full_data
+        # client._Client__command_coroutines.append(manager.subcommand_caller)
+        # client.event(manager.subcommand_caller, name=f"command_{manager.base}")
+    pprint(cmds)
+    print("     COROS")
+    print("     COROS")
+    pprint(
+        [
+            coro._command_data[0]["name"]
+            if isinstance(coro._command_data, list)
+            else coro._command_data["name"]
+            for coro in client._Client__command_coroutines
+        ]
+    )
+    print("     COROS")
+    print("     COROS")
     return subcmds
 
 
