@@ -83,7 +83,8 @@ def cooldown(
 
         @wraps(coro)
         async def wrapper(ctx: Union[CommandContext, Extension], *args, **kwargs):
-            _ctx: CommandContext = ctx if isinstance(ctx, _Context) else args[0]
+            args: list = list(args)
+            _ctx: CommandContext = ctx if isinstance(ctx, _Context) else args.pop(0)
             last_called: dict = coro.__last_called
             now = datetime.now()
             id = get_id(type, _ctx)
@@ -110,7 +111,9 @@ def cooldown(
 
             last_called[id] = now
             coro.__last_called = last_called
-            return await coro(_ctx, *args, **kwargs)
+            if isinstance(ctx, _Context):
+                return await coro(_ctx, *args, **kwargs)
+            return await coro(ctx, _ctx, *args, **kwargs)
 
         return wrapper
 
