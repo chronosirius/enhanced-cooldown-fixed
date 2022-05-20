@@ -115,7 +115,7 @@ def command(
         )
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
-        if not hasattr(coro, "manager"):
+        if not hasattr(coro, "manager") and type == ApplicationCommandType.CHAT_INPUT:
             coro.manager = Manager(
                 coro, type, _name, _description, _scope, self.__debug_scope, self
             )
@@ -123,6 +123,14 @@ def command(
             coro.group = coro.manager.group
             coro._original = True
 
+            self.old_command(
+                type=type,
+                name=_name,
+                description=_description,
+                scope=_scope,
+                options=_options,
+            )(coro)
+        elif type != ApplicationCommandType.CHAT_INPUT:
             self.old_command(
                 type=type,
                 name=_name,
