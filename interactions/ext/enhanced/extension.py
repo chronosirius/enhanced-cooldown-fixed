@@ -148,21 +148,6 @@ class EnhancedExtension(Extension):
         return self
 
 
-# def start(self: Client) -> None:
-#     """Starts the client session."""
-#     if hasattr(self, "_command_data") and self._command_data:
-#         if self._automate_sync:
-#             if self._loop.is_running():
-#                 for command in self._command_data:
-#                     self._loop.create_task(self._synchronize(command))
-#             else:
-#                 for command in self._command_data:
-#                     self._loop.run_until_complete(self._synchronize(command))
-#         for name, coro in self._command_coros.items():
-#             self.event(coro, name=f"command_{name}")
-#     self._loop.run_until_complete(self._ready())
-
-
 class Enhanced(Extension):
     """
     This is the core of this library, initialized when loading the extension.

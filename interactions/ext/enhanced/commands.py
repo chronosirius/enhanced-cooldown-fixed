@@ -116,9 +116,7 @@ def command(
         log.debug(f"command: {_name=} {_description=} {_options=}")
 
         if not hasattr(coro, "manager") and type == ApplicationCommandType.CHAT_INPUT:
-            coro.manager = Manager(
-                coro, type, _name, _description, _scope, self.__debug_scope, self
-            )
+            coro.manager = Manager(coro, type, _name, _description, _scope, debug_scope, self)
             coro.subcommand = coro.manager.subcommand
             coro.group = coro.manager.group
             coro._original = True
@@ -139,7 +137,6 @@ def command(
                 options=_options,
             )(coro)
 
-        # return self.event(coro, name=f"command_{coro.__name__ if name is MISSING else name}")
         return coro
 
     if _coro is not MISSING:

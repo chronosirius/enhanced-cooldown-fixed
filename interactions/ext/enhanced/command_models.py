@@ -167,7 +167,7 @@ class EnhancedOption:
         self.value = value
 
 
-def parameters_to_options(params: "OrderedDict") -> List[Option]:
+def parameters_to_options(params: "OrderedDict", is_ext: bool = False) -> List[Option]:
     """Converts `EnhancedOption`s to `Option`s."""
     log.debug("parameters_to_options:")
     _options = [
@@ -201,11 +201,11 @@ def parameters_to_options(params: "OrderedDict") -> List[Option]:
         if isinstance(param.annotation, _AnnotatedAlias)
         else MISSING
         for __name, param in params.items()
-    ][1:]
+    ][(2 if is_ext else 1) :]
 
     if any(opt is MISSING for opt in _options):
         raise TypeError(
-            "You must typehint with `EnhancedOption` or not specify `options=...` in the decorator!"
+            "You must typehint with `EnhancedOption` or specify `options=...` in the decorator!"
         )
     log.debug(f"  _options: {_options}\n")
 

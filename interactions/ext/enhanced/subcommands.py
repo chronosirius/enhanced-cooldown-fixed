@@ -353,20 +353,6 @@ class SubcommandSetup:
         inner._command_data = self.commands
         self.client._Client__command_coroutines.append(inner)
 
-        # OLD:
-        # if self.client._automate_sync:
-        #     if self.client._loop.is_running():
-        #         [
-        #             self.client._loop.create_task(self.client._synchronize(command))
-        #             for command in self.commands
-        #         ]
-        #     else:
-        #         [
-        #             self.client._loop.run_until_complete(self.client._synchronize(command))
-        #             for command in self.commands
-        #         ]
-        # END OLD
-
         if self.scope is not MISSING:
             if isinstance(self.scope, list):
                 [self.client._scopes.add(_ if isinstance(_, int) else _.id) for _ in self.scope]
@@ -531,12 +517,13 @@ class ExternalSubcommandSetup(SubcommandSetup):
                 raise ValueError("Description must be less than 100 characters.")
 
             params = signature(coro).parameters
+            print("SUB", params)
             _options = (
                 getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
-                else parameters_to_options(params)
+                else parameters_to_options(params, True)
                 if options is MISSING
-                and len(params) > 1
+                and len(params) > 2
                 and any(
                     isinstance(param.annotation, (EnhancedOption, _AnnotatedAlias))
                     for _, param in params.items()
