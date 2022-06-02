@@ -10,8 +10,8 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 
 (c) 2022 interactions-py.
 """
-from inspect import _empty
-from typing import TYPE_CHECKING, Any, Callable, List, Optional, Union, get_args
+from inspect import _empty, signature
+from typing import TYPE_CHECKING, Any, Callable, Coroutine, List, Optional, Union, get_args
 
 from interactions import (
     MISSING,
@@ -166,10 +166,43 @@ class EnhancedOption:
         self.focused = focused
         self.value = value
 
+    def __repr__(self):
+        return f"<EnhancedOption type={self.type}, name={self.name}>"
 
-def parameters_to_options(params: "OrderedDict", is_ext: bool = False) -> List[Option]:
+
+def loop_params(params: dict, stop: int) -> dict:
+    """Loops through the parameters and deletes until stop index."""
+    print("params:", params)
+    for i, key in enumerate(params.copy()):
+        if i > stop:
+            break
+        del params[key]
+    print("params:", params)
+    return params
+
+
+def format_parameters(coro: Coroutine):
+    """Formats the parameters of a function."""
+    params: OrderedDict = signature(coro).parameters
+    _params: dict = dict(params.items())
+    if coro.__name__ == "eeeeee":
+        print(coro.__qualname__)
+    if "." in coro.__qualname__:
+        return loop_params(_params, 1)
+    else:
+        return loop_params(_params, 0)
+
+
+def parameters_to_options(coro: Coroutine, has_res: bool = False) -> List[Option]:
     """Converts `EnhancedOption`s to `Option`s."""
     log.debug("parameters_to_options:")
+    params: dict = format_parameters(coro)
+    if has_res:
+        for key in params:
+            del params[key]
+            break
+    if coro.__name__ == "options":
+        print("OPTS   ", params)
     _options = [
         Option(
             type=param.annotation.type,
@@ -201,9 +234,14 @@ def parameters_to_options(params: "OrderedDict", is_ext: bool = False) -> List[O
         if isinstance(param.annotation, _AnnotatedAlias)
         else MISSING
         for __name, param in params.items()
-    ][(2 if is_ext else 1) :]
+    ]
 
     if any(opt is MISSING for opt in _options):
+        for opt in _options:
+            if opt is MISSING:
+                print(" ", "MISSING")
+            else:
+                print(" ", opt.type, opt.name)
         raise TypeError(
             "You must typehint with `EnhancedOption` or specify `options=...` in the decorator!"
         )

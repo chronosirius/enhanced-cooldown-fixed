@@ -143,9 +143,9 @@ class SubcommandManager:
             _options = (
                 getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
-                else parameters_to_options(params[1:-1])
+                else parameters_to_options(coro, True)
                 if options is MISSING
-                and (len(params) > 3 if params.get("self") else len(params) > 2)
+                and (len(params) > 3 if "." in coro.__qualname__ else len(params) > 2)
                 else None
                 if options is MISSING
                 else options
@@ -268,9 +268,9 @@ class GroupManager:
             _options = (
                 getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
-                else parameters_to_options(params[1:-1])
+                else parameters_to_options(coro, True)
                 if options is MISSING
-                and (len(params) > 3 if params.get("self") else len(params) > 2)
+                and (len(params) > 3 if "." in coro.__qualname__ else len(params) > 2)
                 else None
                 if options is MISSING
                 else options

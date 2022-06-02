@@ -104,7 +104,7 @@ def command(
         _options = (
             coro.__decor_options
             if hasattr(coro, "__decor_options")
-            else parameters_to_options(params)
+            else parameters_to_options(coro)
             if options is MISSING
             and len(params) > 1
             and any(

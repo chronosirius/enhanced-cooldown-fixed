@@ -284,8 +284,13 @@ class SubcommandSetup:
             _options = (
                 getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
-                else parameters_to_options(params)
-                if options is MISSING and len(params) > 1
+                else parameters_to_options(coro)
+                if options is MISSING
+                and len(params) > 1
+                and any(
+                    isinstance(param.annotation, (EnhancedOption, _AnnotatedAlias))
+                    for _, param in params.items()
+                )
                 else options
             )
 
@@ -521,7 +526,7 @@ class ExternalSubcommandSetup(SubcommandSetup):
             _options = (
                 getattr(coro, "__decor_options")
                 if hasattr(coro, "__decor_options")
-                else parameters_to_options(params, True)
+                else parameters_to_options(coro)
                 if options is MISSING
                 and len(params) > 2
                 and any(
