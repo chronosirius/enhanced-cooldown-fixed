@@ -163,11 +163,11 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
     """
 
     def decorator(coro):
+        _type = kwargs.get("type", ApplicationCommandType.CHAT_INPUT)
         _name = kwargs.get("name", coro.__name__)
         _desc = (
             MISSING
-            if kwargs.get("type", ApplicationCommandType.CHAT_INPUT)
-            != ApplicationCommandType.CHAT_INPUT
+            if _type != ApplicationCommandType.CHAT_INPUT
             else kwargs.get("description", getdoc(coro) or "No description")
         )
         if isinstance(_desc, str):
@@ -176,7 +176,7 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
                 raise ValueError("Description must be less than 100 characters.")
         coro.manager = Manager(
             coro,
-            kwargs.get("type", ApplicationCommandType.CHAT_INPUT),
+            _type,
             _name,
             _desc,
             kwargs.get("scope"),
