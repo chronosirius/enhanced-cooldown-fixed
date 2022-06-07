@@ -450,7 +450,10 @@ class Manager:
             return base_res
 
         if self.scope in {None, MISSING} and not self.debug_scope:
-            subcommand_caller._command_data = self.full_data[0]
+            if isinstance(self.full_data, list):
+                subcommand_caller._command_data = self.full_data[0]
+            elif isinstance(self.full_data, dict):
+                subcommand_caller._command_data = self.full_data
         else:
             subcommand_caller._command_data = self.full_data
         self.client._websocket._dispatch.events[f"command_{self.base}"] = [subcommand_caller]
