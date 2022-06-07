@@ -163,16 +163,11 @@ def extension_command(_coro: Optional[Coroutine] = MISSING, **kwargs):
     """
 
     def decorator(coro):
-        # kwargs["name"] = kwargs.get("name", coro.__name__)
-        # kwargs["description"] = (
-        #     MISSING
-        #     if type != ApplicationCommandType.CHAT_INPUT
-        #     else kwargs.get("description", getdoc(coro) or "No description")
-        # )
         _name = kwargs.get("name", coro.__name__)
         _desc = (
             MISSING
-            if type != ApplicationCommandType.CHAT_INPUT
+            if kwargs.get("type", ApplicationCommandType.CHAT_INPUT)
+            != ApplicationCommandType.CHAT_INPUT
             else kwargs.get("description", getdoc(coro) or "No description")
         )
         if isinstance(_desc, str):
