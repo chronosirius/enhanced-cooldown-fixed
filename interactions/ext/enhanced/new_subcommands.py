@@ -358,9 +358,7 @@ class Manager:
     ) -> None:
         self.type = type
         self.base = base
-        self.description = (
-            "No description" if description is MISSING or description is None else description
-        )
+        self.description = "No description" if description in {MISSING, None} else description
         self.scope = scope
         self.debug_scope = debug_scope
         self.client = client
