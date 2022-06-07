@@ -1,4 +1,5 @@
 from inspect import getdoc, signature
+from sqlite3 import DataError, DatabaseError
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Type, Union
 
 from interactions.client.decor import command
@@ -383,11 +384,19 @@ class Manager:
             options=self.data,
             scope=self.scope,
         )
-        for i, cmd in enumerate(data.copy()):
-            for j, opt in enumerate(cmd.get("options", [])):
+        if self.scope in {None, MISSING}:
+            data: Dict[str, List[dict]] = data[0]
+        if isinstance(data, list):
+            for i, cmd in enumerate(data.copy()):
+                for j, opt in enumerate(cmd.get("options", [])):
+                    for key, value in opt.copy().items():
+                        if value is None or value is MISSING:
+                            del data[i]["options"][j][key]
+        else:
+            for j, opt in enumerate(data.copy().get("options", [])):
                 for key, value in opt.copy().items():
                     if value is None or value is MISSING:
-                        del data[i]["options"][j][key]
+                        del data["options"][j][key]
         return data
 
     def sync_client_commands(self) -> None:
