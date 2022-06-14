@@ -1,5 +1,4 @@
 from inspect import getdoc, signature
-from sqlite3 import DataError, DatabaseError
 from typing import Any, Callable, Coroutine, Dict, List, Optional, Type, Union
 
 from interactions.client.decor import command

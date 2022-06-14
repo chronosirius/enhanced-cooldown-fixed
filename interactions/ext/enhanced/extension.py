@@ -164,7 +164,6 @@ class Enhanced(Extension):
     * `(?)bot: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
     * `?ignore_warning: bool`: Whether to ignore the warning. Defaults to `False`.
     * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
-    * `?add_get: bool`: Whether to add the `get()` helper function. Defaults to `True`.
     * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
     * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
     * `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
@@ -176,7 +175,6 @@ class Enhanced(Extension):
         *,
         ignore_warning: bool = False,
         debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
-        add_get: bool = True,
         add_subcommand: bool = True,
         modify_callbacks: bool = True,
         modify_command: bool = True,
@@ -198,14 +196,6 @@ class Enhanced(Extension):
         if debug_scope is not None:
             log.debug("Setting debug_scope (debug_scope)")
             setattr(bot, "__debug_scope", debug_scope)
-
-        if add_get:
-            from .get_helpers import get, get_emoji, get_role
-
-            log.debug("Adding bot.get (add_get)")
-            bot._http.get_emoji = types.MethodType(get_emoji, bot._http)
-            bot._http.get_role = types.MethodType(get_role, bot._http)
-            bot.get = types.MethodType(get, bot)
 
         if add_subcommand:
             from .subcommands import subcommand_base
@@ -287,7 +277,6 @@ def setup(
     *,
     ignore_warning: bool = False,
     debug_scope: Optional[Union[int, Guild, List[int], List[Guild]]] = None,
-    add_get: bool = True,
     add_subcommand: bool = True,
     modify_callbacks: bool = True,
     modify_command: bool = True,
@@ -307,7 +296,6 @@ def setup(
     * `(?)client: Client`: The client instance. Not required if using `client.load("interactions.ext.enhanced", ...)`.
     * `?ignore_warning: bool`: Whether to ignore the warning. Defaults to `False`.
     * `?debug_scope: int | Guild | list[int] | list[Guild]`: The debug scope to apply to global commands.
-    * `?add_get: bool`: Whether to add the `get()` helper function. Defaults to `True`.
     * `?add_subcommand: bool`: Whether to add subcommand hooks to the client. Defaults to `True`.
     * `?modify_callbacks: bool`: Whether to modify callback decorators. Defaults to `True`.
     * `?modify_command: bool`: Whether to modify the command decorator. Defaults to `True`.
@@ -317,7 +305,6 @@ def setup(
         bot,
         ignore_warning=ignore_warning,
         debug_scope=debug_scope,
-        add_get=add_get,
         add_subcommand=add_subcommand,
         modify_callbacks=modify_callbacks,
         modify_command=modify_command,

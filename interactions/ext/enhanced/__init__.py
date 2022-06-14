@@ -14,7 +14,6 @@ Modules:
 * components: components.
 * cooldowns: command cooldowns.
 * extension: extension.
-* get_helpers: get helpers.
 * subcommands: subcommands.
 
 GitHub: https://github.com/interactions-py/enhanced/
@@ -31,7 +30,6 @@ from . import (
     components,
     cooldowns,
     extension,
-    get_helpers,
     subcommands,
 )
 from ._logging import CustomFormatter, Data, get_logger
@@ -41,7 +39,6 @@ from .commands import autodefer, command, extension_command
 from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
 from .cooldowns import cooldown
 from .extension import Enhanced, EnhancedExtension, base, setup, sync_subcommands, version
-from .get_helpers import get
 from .subcommands import (
     ExternalSubcommandSetup,
     Group,
@@ -61,8 +58,6 @@ __all__ = [
         "command_models",
             "EnhancedOption",  # noqa E131
             "option",
-        "get_helpers",
-            "get",
         "commands",
             "command",
             "extension_command",
