@@ -191,10 +191,16 @@ def extension_component(
         )
 
         if startswith:
-            func.startswith = True
+            try:
+                func.startswith = True
+            except AttributeError:
+                func.__func__.startswith = True
             payload = f"startswith_{payload}"
         elif regex:
-            func.regex = compile(payload)
+            try:
+                func.regex = compile(payload)
+            except AttributeError:
+                func.__func__.regex = compile(payload)
             payload = f"regex_{payload}"
 
         log.debug(f"Extension component callback, {startswith=}, {regex=}")
@@ -252,10 +258,16 @@ def extension_modal(
         payload: str = modal.custom_id if isinstance(modal, Modal) else modal
 
         if startswith:
-            func.startswith = True
+            try:
+                func.startswith = True
+            except AttributeError:
+                func.__func__.startswith = True
             payload = f"startswith_{payload}"
         elif regex:
-            func.regex = compile(payload)
+            try:
+                func.regex = compile(payload)
+            except AttributeError:
+                func.__func__.regex = compile(payload)
             payload = f"regex_{payload}"
 
         log.debug(f"Extension modal callback, {startswith=}, {regex=}")
