@@ -71,10 +71,16 @@ def component(
             raise ValueError("Cannot use both startswith and regex!")
 
         if startswith:
-            coro.startswith = True
+            try:
+                coro.startswith = True
+            except AttributeError:
+                coro.__func__.startswith = True
             bot.event(coro, name=f"component_startswith_{payload}")
         elif regex:
-            coro.regex = compile(payload)
+            try:
+                coro.regex = compile(payload)
+            except AttributeError:
+                coro.__func__.regex = compile(payload)
             bot.event(coro, name=f"component_regex_{payload}")
         else:
             bot.event(coro, name=f"component_{payload}")
@@ -129,10 +135,16 @@ def modal(
             raise ValueError("Cannot use both startswith and regex!")
 
         if startswith:
-            coro.startswith = True
+            try:
+                coro.startswith = True
+            except AttributeError:
+                coro.__func__.startswith = True
             bot.event(coro, name=f"modal_startswith_{payload}")
         elif regex:
-            coro.regex = compile(payload)
+            try:
+                coro.regex = compile(payload)
+            except AttributeError:
+                coro.__func__.regex = compile(payload)
             bot.event(coro, name=f"modal_regex_{payload}")
         else:
             bot.event(coro, name=f"modal_{payload}")
