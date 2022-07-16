@@ -12,13 +12,15 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 from datetime import datetime, timedelta
 from functools import wraps
 from inspect import iscoroutinefunction, signature
-from typing import Callable, Coroutine, Optional, Type, Union
+from typing import Awaitable, Callable, Optional, Type, Union
 
 from interactions.client.context import _Context
 
 from interactions import Channel, CommandContext, Extension, Guild, Member, User
 
 NoneType: Type[None] = type(None)
+_type: object = type
+Coroutine = Callable[..., Awaitable]
 
 
 def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext) -> str:
@@ -66,7 +68,8 @@ def cooldown(
     """
     if not (delta_args or delta_kwargs):
         raise ValueError(
-            "Cooldown amount must be provided! Valid arguments and keyword arguments are listed in https://docs.python.org/3/library/datetime.html#datetime.timedelta"
+            "Cooldown amount must be provided! Valid arguments and keyword arguments are listed in "
+            "https://docs.python.org/3/library/datetime.html#datetime.timedelta"
         )
 
     delta = timedelta(*delta_args, **delta_kwargs)

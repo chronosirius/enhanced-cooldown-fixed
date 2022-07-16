@@ -11,26 +11,15 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 (c) 2022 interactions-py.
 """
 from inspect import _empty, signature
-from typing import TYPE_CHECKING, Any, Callable, Coroutine, List, Optional, Union, get_args
+from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union, get_args
 
-from interactions import (
-    MISSING,
-    Attachment,
-    Channel,
-    ChannelType,
-    Choice,
-    File,
-    Member,
-    Option,
-    OptionType,
-    Role,
-    User,
-)
+from interactions import MISSING, Attachment, Channel, File, Member, Option, OptionType, Role, User
 
 from ._logging import get_logger
 
 if TYPE_CHECKING:
-    from collections import OrderedDict
+    from types import MappingProxyType
+    from inspect import Parameter
 
 from typing_extensions import _AnnotatedAlias
 
@@ -106,65 +95,47 @@ class EnhancedOption:
 
     Parameters:
 
-    * `?type: type | int | OptionType`: The type of the option.
+    * `?option_type: type | int | OptionType`: The type of the option.
     * `?description: str`: The description of the option. Defaults to the docstring or `"No description"`.
     * `?name: str`: The name of the option. Defaults to the argument name.
-    * `?choices: list[Choice]`: The choices of the option.
-    * `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
-    * `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
-    * `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*
-    * `?autocomplete: bool`: If the option should be autocompleted.
-    * `?focused: bool`: If the option should be focused.
-    * `?value: str`: The value of the option.
     """
 
     def __init__(
         self,
-        type: Union[_type, int, OptionType] = None,
-        description: Optional[str] = None,
+        option_type: Union[_type, int, OptionType] = None,
+        /,
+        description: str = "No description",
         name: Optional[str] = None,
-        choices: Optional[List[Choice]] = None,
-        channel_types: Optional[List[ChannelType]] = None,
-        min_value: Optional[int] = None,
-        max_value: Optional[int] = None,
-        autocomplete: Optional[bool] = None,
-        focused: Optional[bool] = None,
-        value: Optional[str] = None,
+        **kwargs,
     ):
         log.debug("EnhancedOption.__init__")
-        if isinstance(type, (int, _type(None))):
-            self.type = type
-        elif type in (str, int, float, bool):
-            if type is str:
+        if isinstance(option_type, (int, _type(None))):
+            self.type = option_type
+        elif option_type in (str, int, float, bool):
+            if option_type is str:
                 self.type = OptionType.STRING
-            elif type is int:
+            elif option_type is int:
                 self.type = OptionType.INTEGER
-            elif type is float:
+            elif option_type is float:
                 self.type = OptionType.NUMBER
-            elif type is bool:
+            elif option_type is bool:
                 self.type = OptionType.BOOLEAN
-        elif isinstance(type, OptionType):
-            self.type = type
-        elif type is User or type is Member:
+        elif isinstance(option_type, OptionType):
+            self.type = option_type
+        elif option_type is User or option_type is Member:
             self.type = OptionType.USER
-        elif type is Channel:
+        elif option_type is Channel:
             self.type = OptionType.CHANNEL
-        elif type is Role:
+        elif option_type is Role:
             self.type = OptionType.ROLE
-        elif type is File or type is Attachment:
+        elif option_type is File or option_type is Attachment:
             self.type = OptionType.ATTACHMENT
         else:
-            raise TypeError(f"Invalid type: {type}")
+            raise TypeError(f"Invalid type: {option_type}")
 
         self.description = description or "No description"
         self.name = name
-        self.choices = choices
-        self.channel_types = channel_types
-        self.min_value = min_value
-        self.max_value = max_value
-        self.autocomplete = autocomplete
-        self.focused = focused
-        self.value = value
+        self.kwargs = kwargs
 
     def __repr__(self):
         return f"<EnhancedOption type={self.type}, name={self.name}>"
@@ -181,19 +152,18 @@ def loop_params(params: dict, stop: int) -> dict:
     return params
 
 
-def format_parameters(coro: Coroutine):
+def format_parameters(coro: Callable[..., Awaitable]):
     """Formats the parameters of a function."""
-    params: OrderedDict = signature(coro).parameters
+    params: MappingProxyType[str, Parameter] = signature(coro).parameters
     _params: dict = dict(params.items())
-    if coro.__name__ == "eeeeee":
-        print(coro.__qualname__)
+
     if "." in coro.__qualname__:
         return loop_params(_params, 1)
     else:
         return loop_params(_params, 0)
 
 
-def parameters_to_options(coro: Coroutine, has_res: bool = False) -> List[Option]:
+def parameters_to_options(coro: Callable[..., Awaitable], has_res: bool = False) -> List[Option]:
     """Converts `EnhancedOption`s to `Option`s."""
     log.debug("parameters_to_options:")
     params: dict = format_parameters(coro)
@@ -209,13 +179,7 @@ def parameters_to_options(coro: Coroutine, has_res: bool = False) -> List[Option
             name=param.annotation.name or __name,
             description=param.annotation.description,
             required=param.default is _empty,
-            choices=param.annotation.choices,
-            channel_types=param.annotation.channel_types,
-            min_value=param.annotation.min_value,
-            max_value=param.annotation.max_value,
-            autocomplete=param.annotation.autocomplete,
-            focused=param.annotation.focused,
-            value=param.annotation.value,
+            **param.annotation.kwargs,
         )
         if isinstance(param.annotation, EnhancedOption)
         else Option(
@@ -223,13 +187,7 @@ def parameters_to_options(coro: Coroutine, has_res: bool = False) -> List[Option
             name=get_option(param).name or __name,
             description=get_option(param).description,
             required=param.default is _empty,
-            choices=get_option(param).choices,
-            channel_types=get_option(param).channel_types,
-            min_value=get_option(param).min_value,
-            max_value=get_option(param).max_value,
-            autocomplete=get_option(param).autocomplete,
-            focused=get_option(param).focused,
-            value=get_option(param).value,
+            **{key: value for key, value in get_option(param).kwargs},
         )
         if isinstance(param.annotation, _AnnotatedAlias)
         else MISSING
@@ -248,97 +206,3 @@ def parameters_to_options(coro: Coroutine, has_res: bool = False) -> List[Option
     log.debug(f"  _options: {_options}\n")
 
     return _options
-
-
-def option(
-    type: Union[_type, int, OptionType],
-    name: str,
-    description: Optional[str] = "No description",
-    choices: Optional[List[Choice]] = None,
-    required: Optional[bool] = True,
-    channel_types: Optional[List[ChannelType]] = None,
-    min_value: Optional[int] = None,
-    max_value: Optional[int] = None,
-    autocomplete: Optional[bool] = None,
-    focused: Optional[bool] = None,
-    value: Optional[str] = None,
-):
-    """
-    An alternative way to provide options via a decorator.
-
-    Works with the `command` and `(External)SubcommandSetup.subcommand` decorators.
-
-    Incompatible with `EnhancedOption`!
-
-    ```py
-    from interactions.ext.enhanced import option
-    ...
-    bot.load("interactions.ext.enhanced")
-    ...
-    @bot.command(...)
-    @option(int, "name", "description", ...)
-    @option(str, "name2", "description", ...)
-    async def foo(ctx, name: int, name2: str):
-        ...
-    ```
-
-    Parameters:
-
-    * `type: type | int | OptionType`: The type of the option.
-    * `name: str`: The name of the option.
-    * `?description: str`: The description of the option. Defaults to `"No description"`.
-    * `?choices: list[Choice]`: The choices of the option.
-    * `?required: bool`: If the option is required.
-    * `?channel_types: list[ChannelType]`: The channel types of the option. *Only used if the option type is a channel.*
-    * `?min_value: int`: The minimum value of the option. *Only used if the option type is a number or integer.*
-    * `?max_value: int`: The maximum value of the option. *Only used if the option type is a number or integer.*
-    * `?autocomplete: bool`: If the option should be autocompleted.
-    * `?focused: bool`: If the option should be focused.
-    * `?value: str`: The value of the option.
-    """
-
-    def decorator(func: Callable[..., Any]):
-        if isinstance(type, int):
-            _type = type
-        elif type in (str, int, float, bool):
-            if type is str:
-                _type = OptionType.STRING
-            elif type is int:
-                _type = OptionType.INTEGER
-            elif type is float:
-                _type = OptionType.NUMBER
-            elif type is bool:
-                _type = OptionType.BOOLEAN
-        elif isinstance(type, OptionType):
-            _type = type
-        elif type is User or type is Member:
-            _type = OptionType.USER
-        elif type is Channel:
-            _type = OptionType.CHANNEL
-        elif type is Role:
-            _type = OptionType.ROLE
-        elif type is File or type is Attachment:
-            _type = OptionType.ATTACHMENT
-        else:
-            raise TypeError(f"Invalid type: {type}")
-
-        option: Option = Option(
-            type=_type,
-            name=name,
-            description=description,
-            choices=choices,
-            required=required,
-            channel_types=channel_types,
-            min_value=min_value,
-            max_value=max_value,
-            autocomplete=autocomplete,
-            focused=focused,
-            value=value,
-        )
-        if hasattr(func, "__decor_options"):
-            func.__decor_options.insert(0, option)
-        else:
-            func.__decor_options = [option]
-        return func
-
-    return decorator

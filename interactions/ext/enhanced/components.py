@@ -179,6 +179,7 @@ def SelectMenu(
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
     disabled: Optional[bool] = False,
+    **kwargs,
 ) -> SM:
     """
     A helper function that passes arguments to `SelectMenu`.

@@ -14,13 +14,14 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 """
 from functools import wraps
 from re import compile
-from typing import Any, Callable, Coroutine, Optional, Union
+from typing import Awaitable, Callable, Optional, Union
 
 from interactions import Button, Client, Component, Modal, SelectMenu
 
 from ._logging import get_logger
 
 log = get_logger("callback")
+Coroutine = Callable[..., Awaitable]
 
 
 def component(
@@ -28,7 +29,7 @@ def component(
     component: Union[str, Button, SelectMenu],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
-) -> Callable[..., Any]:
+) -> Callable[[Coroutine], Coroutine]:
     """
     A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
@@ -57,7 +58,7 @@ def component(
     * `regex: bool`: Whether the component custom_id should match the given regex. Defaults to `False`.
     """
 
-    def decorator(coro: Coroutine) -> Callable[..., Any]:
+    def decorator(coro: Coroutine) -> Coroutine:
         if hasattr(coro, "__extension"):
             return bot.event(coro, name=f"component_{component}")
 
@@ -96,7 +97,7 @@ def modal(
     modal: Union[Modal, str],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
-) -> Callable[..., Any]:
+) -> Callable[[Coroutine], Coroutine]:
     """
     A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
 
@@ -125,7 +126,7 @@ def modal(
     * `regex: bool`: Whether the modal custom_id should match the given regex. Defaults to `False`.
     """
 
-    def decorator(coro: Coroutine) -> Any:
+    def decorator(coro: Coroutine) -> Coroutine:
         if hasattr(coro, "__extension"):
             return bot.event(coro, name=f"modal_{modal}")
 

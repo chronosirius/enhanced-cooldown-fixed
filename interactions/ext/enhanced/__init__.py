@@ -22,31 +22,14 @@ PyPI: https://pypi.org/project/enhanced/
 
 (c) 2022 interactions-py.
 """
-from . import (
-    _logging,
-    callbacks,
-    command_models,
-    commands,
-    components,
-    cooldowns,
-    extension,
-    subcommands,
-)
+from . import _logging, callbacks, command_models, commands, components, cooldowns, extension
 from ._logging import CustomFormatter, Data, get_logger
 from .callbacks import component, extension_component, extension_modal, modal
-from .command_models import EnhancedOption, option
-from .commands import autodefer, command, extension_command
+from .command_models import EnhancedOption
+from .commands import setup_options
 from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
 from .cooldowns import cooldown
-from .extension import Enhanced, EnhancedExtension, base, setup, sync_subcommands, version
-from .subcommands import (
-    ExternalSubcommandSetup,
-    Group,
-    Subcommand,
-    SubcommandSetup,
-    ext_subcommand_base,
-    subcommand_base,
-)
+from .extension import Enhanced, base, setup, version
 
 # fmt: off
 __all__ = [
@@ -57,18 +40,8 @@ __all__ = [
     # "cmd",
         "command_models",
             "EnhancedOption",  # noqa E131
-            "option",
         "commands",
-            "command",
-            "extension_command",
-            "autodefer",
-        "subcommands",
-            "subcommand_base",
-            "ext_subcommand_base",
-            "SubcommandSetup",
-            "ExternalSubcommandSetup",
-            "Subcommand",
-            "Group",
+            "setup_options",
     # "cmpt",
         "callbacks",
             "component",
@@ -83,8 +56,6 @@ __all__ = [
             "Modal",
             "spread_to_rows",
     "extension",
-        "sync_subcommands",
-        "EnhancedExtension",
         "Enhanced",
         "setup",
         "base",

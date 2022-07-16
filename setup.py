@@ -21,7 +21,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        "discord-py-interactions>=4.1.1rc.1",
+        "discord-py-interactions>=4.3.0",
         "typing_extensions",
     ],
 )
