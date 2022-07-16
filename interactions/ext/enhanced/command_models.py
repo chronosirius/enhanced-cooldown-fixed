@@ -143,12 +143,10 @@ class EnhancedOption:
 
 def loop_params(params: dict, stop: int) -> dict:
     """Loops through the parameters and deletes until stop index."""
-    print("params:", params)
     for i, key in enumerate(params.copy()):
         if i > stop:
             break
         del params[key]
-    print("params:", params)
     return params
 
 
@@ -171,8 +169,6 @@ def parameters_to_options(coro: Callable[..., Awaitable], has_res: bool = False)
         for key in params:
             del params[key]
             break
-    if coro.__name__ == "options":
-        print("OPTS   ", params)
     _options = [
         Option(
             type=param.annotation.type,
@@ -195,11 +191,6 @@ def parameters_to_options(coro: Callable[..., Awaitable], has_res: bool = False)
     ]
 
     if any(opt is MISSING for opt in _options):
-        for opt in _options:
-            if opt is MISSING:
-                print(" ", "MISSING")
-            else:
-                print(" ", opt.type, opt.name)
         raise TypeError(
             "You must typehint with `EnhancedOption` or specify `options=...` in the decorator!"
         )

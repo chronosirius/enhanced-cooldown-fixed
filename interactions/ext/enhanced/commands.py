@@ -38,10 +38,10 @@ def setup_options(coro: Callable[..., Awaitable]):
         nonlocal params
         return len(params) > num and all(
             isinstance(param.annotation, (EnhancedOption, _AnnotatedAlias))
-            for param in params.values()[num:]
+            for param in list(params.values())[num:]
         )
 
-    if not check(1) or check(2):
+    if not (check(1) or check(2)):
         return coro
 
     options = parameters_to_options(coro)
