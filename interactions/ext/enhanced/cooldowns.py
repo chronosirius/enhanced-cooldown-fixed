@@ -27,8 +27,10 @@ def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext
     """Returns the appropriate ID for the type provided."""
     type = type.lower() if isinstance(type, str) else type
 
-    if type == "user" or type is User or type == "member" or type is Member:
+    if type == "user" or type is User:
         return str(ctx.user.id)
+    if type == "member" or type is Member:
+        return f"{ctx.guild.id}:{ctx.author.id}"
     if type == "channel" or type is Channel:
         return str(ctx.channel_id)
     if type == "guild" or type is Guild:
