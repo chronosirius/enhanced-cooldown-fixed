@@ -16,7 +16,7 @@ from typing import Awaitable, Callable, Optional, Type, Union
 
 from interactions.client.context import _Context
 
-from interactions import Channel, CommandContext, Extension, Guild, Member, User
+from interactions import Channel, Command, CommandContext, Extension, Guild, Member, User
 
 NoneType: Type[None] = type(None)
 _type: object = type
@@ -42,6 +42,7 @@ def cooldown(
     *delta_args,
     error: Optional[Coroutine] = None,
     type: Optional[Union[str, User, Channel, Guild]] = "user",
+    count: int = 1,
     **delta_kwargs,
 ):
     """
@@ -66,6 +67,7 @@ def cooldown(
     * `*delta_args: tuple[datetime.timedelta arguments]`: The arguments to pass to `datetime.timedelta`.
     * `?error: Coroutine`: The function to call if the user is on cooldown. Defaults to `None`.
     * `?type: str | User | Channel | Guild`: The type of cooldown. Defaults to `None`.
+    * `?count: int`: The number of times the user can use the command before they are on cooldown. Defaults to `1`.
     * `**delta_kwargs: dict[datetime.timedelta arguments]`: The keyword arguments to pass to `datetime.timedelta`.
     """
     if not (delta_args or delta_kwargs):
@@ -77,7 +79,11 @@ def cooldown(
     delta = timedelta(*delta_args, **delta_kwargs)
 
     def decorator(coro: Coroutine):
+        if isinstance(coro, Command):
+            raise ValueError("Cooldowns must go below command decorators!")
+
         coro.__last_called = {}
+        coro.__count = 0
 
         if not isinstance(error, (Callable, NoneType)):
             raise TypeError(
@@ -88,14 +94,16 @@ def cooldown(
 
         @wraps(coro)
         async def wrapper(ctx: Union[CommandContext, Extension], *args, **kwargs):
+            coro.__count += 1
             args: list = list(args)
             _ctx: CommandContext = ctx if isinstance(ctx, _Context) else args.pop(0)
             last_called: dict = coro.__last_called
             now = datetime.now()
             id = get_id(type, _ctx)
             unique_last_called = last_called.get(id)
+            on_cooldown: bool = unique_last_called and (now - unique_last_called < delta)
 
-            if unique_last_called and (now - unique_last_called < delta):
+            if on_cooldown and coro.__count > count:
                 if not error:
                     return await _ctx.send(
                         f"This command is on cooldown for {delta - (now - unique_last_called)}!"
@@ -116,6 +124,7 @@ def cooldown(
 
             last_called[id] = now
             coro.__last_called = last_called
+            coro.__count = 1 if coro.__count > count else coro.__count
             if isinstance(ctx, _Context):
                 return await coro(_ctx, *args, **kwargs)
             return await coro(ctx, _ctx, *args, **kwargs)
