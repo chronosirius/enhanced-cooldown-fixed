@@ -78,10 +78,11 @@ class Cooldown:
 
     def __call__(self, coro: Coroutine) -> Coroutine:
         if isinstance(coro, Command):
-            raise ValueError("Cooldowns must go below command decorators!")
+            raise SyntaxError("Cooldowns must go below command decorators!")
 
         @wraps(coro)
         async def wrapper(ctx: Union[CommandContext, Extension], *args, **kwargs):
+            coro.cooldown = self
             args: list = list(args)
             _ctx: CommandContext = ctx if isinstance(ctx, _Context) else args.pop(0)
             id = self.get_id(self.type, _ctx)
