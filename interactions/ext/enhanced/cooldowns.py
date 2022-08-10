@@ -12,7 +12,7 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 from datetime import datetime, timedelta
 from functools import wraps
 from inspect import iscoroutinefunction, signature
-from typing import Awaitable, Callable, Optional, Type, Union
+from typing import Awaitable, Callable, Dict, Optional, Type, Union
 
 from interactions.client.context import _Context
 
@@ -23,28 +23,7 @@ _type: object = type
 Coroutine = Callable[..., Awaitable]
 
 
-def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext) -> str:
-    """Returns the appropriate ID for the type provided."""
-    type = type.lower() if isinstance(type, str) else type
-
-    if type == "user" or type is User:
-        return str(ctx.user.id)
-    if type == "member" or type is Member:
-        return f"{ctx.guild.id}:{ctx.author.id}"
-    if type == "channel" or type is Channel:
-        return str(ctx.channel_id)
-    if type == "guild" or type is Guild:
-        return str(ctx.guild_id)
-    raise TypeError("Invalid type provided for `type`!")
-
-
-def cooldown(
-    *delta_args,
-    error: Optional[Coroutine] = None,
-    type: Optional[Union[str, User, Channel, Guild]] = "user",
-    count: int = 1,
-    **delta_kwargs,
-):
+class Cooldown:
     """
     A decorator for handling cooldowns.
 
@@ -70,65 +49,96 @@ def cooldown(
     * `?count: int`: The number of times the user can use the command before they are on cooldown. Defaults to `1`.
     * `**delta_kwargs: dict[datetime.timedelta arguments]`: The keyword arguments to pass to `datetime.timedelta`.
     """
-    if not (delta_args or delta_kwargs):
-        raise ValueError(
-            "Cooldown amount must be provided! Valid arguments and keyword arguments are listed in "
-            "https://docs.python.org/3/library/datetime.html#datetime.timedelta"
-        )
 
-    delta = timedelta(*delta_args, **delta_kwargs)
-
-    def decorator(coro: Coroutine):
-        if isinstance(coro, Command):
-            raise ValueError("Cooldowns must go below command decorators!")
-
-        coro.__last_called = {}
-        coro.__count = 0
-
-        if not isinstance(error, (Callable, NoneType)):
-            raise TypeError(
-                "Invalid type provided for `error`! Must be a `Callable`, specifically a `Coroutine`!"
+    def __init__(
+        self,
+        *delta_args,
+        error: Optional[Coroutine] = None,
+        type: Optional[Union[str, User, Channel, Guild]] = "user",
+        count: int = 1,
+        **delta_kwargs,
+    ):
+        if not (delta_args or delta_kwargs):
+            raise ValueError(
+                "Cooldown amount must be provided! Valid arguments and keyword arguments are listed in "
+                "https://docs.python.org/3/library/datetime.html#datetime.timedelta"
             )
+        if not isinstance(error, (Callable, NoneType)):
+            raise TypeError("Invalid type provided for `error`! Must be a `Coroutine`!")
         if type not in {"user", User, "member", Member, "guild", Guild, "channel", Channel}:
             raise TypeError("Invalid type provided for `type`!")
 
+        self.delta = timedelta(*delta_args, **delta_kwargs)
+        self.error = error
+        self.type = type
+
+        self.last_called: Dict[str, datetime] = {}
+        self.count: int = count
+        self.coro_count: Dict[str, int] = {}
+
+    def __call__(self, coro: Coroutine) -> Coroutine:
+        if isinstance(coro, Command):
+            raise ValueError("Cooldowns must go below command decorators!")
+
         @wraps(coro)
         async def wrapper(ctx: Union[CommandContext, Extension], *args, **kwargs):
-            coro.__count += 1
             args: list = list(args)
             _ctx: CommandContext = ctx if isinstance(ctx, _Context) else args.pop(0)
-            last_called: dict = coro.__last_called
+            id = self.get_id(self.type, _ctx)
+            self.coro_count[id] = self.coro_count.get(id, 0) + 1
             now = datetime.now()
-            id = get_id(type, _ctx)
-            unique_last_called = last_called.get(id)
-            on_cooldown: bool = unique_last_called and (now - unique_last_called < delta)
+            unique_last_called = self.last_called.get(id)
+            on_cooldown: bool = unique_last_called and (now - unique_last_called < self.delta)
 
-            if on_cooldown and coro.__count > count:
-                if not error:
+            if on_cooldown and self.coro_count[id] > self.count:
+                if not self.error:
                     return await _ctx.send(
-                        f"This command is on cooldown for {delta - (now - unique_last_called)}!"
+                        f"This command is on cooldown for {self.delta - (now - unique_last_called)}!"
                     )
                 return (
                     (
-                        await error(_ctx, delta - (now - unique_last_called))
-                        if iscoroutinefunction(error)
-                        else error(_ctx, delta - (now - unique_last_called))
+                        await self.error(_ctx, self.delta - (now - unique_last_called))
+                        if iscoroutinefunction(self.error)
+                        else self.error(_ctx, self.delta - (now - unique_last_called))
                     )
-                    if len(signature(error).parameters) == 2
+                    if len(signature(self.error).parameters) == 2
                     else (
-                        await error(ctx, _ctx, delta - (now - unique_last_called))
-                        if iscoroutinefunction(error)
-                        else error(ctx, _ctx, delta - (now - unique_last_called))
+                        await self.error(ctx, _ctx, self.delta - (now - unique_last_called))
+                        if iscoroutinefunction(self.error)
+                        else self.error(ctx, _ctx, self.delta - (now - unique_last_called))
                     )
                 )
 
-            last_called[id] = now
-            coro.__last_called = last_called
-            coro.__count = 1 if coro.__count > count else coro.__count
+            self.last_called[id] = now
+            self.coro_count[id] = 1 if self.coro_count[id] > self.count else self.coro_count[id]
             if isinstance(ctx, _Context):
                 return await coro(_ctx, *args, **kwargs)
             return await coro(ctx, _ctx, *args, **kwargs)
 
         return wrapper
 
-    return decorator
+    def reset(self, id: Optional[str] = None):
+        if id:
+            self.last_called.pop(id)
+            self.coro_count.pop(id)
+        else:
+            self.last_called = {}
+            self.coro_count = {}
+
+    @staticmethod
+    def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext) -> str:
+        """Returns the appropriate ID for the type provided."""
+        type = type.lower() if isinstance(type, str) else type
+
+        if type == "user" or type is User:
+            return str(ctx.user.id)
+        if type == "member" or type is Member:
+            return f"{ctx.guild.id}:{ctx.author.id}"
+        if type == "channel" or type is Channel:
+            return str(ctx.channel_id)
+        if type == "guild" or type is Guild:
+            return str(ctx.guild_id)
+        raise TypeError("Invalid type provided for `type`!")
+
+
+cooldown = Cooldown
