@@ -13,6 +13,7 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 import types
 from logging import Logger
 from re import fullmatch
+from typing import Union
 
 from interactions import Client, CommandContext, ComponentContext, Extension
 from interactions.ext import Base, Version, VersionAuthor
@@ -37,7 +38,7 @@ base = Base(
     link="https://github.com/interactions-py/enhanced",
     packages=["interactions.ext.enhanced"],
     requirements=[
-        "discord-py-interactions>=4.2.0",
+        "discord-py-interactions>=4.3.0",
         "typing_extensions",
     ],
 )
@@ -91,49 +92,38 @@ class Enhanced(Extension):
 
         log.info("Hooks applied")
 
-    async def _on_component(self, ctx: ComponentContext):
-        """on_component callback for modified callbacks."""
+    async def __callback(self, ctx: Union[ComponentContext, CommandContext]):
+        callback = "component" if isinstance(ctx, ComponentContext) else "modal"
         websocket = self.client._websocket
-        if any(
+
+        if not any(
             any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
             for _, funcs in websocket._dispatch.events.items()
         ):
-            for decorator_custom_id, funcs in websocket._dispatch.events.items():
-                for func in funcs:
-                    if hasattr(func, "startswith"):
-                        if ctx.data.custom_id.startswith(
-                            decorator_custom_id.replace("component_startswith_", "")
-                        ):
-                            log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
-                    elif hasattr(func, "regex") and fullmatch(
-                        func.regex,
-                        ctx.data.custom_id.replace("component_regex_", ""),
+            return
+
+        for decorator_custom_id, funcs in websocket._dispatch.events.items():
+            for func in funcs:
+                if hasattr(func, "startswith"):
+                    if ctx.data.custom_id.startswith(
+                        decorator_custom_id.replace(f"{callback}_startswith_", "")
                     ):
-                        log.info(f"{func} regex {func.regex} matched")
+                        log.info(f"{func} startswith {func.startswith} matched")
                         return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+                elif hasattr(func, "regex") and fullmatch(
+                    func.regex,
+                    ctx.data.custom_id.replace(f"{callback}_regex_", ""),
+                ):
+                    log.info(f"{func} regex {func.regex} matched")
+                    return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+
+    async def _on_component(self, ctx: ComponentContext):
+        """on_component callback for modified callbacks."""
+        return await self.__callback(ctx)
 
     async def _on_modal(self, ctx: CommandContext):
         """on_modal callback for modified callbacks."""
-        websocket = self.client._websocket
-        if any(
-            any(hasattr(func, "startswith") or hasattr(func, "regex") for func in funcs)
-            for _, funcs in websocket._dispatch.events.items()
-        ):
-            for decorator_custom_id, funcs in websocket._dispatch.events.items():
-                for func in funcs:
-                    if hasattr(func, "startswith"):
-                        if ctx.data.custom_id.startswith(
-                            decorator_custom_id.replace("modal_startswith_", "")
-                        ):
-                            log.info(f"{func} startswith {func.startswith} matched")
-                            return websocket._dispatch.dispatch(decorator_custom_id, ctx)
-                    elif hasattr(func, "regex") and fullmatch(
-                        func.regex,
-                        ctx.data.custom_id.replace("modal_regex_", ""),
-                    ):
-                        log.info(f"{func} regex {func.regex} matched")
-                        return websocket._dispatch.dispatch(decorator_custom_id, ctx)
+        return await self.__callback(ctx)
 
 
 def setup(
