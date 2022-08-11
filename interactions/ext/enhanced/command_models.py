@@ -23,6 +23,8 @@ if TYPE_CHECKING:
 
 from typing_extensions import _AnnotatedAlias
 
+__all__ = ("EnhancedOption",)
+
 log = get_logger("command_models")
 _type: type = type
 
@@ -96,8 +98,9 @@ class EnhancedOption:
     Parameters:
 
     * `?option_type: type | int | OptionType`: The type of the option.
-    * `?description: str`: The description of the option. Defaults to the docstring or `"No description"`.
+    * `?description: str = "No description"`: The description of the option.
     * `?name: str`: The name of the option. Defaults to the argument name.
+    * `?**kwargs`: Any additional keyword arguments, same as `ipy.Option`.
     """
 
     def __init__(

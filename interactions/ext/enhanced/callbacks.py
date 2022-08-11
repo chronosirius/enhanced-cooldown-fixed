@@ -23,15 +23,18 @@ from ._logging import get_logger
 log = get_logger("callback")
 Coroutine = Callable[..., Awaitable]
 
+__all__ = ("component", "modal", "extension_component", "extension_modal")
+
 
 def component(
     bot: Client,
     component: Union[str, Button, SelectMenu],
-    startswith: Optional[bool] = False,
-    regex: Optional[bool] = False,
+    startswith: bool = False,
+    regex: bool = False,
 ) -> Callable[[Coroutine], Coroutine]:
     """
-    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
+    A modified decorator that allows you to add more information to the `custom_id` and use
+    `startswith` or `regex` to invoke the callback.
 
     ```py
     bot.load("interactions.ext.enhanced")
@@ -53,9 +56,10 @@ def component(
 
     Parameters:
 
+    * `(X)bot: Client`: The bot client.
     * `component: str | Button | SelectMenu`: The component custom_id or regex to listen to.
-    * `startswith: bool`: Whether the component custom_id should start with the given string. Defaults to `False`.
-    * `regex: bool`: Whether the component custom_id should match the given regex. Defaults to `False`.
+    * `?startswith: bool = False`: Whether the component custom_id starts with the given string.
+    * `?regex: bool = False`: Whether the component custom_id matches the given regex.
     """
 
     def decorator(coro: Coroutine) -> Coroutine:
@@ -95,11 +99,12 @@ def component(
 def modal(
     bot: Client,
     modal: Union[Modal, str],
-    startswith: Optional[bool] = False,
-    regex: Optional[bool] = False,
+    startswith: bool = False,
+    regex: bool = False,
 ) -> Callable[[Coroutine], Coroutine]:
     """
-    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback.
+    A modified decorator that allows you to add more information to the `custom_id` and use
+    `startswith` or `regex` to invoke the callback.
 
     ```py
     bot.load("interactions.ext.enhanced")
@@ -121,9 +126,10 @@ def modal(
 
     Parameters:
 
+    * `(X)bot: Client`: The bot client.
     * `modal: str | Modal`: The modal custom_id or regex to listen to.
-    * `startswith: bool`: Whether the modal custom_id should start with the given string. Defaults to `False`.
-    * `regex: bool`: Whether the modal custom_id should match the given regex. Defaults to `False`.
+    * `?startswith: bool = False`: Whether the modal custom_id starts with the given string.
+    * `?regex: bool`: Whether the modal custom_id matches the given regex.
     """
 
     def decorator(coro: Coroutine) -> Coroutine:
@@ -156,14 +162,14 @@ def modal(
     return decorator
 
 
-@wraps(Client.component)
 def extension_component(
     component: Union[str, Button, SelectMenu],
     startswith: Optional[bool] = False,
     regex: Optional[bool] = False,
 ):
     """
-    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback inside of `Extension`s.
+    A modified decorator that allows you to add more information to the `custom_id` and use
+    `startswith` or `regex` to invoke the callback inside of `Extension`s.
 
     ```py
     # main.py:
@@ -187,8 +193,8 @@ def extension_component(
     Parameters:
 
     * `component: str | Button | SelectMenu`: The component custom_id or regex to listen to.
-    * `startswith: bool`: Whether the component custom_id should start with the given string. Defaults to `False`.
-    * `regex: bool`: Whether the component custom_id should match the given regex. Defaults to `False`.
+    * `?startswith: bool = False`: Whether the component custom_id starts with the given string.
+    * `?regex: bool = False`: Whether the component custom_id matches the given regex.
     """
 
     def decorator(func):
@@ -227,14 +233,14 @@ def extension_component(
     return decorator
 
 
-@wraps(Client.modal)
 def extension_modal(
     modal: Union[Modal, str],
-    startswith: Optional[bool] = False,
-    regex: Optional[bool] = False,
+    startswith: bool = False,
+    regex: bool = False,
 ):
     """
-    A modified decorator that allows you to add more information to the `custom_id` and use `startswith` or `regex` to invoke the callback inside of `Extension`s.
+    A modified decorator that allows you to add more information to the `custom_id` and use
+    `startswith` or `regex` to invoke the callback inside of `Extension`s.
 
     ```py
     # main.py:
@@ -258,8 +264,8 @@ def extension_modal(
     Parameters:
 
     * `modal: str | Modal`: The modal custom_id or regex to listen to.
-    * `startswith: bool`: Whether the modal custom_id should start with the given string. Defaults to `False`.
-    * `regex: bool`: Whether the modal custom_id should match the given regex. Defaults to `False`.
+    * `?startswith: bool = False`: Whether the modal custom_id starts with the given string.
+    * `?regex: bool` = False: Whether the modal custom_id matches the given regex.
     """
 
     def decorator(func):

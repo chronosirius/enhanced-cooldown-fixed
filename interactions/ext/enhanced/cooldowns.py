@@ -18,16 +18,19 @@ from interactions.client.context import _Context
 
 from interactions import Channel, Command, CommandContext, Extension, Guild, Member, User
 
+__all__ = ("cooldown",)
+
 NoneType: Type[None] = type(None)
 _type: object = type
 Coroutine = Callable[..., Awaitable]
 
 
-class Cooldown:
+class cooldown:
     """
     A decorator for handling cooldowns.
 
-    Parameters for `datetime.timedelta` are `days=0, seconds=0, microseconds=0, milliseconds=0, minutes=0, hours=0, weeks=0`.
+    Parameters for `datetime.timedelta` are `days=0, seconds=0, microseconds=0,
+    milliseconds=0, minutes=0, hours=0, weeks=0`.
 
     ```py
     from interactions.ext.better_interactions import cooldown
@@ -44,9 +47,9 @@ class Cooldown:
     Parameters:
 
     * `*delta_args: tuple[datetime.timedelta arguments]`: The arguments to pass to `datetime.timedelta`.
-    * `?error: Coroutine`: The function to call if the user is on cooldown. Defaults to `None`.
-    * `?type: str | User | Channel | Guild`: The type of cooldown. Defaults to `None`.
-    * `?count: int`: The number of times the user can use the command before they are on cooldown. Defaults to `1`.
+    * `?error: Coroutine`: The function to call if the user is on cooldown.
+    * `?type: str | User | Channel | Guild = "user"`: The type of cooldown.
+    * `?count: int = 1`: The number of times the user can use the command before they are on cooldown.
     * `**delta_kwargs: dict[datetime.timedelta arguments]`: The keyword arguments to pass to `datetime.timedelta`.
     """
 
@@ -54,7 +57,7 @@ class Cooldown:
         self,
         *delta_args,
         error: Optional[Coroutine] = None,
-        type: Optional[Union[str, User, Channel, Guild]] = "user",
+        type: Optional[Union[str, User, Member, Channel, Guild]] = "user",
         count: int = 1,
         **delta_kwargs,
     ):
@@ -119,6 +122,20 @@ class Cooldown:
         return wrapper
 
     def reset(self, id: Optional[str] = None):
+        """
+        Resets the cooldown.
+
+        ```py
+        @client.command(...)
+        @cooldown(..., type=..., seconds=..., ...)
+        async def cooldown_command(ctx, ...):
+            cooldown_command.cooldown.reset(cooldown.get_id("user", ctx))
+        ```
+
+        Parameters:
+
+        * `?id: str`: The id of the cooldown to reset. If not provided, all cooldowns are reset.
+        """
         if id:
             self.last_called.pop(id)
             self.coro_count.pop(id)
@@ -127,8 +144,17 @@ class Cooldown:
             self.coro_count = {}
 
     @staticmethod
-    def get_id(type: Optional[Union[str, User, Channel, Guild]], ctx: CommandContext) -> str:
-        """Returns the appropriate ID for the type provided."""
+    def get_id(
+        type: Optional[Union[str, User, Member, Channel, Guild]], ctx: CommandContext
+    ) -> str:
+        """
+        Returns the appropriate ID for the type provided.
+
+        Parameters:
+
+        * `?type: str | User | Member | Channel | Guild`: The type of cooldown.
+        * `ctx: CommandContext`: The context to get the id from.
+        """
         type = type.lower() if isinstance(type, str) else type
 
         if type == "user" or type is User:
@@ -140,6 +166,3 @@ class Cooldown:
         if type == "guild" or type is Guild:
             return str(ctx.guild_id)
         raise TypeError("Invalid type provided for `type`!")
-
-
-cooldown = Cooldown

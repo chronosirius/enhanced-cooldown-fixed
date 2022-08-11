@@ -28,6 +28,15 @@ from interactions import TextStyleType as TST
 
 from ._logging import get_logger
 
+__all__ = (
+    "ActionRow",
+    "Button",
+    "SelectOption",
+    "SelectMenu",
+    "TextInput",
+    "Modal",
+)
+
 log = get_logger("components")
 
 
@@ -66,7 +75,8 @@ def Button(
     custom_id: Optional[str] = None,
     url: Optional[str] = None,
     emoji: Optional[Emoji] = None,
-    disabled: Optional[bool] = False,
+    disabled: bool = False,
+    **kwargs,
 ) -> B:
     """
     A helper function that passes arguments to `Button`.
@@ -87,10 +97,11 @@ def Button(
 
     * `style: ButtonStyle | int`: The style of the button.
     * `label: str`: The label of the button.
-    * `(?)custom_id: str`: The custom id of the button. *Required if the button is not a `ButtonStyle.LINK`.*
-    * `(?)url: str`: The URL of the button. *Required if the button is a `ButtonStyle.LINK`.*
+    * `(?)custom_id: str`: The custom id of the button. *Required if the button is not a link.*
+    * `(?)url: str`: The URL of the button. *Required if the button is a link.*
     * `?emoji: Emoji`: The emoji of the button.
-    * `?disabled: bool`: Whether the button is disabled. Defaults to `False`.
+    * `?disabled: bool = False`: Whether the button is disabled.
+    * `**kwargs: dict`: Any additional arguments of the button.
 
     Returns:
 
@@ -122,6 +133,7 @@ def Button(
         url=url,
         emoji=emoji,
         disabled=disabled,
+        **kwargs,
     )
 
 
@@ -130,7 +142,8 @@ def SelectOption(
     value: str,
     description: Optional[str] = None,
     emoji: Optional[Emoji] = None,
-    disabled: Optional[bool] = False,
+    disabled: bool = False,
+    **kwargs,
 ) -> SO:
     """
     A helper function that passes arguments to `SelectOption`.
@@ -153,7 +166,8 @@ def SelectOption(
     * `value: str`: The value of the option.
     * `?description: str`: The description of the option.
     * `?emoji: Emoji`: The emoji of the option.
-    * `?disabled: bool`: Whether the option is disabled. Defaults to `False`.
+    * `?disabled: bool = False`: Whether the option is disabled.
+    * `**kwargs: dict`: Any additional arguments of the option.
 
     Returns:
 
@@ -168,6 +182,7 @@ def SelectOption(
         description=description,
         emoji=emoji,
         disabled=disabled,
+        **kwargs,
     )
 
 
@@ -178,7 +193,7 @@ def SelectMenu(
     placeholder: Optional[str] = None,
     min_values: Optional[int] = None,
     max_values: Optional[int] = None,
-    disabled: Optional[bool] = False,
+    disabled: bool = False,
     **kwargs,
 ) -> SM:
     """
@@ -204,6 +219,7 @@ def SelectMenu(
     * `?min_values: int`: The minimum number of values that can be selected.
     * `?max_values: int`: The maximum number of values that can be selected.
     * `?disabled: bool`: Whether the select menu is disabled. Defaults to `False`.
+    * `**kwargs: dict`: Any additional arguments of the select menu.
 
     Returns:
 
@@ -219,18 +235,20 @@ def SelectMenu(
         min_values=min_values,
         max_values=max_values,
         disabled=disabled,
+        **kwargs,
     )
 
 
 def TextInput(
     custom_id: str,
     label: str,
-    style: Optional[TST] = TST.SHORT,
+    style: TST = TST.SHORT,
     value: Optional[str] = None,
-    required: Optional[bool] = True,
+    required: bool = True,
     placeholder: Optional[str] = None,
     min_length: Optional[int] = None,
     max_length: Optional[int] = None,
+    **kwargs,
 ) -> TI:
     """
     A helper function that passes arguments to `TextInput`.
@@ -253,7 +271,7 @@ def TextInput(
     * `label: str`: The label of the text input.
     * `?style: TextInputStyle | int`: The style of the text input.
     * `?value: str`: The value of the text input.
-    * `?required: bool`: Whether the text input is required. Defaults to `True`.
+    * `?required: bool = True`: Whether the text input is required.
     * `?placeholder: str`: The placeholder of the text input.
     * `?min_length: int`: The minimum length of the text input.
     * `?max_length: int`: The maximum length of the text input.
@@ -274,10 +292,11 @@ def TextInput(
         placeholder=placeholder,
         min_length=min_length,
         max_length=max_length,
+        **kwargs,
     )
 
 
-def Modal(custom_id: str, title: str, components: List[TI]) -> M:
+def Modal(custom_id: str, title: str, components: List[TI], **kwargs) -> M:
     """
     A helper function that passes arguments to `Modal`.
 
@@ -298,64 +317,11 @@ def Modal(custom_id: str, title: str, components: List[TI]) -> M:
     * `custom_id: str`: The custom id of the modal.
     * `title: str`: The title of the modal.
     * `components: list[TextInput]`: The components of the modal.
+    * `**kwargs: dict`: Any additional arguments of the modal.
 
     Returns:
 
     `Modal`
     """
     log.debug(f"Creating Modal with {custom_id=}, {title=}, {components=}")
-    return M(custom_id=custom_id, title=title, components=components)
-
-
-def spread_to_rows(*components: Union[AR, B, SM], max_in_row: int = 5) -> List[AR]:
-    """
-    A helper function that spreads your components into `ActionRow`s of a set size.
-
-    ```py
-    rows = spread_to_rows(..., max_in_row=...)
-    ```
-
-    Parameters:
-
-    * `*components: tuple[ActionRow | Button | SelectMenu]`: The components to spread, use `None` to explicit start a new row.
-    * `?max_in_row: int`: The maximum number of components in a row. Defaults to `5`.
-
-    Returns:
-
-    `list[ActionRow]`
-    """
-    log.debug(f"spread_to_rows with {components=}, {max_in_row=}")
-    # todo: incorrect format errors
-    if not components or len(components) > 25:
-        raise ValueError("Number of components should be between 1 and 25.")
-    if not 1 <= max_in_row <= 5:
-        raise ValueError("max_in_row should be between 1 and 5.")
-
-    rows = []
-    action_row = []
-    for component in list(components):
-        if component is not None and isinstance(component, B):
-            action_row.append(component)
-
-            if len(action_row) == max_in_row:
-                rows.append(ActionRow(*action_row))
-                action_row = []
-
-            continue
-
-        if action_row:
-            rows.append(ActionRow(*action_row))
-            action_row = []
-
-        if component is not None:
-            if isinstance(component, AR):
-                rows.append(component)
-            elif isinstance(component, SM):
-                rows.append(ActionRow(component))
-    if action_row:
-        rows.append(ActionRow(*action_row))
-
-    if len(rows) > 5:
-        raise ValueError("Number of rows exceeds 5.")
-
-    return rows
+    return M(custom_id=custom_id, title=title, components=components, **kwargs)

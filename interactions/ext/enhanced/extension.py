@@ -20,6 +20,8 @@ from interactions.ext import Base, Version, VersionAuthor
 
 from ._logging import get_logger
 
+__all__ = ("Enhanced", "setup")
+
 log: Logger = get_logger("extension")
 
 

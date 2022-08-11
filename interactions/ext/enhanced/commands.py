@@ -18,6 +18,8 @@ from typing_extensions import _AnnotatedAlias
 from ._logging import get_logger
 from .command_models import EnhancedOption, parameters_to_options
 
+__all__ = ("setup_options",)
+
 log: Logger = get_logger("command")
 
 
@@ -31,6 +33,11 @@ def setup_options(coro: Callable[..., Awaitable]):
     @setup_options
     async def test(ctx, option: EnhancedOption(...)):
         ...
+    ```
+
+    Parameters:
+
+    * `(X)coro: Callable[..., Awaitable]`: The coroutine to setup the options of.
     """
     params = signature(coro).parameters
 

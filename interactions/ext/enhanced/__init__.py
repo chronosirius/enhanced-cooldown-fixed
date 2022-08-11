@@ -27,7 +27,7 @@ from ._logging import CustomFormatter, Data, get_logger
 from .callbacks import component, extension_component, extension_modal, modal
 from .command_models import EnhancedOption
 from .commands import setup_options
-from .components import ActionRow, Button, Modal, SelectMenu, TextInput, spread_to_rows
+from .components import ActionRow, Button, Modal, SelectMenu, TextInput
 from .cooldowns import cooldown
 from .extension import Enhanced, base, setup, version
 
@@ -54,7 +54,6 @@ __all__ = [
             "SelectMenu",
             "TextInput",
             "Modal",
-            "spread_to_rows",
     "extension",
         "Enhanced",
         "setup",
