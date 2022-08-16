@@ -11,7 +11,7 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 (c) 2022 interactions-py.
 """
 from inspect import _empty, signature
-from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Union, get_args
+from typing import TYPE_CHECKING, Awaitable, Callable, List, Optional, Type, Union, get_args
 
 from interactions import MISSING, Attachment, Channel, File, Member, Option, OptionType, Role, User
 
@@ -164,7 +164,9 @@ def format_parameters(coro: Callable[..., Awaitable]):
         return loop_params(_params, 0)
 
 
-def parameters_to_options(coro: Callable[..., Awaitable], has_res: bool = False) -> List[Option]:
+def parameters_to_options(
+    coro: Callable[..., Awaitable], has_res: bool = False
+) -> Optional[List[Option]]:
     """Converts `EnhancedOption`s to `Option`s."""
     log.debug("parameters_to_options:")
     params: dict = format_parameters(coro)
@@ -172,7 +174,8 @@ def parameters_to_options(coro: Callable[..., Awaitable], has_res: bool = False)
         for key in params:
             del params[key]
             break
-    _options = [
+
+    _options: List[Union[Option, Type[MISSING]]] = [
         Option(
             type=param.annotation.type,
             name=param.annotation.name or __name,
@@ -186,7 +189,7 @@ def parameters_to_options(coro: Callable[..., Awaitable], has_res: bool = False)
             name=get_option(param).name or __name,
             description=get_option(param).description,
             required=param.default is _empty,
-            **{key: value for key, value in get_option(param).kwargs},
+            **get_option(param).kwargs,
         )
         if isinstance(param.annotation, _AnnotatedAlias)
         else MISSING

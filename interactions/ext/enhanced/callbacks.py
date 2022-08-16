@@ -12,7 +12,6 @@ GitHub: https://github.com/interactions-py/enhanced/blob/main/interactions/ext/e
 
 (c) 2022 interactions-py.
 """
-from functools import wraps
 from re import compile
 from typing import Awaitable, Callable, Optional, Union
 
