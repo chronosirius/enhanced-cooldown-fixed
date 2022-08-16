@@ -1,6 +1,6 @@
 # Enhanced commands
 
-Enhanced commands have the ability to typehint the parameters 
+Enhanced commands have the ability to typehint the parameters
 of the function instead of specifying them in the decorator.
 
 ## Status

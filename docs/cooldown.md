@@ -4,7 +4,7 @@ Cooldowns are used to set a timer/cooldown/slowmode for a slash command.
 
 They can be set to cooldown for a specific `Member`, `User`, `Channel`, or `Guild`.
 
-You can specify the amount of time to cooldown for, by specifying microseconds, 
+You can specify the amount of time to cooldown for, by specifying microseconds,
 milliseconds, seconds, minutes, hours, days, and/or weeks.
 
 You can also specify an optional coroutine to execute if the command is on cooldown.
