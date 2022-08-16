@@ -8,8 +8,6 @@ The `SelectMenu` component has `style` and `options` as positional arguments, an
 
 The `ActionRow` component uses `*args`, which lets you do `ActionRow(Button(...), Button(...))` instead of `ActionRow(components=[Button(...), Button(...)])`.
 
-The `spread_to_rows` function takes a list of components and returns a list of rows, where each row has a maximum of 5 components.
-
 The `TextInput` component has positional arguments, and shows which are optional and which are not.
 
 The `Modal` just has positional arguments.

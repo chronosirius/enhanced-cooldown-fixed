@@ -20,7 +20,6 @@ pip install -U enhanced
 - [Table of Contents](#table-of-contents)
 - [What is this library?](#what-is-this-library)
 - [What does this have?](#what-does-this-have)
-  - [Subcommands](#subcommands)
   - [Enhanced commands](#enhanced-commands)
   - [Enhanced components](#enhanced-components)
   - [Enhanced callbacks](#enhanced-callbacks)
@@ -36,7 +35,6 @@ It simplifies the process of creating commands, and provides an easy and organiz
 
 Listed below are all the features this library currently has:
 
-- [Subcommands](#subcommands)
 - [Enhanced commands](#enhanced-commands)
 - [Enhanced components](#enhanced-components)
 - [Enhanced callbacks](#enhanced-callbacks)
@@ -48,17 +46,9 @@ Listed below are all the features this library currently has:
 
 [![API Reference](https://img.shields.io/badge/API-Reference-blue.svg)](./API-Reference)
 
-## Subcommands
-
-Subcommands are technically options for commands, meaning to make subcommands, you may need long chains of options and if/elif/else conditionals.
-
-This library provides a way to make subcommands, similar to subcommands in `discord-py-interactions<=3.0.2`.
-
-Click [here](./Subcommands) to see more information and examples on subcommands!
-
 ## Enhanced commands
 
-Enhanced commands are commands that have a default name and description, and the ability to typehint options.
+Enhanced commands have the ability to typehint options instead of using a decorator.
 
 Click [here](./Enhanced-commands) to see more information and examples on enhanced commands!
 
@@ -77,7 +67,5 @@ Click [here](./Enhanced-callbacks) to see more information and examples on enhan
 ## Cooldown
 
 The `cooldown` decorator is a simple and easy way to add a cooldown or slowmode to a command, with customization.
-
-Credit to [@dontbanmeplz](https://github.com/dontbanmeplz) for the original code.
 
 Click [here](./Cooldown) to see more information and examples on cooldown!
