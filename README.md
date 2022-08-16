@@ -31,7 +31,6 @@ It simplifies the process of creating commands, and provides an easy and organiz
 ## Guide
 
 - [Home](https://github.com/interactions-py/enhanced/wiki)
-- [Subcommands](https://github.com/interactions-py/enhanced/wiki/Subcommands)
 - [Enhanced commands](https://github.com/interactions-py/enhanced/wiki/Enhanced-commands)
 - [Enhanced components](https://github.com/interactions-py/enhanced/wiki/Enhanced-components)
 - [Enhanced callbacks](https://github.com/interactions-py/enhanced/wiki/Enhanced-callbacks)
