@@ -22,8 +22,18 @@ PyPI: https://pypi.org/project/enhanced/
 
 (c) 2022 interactions-py.
 """
-from . import _logging, callbacks, command_models, commands, components, cooldowns, extension
+from . import (
+    _logging,
+    alt_ext,
+    callbacks,
+    command_models,
+    commands,
+    components,
+    cooldowns,
+    extension,
+)
 from ._logging import CustomFormatter, Data, get_logger
+from .alt_ext import AltExt
 from .callbacks import component, extension_component, extension_modal, modal
 from .command_models import EnhancedOption
 from .commands import setup_options
@@ -37,6 +47,8 @@ __all__ = [
         "Data",  # noqa E131
         "CustomFormatter",
         "get_logger",
+    "alt_ext",
+        "AltExt",
     # "cmd",
         "command_models",
             "EnhancedOption",  # noqa E131

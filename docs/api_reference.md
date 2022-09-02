@@ -1,30 +1,112 @@
-Table of Contents:
-  - [API Reference](#api-reference)
-    - [callbacks](#callbacks)
-      - [*func* component](#func-component)
-      - [*func* modal](#func-modal)
-      - [*func* extension_component](#func-extension_component)
-      - [*func* extension_modal](#func-extension_modal)
-    - [commands](#commands)
-      - [*func* setup_options](#func-setup_options)
-    - [command_models](#command_models)
-      - [*class* EnhancedOption](#class-enhancedoption)
-    - [components](#components)
-      - [*func* ActionRow](#func-actionrow)
-      - [*func* Button](#func-button)
-      - [*func* SelectOption](#func-selectoption)
-      - [*func* SelectMenu](#func-selectmenu)
-      - [*func* TextInput](#func-textinput)
-      - [*func* Modal](#func-modal)
-    - [cooldowns](#cooldowns)
-      - [*class* cooldown](#class-cooldown)
-        - [*func* get_id](#func-get_id)
-        - [*func* reset](#func-reset)
-    - [extension](#extension)
-      - [*class* Enhanced](#class-enhanced)
-      - [*func* setup](#func-setup)
-
 # API Reference
+
+## alt_ext
+
+### *class* AltExt
+
+
+An alternate extension class that uses simpler and improved syntax.
+
+You don't need a setup function, there is no unnecessary indentation, and you can use the
+extension variable instead of self.
+
+A simple extension:
+```py
+from ext import AltExt
+
+ext = AltExt("ExtName")
+
+@ext.command()
+async def hello(ctx):
+    await ctx.send("Hello!")
+```
+
+Parameters:
+
+* `name: str`: The name of the extension.
+* `**kwargs`: Any attributes to set.
+
+Methods:
+
+#### *func* add
+
+
+A decorator to add a method to the extension.
+
+Usage:
+```py
+ext = AltExt("ExtName")
+
+@ext.add
+async def method(ctx):
+    ...
+```
+
+#### *func* autocomplete
+
+
+A decorator to add an autocomplete callback to the extension.
+
+Same usage as `interactions.extension_autocomplete`.
+
+#### *func* command
+
+
+A decorator to add a command to the extension.
+
+Same usage as `interactions.extension_command`.
+
+#### *func* component
+
+
+A decorator to add a component callback to the extension.
+
+Same usage as `interactions.extension_component`.
+
+#### *func* enhanced_component
+
+
+A decorator to add an enhanced component callback to the extension.
+
+Same usage as `interactions.ext.enhanced.extension_component`.
+
+#### *func* enhanced_modal
+
+
+A decorator to add an enhanced modal callback to the extension.
+
+Same usage as `interactions.ext.enhanced.extension_modal`.
+
+#### *func* event
+
+
+A decorator to add a listener to the extension.
+
+Same usage as `interactions.extension_listener`.
+
+#### *func* message_command
+
+
+A decorator to add a message command to the extension.
+
+Same usage as `interactions.extension_message_command`.
+
+#### *func* modal
+
+
+A decorator to add a modal callback to the extension.
+
+Same usage as `interactions.extension_modal`.
+
+#### *func* setup
+
+The default setup function for the extension.
+#### *func* user_command
+
+
+A decorator to add a user command to the extension.
+
+Same usage as `interactions.extension_user_command`.
 
 ## callbacks
 
