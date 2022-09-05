@@ -72,6 +72,7 @@ class AltExt:
     def __init__(self, name: str, **kwargs) -> None:
         self.name: str = name
         self.extension: Optional[Extension] = None
+        self.client: Optional[Client] = None
         self.__data: Dict[str, Union[Coroutine, Any]] = {}
         self.__setup: bool = True
 
@@ -252,13 +253,16 @@ class AltExt:
 
     def __call__(self, client: Client, *args, **kwargs) -> Extension:
         """Returns the extension in its `Extension` form."""
+        self.client = client
         self.extension = type(
             self.name,
             (Extension,),
             {
                 **self.__data,
                 **{
-                    k: v for k, v in self.__dict__.items() if k not in {"name", "__data", "__setup"}
+                    k: v
+                    for k, v in self.__dict__.items()
+                    if k not in {"name", "extension", "client", "__data", "__setup"}
                 },
             },
         )(client, *args, **kwargs)
