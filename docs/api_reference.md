@@ -26,6 +26,13 @@ Parameters:
 * `name: str`: The name of the extension.
 * `**kwargs`: Any attributes to set.
 
+Additional attributes:
+
+* `extension: Optional[Extension]`: The extension object.
+* `__data: Dict[str, Union[Coroutine, Any]]`: The methods of the extension.
+* `__setup: bool`: Whether the extension needs to be set up.
+* Any other attributes you set when creating the extension or updating it.
+
 Methods:
 
 #### *func* add
@@ -98,9 +105,31 @@ A decorator to add a modal callback to the extension.
 
 Same usage as `interactions.extension_modal`.
 
+#### *func* remove
+
+
+Remove a method from the extension.
+
+Parameters:
+
+* `name: str`: The name of the method to remove.
+
+Returns:
+
+* `Union[Command, Coroutine]`: The method that was removed.
+
 #### *func* setup
 
 The default setup function for the extension.
+#### *func* update
+
+
+Update the attributes of the extension.
+
+Parameters:
+
+* `**kwargs`: Any attributes to set.
+
 #### *func* user_command
 
 

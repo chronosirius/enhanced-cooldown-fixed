@@ -60,15 +60,35 @@ class AltExt:
 
     * `name: str`: The name of the extension.
     * `**kwargs`: Any attributes to set.
+
+    Additional attributes:
+
+    * `extension: Optional[Extension]`: The extension object.
+    * `__data: Dict[str, Union[Coroutine, Any]]`: The methods of the extension.
+    * `__setup: bool`: Whether the extension needs to be set up.
+    * Any other attributes you set when creating the extension or updating it.
     """
 
     def __init__(self, name: str, **kwargs) -> None:
         self.name: str = name
+        self.extension: Optional[Extension] = None
         self.__data: Dict[str, Union[Coroutine, Any]] = {}
         self.__setup: bool = True
 
         for key, value in kwargs.items():
             setattr(self, key, value)
+
+    def update(self, **kwargs) -> None:
+        """
+        Update the attributes of the extension.
+
+        Parameters:
+
+        * `**kwargs`: Any attributes to set.
+        """
+        [setattr(self, key, value) for key, value in kwargs.items()]
+        if self.extension:
+            [setattr(self.extension, key, value) for key, value in kwargs.items()]
 
     def add(
         self, coro: Union[Command, Coroutine], raw: Optional[Union[Command, Coroutine]] = None
@@ -91,6 +111,20 @@ class AltExt:
         self.__data[coro.name if isinstance(coro, Command) else coro.__name__] = coro
         return coro
 
+    def remove(self, name: str) -> Union[Command, Coroutine]:
+        """
+        Remove a method from the extension.
+
+        Parameters:
+
+        * `name: str`: The name of the method to remove.
+
+        Returns:
+
+        * `Union[Command, Coroutine]`: The method that was removed.
+        """
+        return self.__data.pop(name)
+
     def command(self, **kwargs) -> Callable[[Coroutine], Command]:
         """
         A decorator to add a command to the extension.
@@ -109,10 +143,10 @@ class AltExt:
 
         Same usage as `interactions.extension_listener`.
         """
-        coro = remove_self(coro)
 
         def decorator(_coro: Coroutine):
-            return self.add(ext_listener(_coro, name=name), coro)
+            _coro: Coroutine = remove_self(_coro)
+            return self.add(ext_listener(_coro, name=name), _coro)
 
         return decorator(coro) if coro else decorator
 
@@ -218,7 +252,17 @@ class AltExt:
 
     def __call__(self, client: Client, *args, **kwargs) -> Extension:
         """Returns the extension in its `Extension` form."""
-        ext = type(self.name, (Extension,), self.__data)(client, *args, **kwargs)
-        for m in (m for _, m in getmembers(ext) if isinstance(m, Command)):
+        self.extension = type(
+            self.name,
+            (Extension,),
+            {
+                **self.__data,
+                **{
+                    k: v for k, v in self.__dict__.items() if k not in {"name", "__data", "__setup"}
+                },
+            },
+        )(client, *args, **kwargs)
+        self.update(**kwargs)
+        for m in (m for _, m in getmembers(self.extension) if isinstance(m, Command)):
             m.extension = None
-        return ext
+        return self.extension
