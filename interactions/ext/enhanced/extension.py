@@ -26,7 +26,7 @@ log: Logger = get_logger("extension")
 
 
 version: Version = Version(
-    version="4.0.0",
+    version="4.0.1",
     author=VersionAuthor(
         name="Toricane",
         email="prjwl028@gmail.com",
